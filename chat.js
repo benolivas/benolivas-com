@@ -86,7 +86,7 @@ const FACTS = [
       ">opens with sonic weapon",
       ">this is fine"
     ],
-    chips: ["Tell me about the weapon.", "Surprise me again.", "What do you actually do?"]
+    chips: [{ label: "Tell me about the weapon.", route: "whisper" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
   {
     id: 'fact-chess',
@@ -107,11 +107,11 @@ const FACTS = [
       ">unprompted",
       ">on a Tuesday"
     ],
-    chips: ["Tell me about the chess set.", "Surprise me again.", "What do you actually do?"]
+    chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
   {
     id: 'fact-career',
-    text: "Did you know that Ben went from defense contractor to jazz club graphic designer—",
+    text: "Did you know that Ben went from defense contractor to jazz—",
     memebot_meme: 'eye-roll-stanley',
     memebot_greentext: null,
     benos_reaction: "…it made sense at the time.",
@@ -121,11 +121,11 @@ const FACTS = [
       ">about the weapons to jazz pipeline",
       ">okay man"
     ],
-    chips: ["Tell me about Blue Note.", "Surprise me again.", "What do you actually do?"]
+    chips: [{ label: "Tell me about Blue Note.", route: "blue_note" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
   {
     id: 'fact-pdf',
-    text: "Did you know that Ben's portfolio PDF is formatted as a classified government document—",
+    text: "Did you know that Ben's portfolio PDF is classified—",
     memebot_meme: null,
     memebot_greentext: [
       ">UNCLASSIFIED",
@@ -140,11 +140,11 @@ const FACTS = [
       ">in Los Angeles",
       ">no notes actually this rules"
     ],
-    chips: ["Show me the portfolio.", "Surprise me again.", "What do you actually do?"]
+    chips: [{ label: "Show me the portfolio.", route: "portfolio_pdf" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
   {
     id: 'fact-cookies',
-    text: "Did you know that Misfortune Cookies tells you exactly what you don't want to hear—",
+    text: "Did you know that Misfortune Cookies tells you what you don't want to hear—",
     memebot_meme: 'full-of-soup',
     memebot_greentext: null,
     benos_reaction: "…that was the point.",
@@ -155,11 +155,11 @@ const FACTS = [
       ">for sad cookies",
       ">honestly respect"
     ],
-    chips: ["Tell me about Misfortune Cookies.", "Surprise me again.", "What do you actually do?"]
+    chips: [{ label: "Tell me about Misfortune Cookies.", route: "misfortunes" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
   {
     id: 'fact-manray',
-    text: "Did you know that Man Ray was a Dadaist who designed chess pieces nobody played with—",
+    text: "Did you know that Man Ray designed chess pieces nobody played with—",
     memebot_meme: null,
     memebot_greentext: [
       ">be dadaist",
@@ -176,7 +176,7 @@ const FACTS = [
       ">.",
       ">okay that actually tracks"
     ],
-    chips: ["Tell me about Man Ray.", "Surprise me again.", "What do you actually do?"]
+    chips: [{ label: "Tell me about Man Ray.", route: "man_ray_who" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   }
 ];
 
@@ -339,7 +339,7 @@ const INTENTS = [
       { text: "What's it for?", pause: 0 }
     ],
     topic: 'video',
-    chips: ["Brand / product.", "Music video.", "Event coverage.", "Something else."]
+    chips: [{ label: "Brand / product.", route: "need_video" }, { label: "Music video.", route: "need_video" }, { label: "Event coverage.", route: "need_video" }, { label: "Something else.", route: "what_do_you_do" }]
   },
   {
     id: 'show_video',
@@ -349,7 +349,7 @@ const INTENTS = [
     ],
     media: 'video',
     topic: 'video',
-    chips: ["Music videos specifically.", "Corporate / brand work.", "Defense / technical.", "What else?"]
+    chips: [{ label: "Music videos specifically.", route: "show_video" }, { label: "Corporate / brand work.", route: "show_video" }, { label: "Defense / technical.", route: "show_video" }, { label: "What else?", route: "what_do_you_do" }]
   },
   {
     id: 'video_vs_static',
@@ -370,7 +370,7 @@ const INTENTS = [
       { text: "What kind?", pause: 0 }
     ],
     topic: 'design',
-    chips: ["Logo / identity.", "Print.", "Digital / web.", "Packaging.", "Something weird."]
+    chips: [{ label: "Logo / identity.", route: "need_design" }, { label: "Print.", route: "need_design" }, { label: "Digital / web.", route: "need_design" }, { label: "Packaging.", route: "need_design" }, { label: "Something weird.", route: "need_design" }]
   },
   {
     id: 'need_poster',
@@ -380,7 +380,7 @@ const INTENTS = [
     ],
     media: 'posters',
     topic: 'design',
-    chips: ["More editorial.", "Something darker.", "Different style entirely.", "What's it for?"]
+    chips: [{ label: "More editorial.", route: "need_poster" }, { label: "Something darker.", route: "need_poster" }, { label: "Different style entirely.", route: "need_poster" }, { label: "What's it for?", route: "what_do_you_do" }]
   },
   {
     id: 'show_design',
@@ -390,7 +390,7 @@ const INTENTS = [
     ],
     media: 'design',
     topic: 'design',
-    chips: ["More branding.", "Packaging work.", "Something weirder.", "What else?"]
+    chips: [{ label: "More branding.", route: "show_design" }, { label: "Packaging work.", route: "show_design" }, { label: "Something weirder.", route: "show_design" }, { label: "What else?", route: "what_do_you_do" }]
   },
   {
     id: 'color_psychology',
@@ -411,7 +411,7 @@ const INTENTS = [
       { text: "What are you looking for — video, design, motion, something else?", pause: 0 }
     ],
     topic: 'portfolio',
-    chips: ["Video.", "Design.", "Motion graphics.", "All of it."]
+    chips: [{ label: "Video.", route: "show_video" }, { label: "Design.", route: "show_design" }, { label: "Motion graphics.", route: "show_work" }, { label: "All of it.", route: "show_work" }]
   },
   {
     id: 'portfolio_pdf',
@@ -432,7 +432,7 @@ const INTENTS = [
       { text: "Which one is it?", pause: 0 }
     ],
     topic: 'branding',
-    chips: ["Looks dated.", "Doesn't reflect us anymore.", "Leadership change.", "Honestly not sure."]
+    chips: [{ label: "Looks dated.", route: "rebrand" }, { label: "Doesn't reflect us anymore.", route: "rebrand" }, { label: "Leadership change.", route: "rebrand" }, { label: "Honestly not sure.", route: "rebrand" }]
   },
   {
     id: 'why_rebrand_fail',
@@ -452,7 +452,7 @@ const INTENTS = [
       { text: "What's the page doing right now — video, static images, long-form copy?", pause: 0 }
     ],
     topic: 'conversions',
-    chips: ["Static images.", "Short video.", "Long-form copy.", "Mix of things."]
+    chips: [{ label: "Static images.", route: "conversions_static" }, { label: "Short video.", route: "need_video" }, { label: "Long-form copy.", route: "conversions" }, { label: "Mix of things.", route: "conversions" }]
   },
   {
     id: 'conversions_static',
@@ -483,7 +483,7 @@ const INTENTS = [
       { text: "You're going to ask about the chess set.", pause: 0 }
     ],
     topic: 'projects',
-    chips: ["Tell me about the chess set.", "Tell me about the cookies.", "Tell me about the weapon."]
+    chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Tell me about the cookies.", route: "misfortunes" }, { label: "Tell me about the weapon.", route: "whisper" }]
   },
   {
     id: 'unusual',
@@ -503,7 +503,7 @@ const INTENTS = [
       { text: "Man Ray was not consulted. I think he'd be fine with it.", pause: 0 }
     ],
     topic: 'projects',
-    chips: ["Tell me about Man Ray.", "What does the packaging look like?", "Can I buy one?"]
+    chips: [{ label: "Tell me about Man Ray.", route: "man_ray_who" }, { label: "What does the packaging look like?", route: "chess" }, { label: "Can I buy one?", route: "can_buy_chess" }]
   },
   {
     id: 'misfortunes',
@@ -514,7 +514,7 @@ const INTENTS = [
       { text: "If you want to feel seen by a cookie: misfortunes.net.", pause: 0 }
     ],
     topic: 'projects',
-    chips: ["What does it look like?", "What's the worst fortune?", "Is it for sale?"]
+    chips: [{ label: "What does it look like?", route: "misfortunes" }, { label: "What's the worst fortune?", route: "worst_fortune" }, "Is it for sale?"]
   },
   {
     id: 'whisper',
@@ -525,7 +525,7 @@ const INTENTS = [
       { text: "The datasheet is the interesting part. Government document parody. Very dry.", pause: 0 }
     ],
     topic: 'projects',
-    chips: ["Show me the datasheet.", "How does it work?", "Is this legal?"]
+    chips: [{ label: "Show me the datasheet.", route: "portfolio_pdf" }, { label: "How does it work?", route: "whisper" }, { label: "Is this legal?", route: "weapon_legal" }]
   },
   {
     id: 'weapon_legal',
@@ -542,7 +542,7 @@ const INTENTS = [
       { text: "Blue Note Los Angeles — one of the iconic jazz franchise venues. Ben is the in-house graphic designer on the marketing team.", pause: 500 },
       { text: "It is, in fact, a good sentence to have in a bio.", pause: 0 }
     ],
-    chips: ["What does he do there?", "What kind of jazz?", "What do you actually do?"]
+    chips: [{ label: "What does he do there?", route: "blue_note_work" }, "What kind of jazz?", { label: "What do you actually do?", route: "what_do_you_do" }]
   },
   {
     id: 'blue_note_work',
@@ -551,7 +551,7 @@ const INTENTS = [
       { text: "Posters, social, print, digital — the full marketing stack for a live music venue.", pause: 600 },
       { text: "Every week is a new show. Every show needs assets. It's fast.", pause: 0 }
     ],
-    chips: ["Show me examples.", "What do you actually do?"]
+    chips: [{ label: "Show me examples.", route: "show_work" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
 
   /* ── META ────────────────────────────────────────── */
@@ -562,7 +562,7 @@ const INTENTS = [
       { text: "Man Ray was a Dadaist and Surrealist — photography, painting, objects. Active in Paris in the 1920s. Made things that deliberately resisted being useful.", pause: 700 },
       { text: "He also designed chess pieces. Never meant to be played with. Ben found this relatable.", pause: 0 }
     ],
-    chips: ["Tell me about the chess set.", "Surprise me again."]
+    chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Surprise me again.", route: "surprise" }]
   },
   {
     id: 'can_buy_chess',
@@ -742,6 +742,8 @@ function appendLabelOnly(role, who) {
   wDiv.textContent = who;
   const body = document.createElement('div');
   body.className = 'msg-body ' + role;
+  // memebot body gets extra class for layout
+  if (role === 'memebot') body.classList.add('memebot-body');
   row.appendChild(wDiv);
   row.appendChild(body);
   chatWindow.appendChild(row);
@@ -760,22 +762,26 @@ function charDelay(text, i) {
   return 28 + Math.random()*28;
 }
 
-function typewriter(el, text, onDone) {
+function typewriter(el, text, onDone, fast=true) {
   el.classList.remove('typing');
   el.textContent = '';
   let i = 0;
+  // fast=true: BEN OS speed (LLM-like, snappy)
+  // fast=false: MemeBot speed (human-paced, deliberate)
+  const spd = fast ? 1 : 2.8;
   function tick() {
     if (i < text.length) {
       el.textContent += text[i];
       scrollBottom();
-      setTimeout(tick, charDelay(text, i++));
+      setTimeout(tick, charDelay(text, i++) * spd);
     } else if (onDone) { onDone(); }
   }
-  setTimeout(tick, 80 + Math.random()*80);
+  setTimeout(tick, fast ? 40 + Math.random()*40 : 120 + Math.random()*80);
 }
 
 /* ── RENDER BEATS ────────────────────────────────── */
 function renderBeats(beats, who, onComplete) {
+  const fast = (who !== 'MEMEBOT'); // BEN OS fast, MemeBot human-paced
   let i = 0;
   function next() {
     if (i >= beats.length) { if (onComplete) onComplete(); return; }
@@ -783,45 +789,63 @@ function renderBeats(beats, who, onComplete) {
     if (i === 1) {
       const typing = chatWindow.querySelector('.msg-body.typing');
       if (typing) {
-        typewriter(typing, beat.text, () => beat.pause ? setTimeout(next, beat.pause) : next());
+        typewriter(typing, beat.text, () => beat.pause ? setTimeout(next, beat.pause) : next(), fast);
         return;
       }
     }
     const role = who === 'MEMEBOT' ? 'memebot' : 'sys';
     const { body } = appendMsg(role, '', who, { typing: true });
-    typewriter(body, beat.text, () => beat.pause ? setTimeout(next, beat.pause) : next());
+    typewriter(body, beat.text, () => beat.pause ? setTimeout(next, beat.pause) : next(), fast);
   }
   next();
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
-function renderMemebotImage(memeId) {
+function renderMemebotImage(memeId, targetBody) {
   const meme = MEMES.find(m => m.id === memeId);
   if (!meme) return;
-  const wrap = document.createElement('div');
-  wrap.className = 'memebot-img-wrap';
   const img = document.createElement('img');
   img.className = 'memebot-img';
   img.alt = meme.id;
   img.src = meme.file;
   img.onload = () => img.classList.add('loaded');
-  wrap.appendChild(img);
-  chatWindow.appendChild(wrap);
+  const container = targetBody || chatWindow;
+  container.appendChild(img);
   scrollBottom();
 }
 
-/* ── MEMEBOT GREENTEXT ───────────────────────────── */
-function renderGreentext(lines) {
-  const wrap = document.createElement('div');
-  wrap.className = 'greentext';
-  lines.forEach(line => {
+/* ── MEMEBOT GREENTEXT — line by line, human paced ── */
+function renderGreentext(lines, targetBody, onDone) {
+  const container = targetBody || chatWindow;
+  let i = 0;
+  function nextLine() {
+    if (i >= lines.length) { if (onDone) onDone(); return; }
+    const line = lines[i++];
     const span = document.createElement('div');
     span.className = 'gt-line';
-    span.textContent = line.replace(/^>/, '').trim();
-    wrap.appendChild(span);
-  });
-  chatWindow.appendChild(wrap);
-  scrollBottom();
+    span.style.opacity = '0';
+    container.appendChild(span);
+    scrollBottom();
+    // Type each line character by character at human pace
+    const text = line.replace(/^>/, '').trim();
+    span.style.opacity = '1';
+    let c = 0;
+    function typeChar() {
+      if (c < text.length) {
+        span.textContent = text.slice(0, c+1);
+        scrollBottom();
+        // Greentext types briskly but humanly — faster than MemeBot prose
+        const delay = text[c] === ' ' ? 60 + Math.random()*40 : 30 + Math.random()*30;
+        c++;
+        setTimeout(typeChar, delay);
+      } else {
+        // Pause between lines — feels like thinking
+        setTimeout(nextLine, 280 + Math.random()*180);
+      }
+    }
+    setTimeout(typeChar, 60 + Math.random()*60);
+  }
+  nextLine();
 }
 
 /* ── IMAGE GRID ──────────────────────────────────── */
@@ -841,17 +865,80 @@ function renderImageGrid(key) {
 }
 
 /* ── CHIPS ───────────────────────────────────────── */
+function dismissAllChips() {
+  chatWindow.querySelectorAll('.chips').forEach(row => {
+    row.style.transition = 'opacity 0.25s ease';
+    row.style.opacity = '0';
+    row.style.pointerEvents = 'none';
+    setTimeout(() => row.remove(), 260);
+  });
+}
+
 function renderChips(chips) {
   if (!chips?.length) return;
   const wrap = document.createElement('div'); wrap.className = 'chips';
-  chips.forEach(text => {
+  chips.forEach(chip => {
+    // chip can be a string (old format, goes through matcher)
+    // or { label, route } (new format, routes directly by intent id)
+    const label = typeof chip === 'string' ? chip : chip.label;
+    const route = typeof chip === 'string' ? null : chip.route;
+
     const btn = document.createElement('button'); btn.className = 'chip';
-    btn.textContent = text;
-    btn.addEventListener('click', () => sendMessage(text));
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      dismissAllChips();
+      if (route) {
+        // Direct route — bypass text matcher entirely
+        fireIntent(route, label);
+      } else {
+        // Fallback — goes through text matcher (old behavior)
+        sendMessage(label);
+      }
+    });
     wrap.appendChild(btn);
   });
   chatWindow.appendChild(wrap);
   scrollBottom();
+}
+
+/* ── FIRE INTENT DIRECTLY — used by chip routing ──── */
+// Bypasses text matching. label is shown in chat as "You said X".
+async function fireIntent(intentId, label) {
+  if (isWaiting) return;
+  setWaiting(true);
+
+  // Special case: surprise picks a random fact
+  if (intentId === 'surprise') {
+    appendMsg('user', label, 'You');
+    conversationHistory.push({ role: 'user', content: label });
+    const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
+    await new Promise(r => setTimeout(r, 280 + Math.random()*180));
+    playSurprise(typingBody);
+    return;
+  }
+
+  const intent = INTENTS.find(i => i.id === intentId);
+  if (!intent) {
+    // Unknown route — fall through to text matcher
+    sendMessage(label);
+    return;
+  }
+
+  appendMsg('user', label, 'You');
+  conversationHistory.push({ role: 'user', content: label });
+  statusLabel.textContent = '';
+
+  const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
+  await new Promise(r => setTimeout(r, 280 + Math.random()*180));
+
+  if (intent.topic) sessionTopics.push(intent.topic);
+  renderBeats(intent.beats, 'BEN OS', () => {
+    if (intent.media)  setTimeout(() => renderImageGrid(intent.media), 200);
+    if (intent.chips)  setTimeout(() => renderChips(intent.chips), intent.media ? 600 : 200);
+    conversationHistory.push({ role: 'assistant', content: intent.beats[intent.beats.length-1]?.text || '' });
+    statusLabel.textContent = '';
+    setWaiting(false);
+  });
 }
 
 /* ── SURPRISE ME ─────────────────────────────────── */
@@ -891,10 +978,10 @@ function playSurprise(typingBody) {
         const hasGreentext = fact.memebot_greentext?.length;
 
         if (hasMeme || hasGreentext) {
-          appendLabelOnly('memebot', 'MEMEBOT');
+          const mb1Body = appendLabelOnly('memebot', 'MEMEBOT');
           setTimeout(() => {
-            if (hasMeme)      renderMemebotImage(fact.memebot_meme);
-            else              renderGreentext(fact.memebot_greentext);
+            if (hasMeme)      renderMemebotImage(fact.memebot_meme, mb1Body);
+            else              renderGreentext(fact.memebot_greentext, mb1Body);
 
             // BEN OS reacts
             setTimeout(() => {
@@ -905,9 +992,9 @@ function playSurprise(typingBody) {
                   // Second MemeBot greentext beat
                   if (fact.memebot_greentext_2?.length) {
                     setTimeout(() => {
-                      appendLabelOnly('memebot', 'MEMEBOT');
+                      const mb2Body = appendLabelOnly('memebot', 'MEMEBOT');
                       setTimeout(() => {
-                        renderGreentext(fact.memebot_greentext_2);
+                        renderGreentext(fact.memebot_greentext_2, mb2Body);
                         setTimeout(() => { renderChips(fact.chips); setWaiting(false); }, 400);
                       }, 500 + Math.random()*300);
                     }, 600);
@@ -926,9 +1013,9 @@ function playSurprise(typingBody) {
             typewriter(reactBody, fact.benos_reaction, () => {
               if (fact.memebot_greentext_2?.length) {
                 setTimeout(() => {
-                  appendLabelOnly('memebot', 'MEMEBOT');
+                  const mb3Body = appendLabelOnly('memebot', 'MEMEBOT');
                   setTimeout(() => {
-                    renderGreentext(fact.memebot_greentext_2);
+                    renderGreentext(fact.memebot_greentext_2, mb3Body);
                     setTimeout(() => { renderChips(fact.chips); setWaiting(false); }, 400);
                   }, 500 + Math.random()*300);
                 }, 600);
@@ -949,10 +1036,10 @@ function playVignette(vignette, typingBody) {
   const doMemebot = () => {
     const mb = vignette.memebot;
     if (!mb) { fireVignetteReaction(vignette); return; }
-    appendLabelOnly('memebot', 'MEMEBOT');
+    const vigMbBody = appendLabelOnly('memebot', 'MEMEBOT');
     setTimeout(() => {
-      if (mb.type === 'image')      renderMemebotImage(mb.id);
-      else if (mb.type === 'greentext') renderGreentext(mb.lines);
+      if (mb.type === 'image')      renderMemebotImage(mb.id, vigMbBody);
+      else if (mb.type === 'greentext') renderGreentext(mb.lines, vigMbBody);
       setTimeout(() => fireVignetteReaction(vignette), 800);
     }, 500 + Math.random()*300);
   };
