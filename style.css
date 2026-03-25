@@ -6,9 +6,9 @@
   --rule:      #C8C4BB;
   --rule-dark: #1C1C18;
   --text:      #1C1C18;
-  --text2:     #2A2A24;
-  --muted:     #7A7875;
-  --faint:     #B0ACA4;
+  --text2:     #1C1C18;
+  --muted:     #5A5855;
+  --faint:     #8A8680;
   --accent:    #B8912A;
   --memebot:   #C4622D;
   --sans:      'DM Sans', sans-serif;
@@ -26,7 +26,7 @@ body.dark {
   --rule-dark: #EEEAE2;
   --text:      #EEEAE2;
   --text2:     #D4D0C8;
-  --muted:     #7A7875;
+  --muted:     #5A5855;
   --faint:     #4A4844;
   --accent:    #B8912A;
 }
@@ -37,7 +37,7 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -285,15 +285,15 @@ body.dark #input-area.is-sticky .input-wrap {
 
 .door {
   font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 300;
+  font-size: 13px;
+  font-weight: 400;
   color: var(--muted);
   background: transparent;
   border: 0.5px solid var(--rule);
-  padding: 6px 14px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, opacity 0.3s ease, transform 0.3s ease;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   opacity: 0;
   animation: fadein 0.6s ease forwards;
 }
@@ -310,15 +310,15 @@ body.dark #input-area.is-sticky .input-wrap {
 /* ── CHIP (inside chat) ──────────────────────────── */
 .chip {
   font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 300;
+  font-size: 13px;
+  font-weight: 400;
   color: var(--muted);
   background: transparent;
   border: 0.5px solid var(--rule);
-  padding: 6px 14px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .chip:hover { color: var(--text); border-color: var(--muted); }
@@ -344,7 +344,8 @@ body.dark #input-area.is-sticky .input-wrap {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--faint);
-  padding-top: 0;
+  padding-top: 3px;
+  line-height: 1;
   text-align: right;
   user-select: none;
   white-space: nowrap;
@@ -355,10 +356,11 @@ body.dark #input-area.is-sticky .input-wrap {
 .msg-who.memebot { color: var(--memebot); }
 
 .msg-body {
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 1.8;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
   color: var(--text2);
+  margin-top: -3px;
 }
 
 .msg-body.user { color: var(--text); font-weight: 400; }
@@ -512,6 +514,77 @@ body.dark #input-area.is-sticky .input-wrap {
   opacity: 0;
   animation: fadein 1.2s ease 2s forwards;
 }
+
+
+/* ── LIGHTBOX ────────────────────────────────────── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(28,28,24,0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadein 0.2s ease forwards;
+}
+
+.lightbox-inner {
+  position: relative;
+  max-width: min(90vw, 860px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -36px;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--faint);
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+
+.lightbox-close:hover { color: var(--text); }
+
+.lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+}
+
+.lightbox-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 0 0;
+}
+
+.lightbox-title {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.lightbox-link {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.lightbox-link:hover { opacity: 0.7; }
 
 /* ── ANIMATIONS ──────────────────────────────────── */
 @keyframes fadein {

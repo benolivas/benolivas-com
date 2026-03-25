@@ -46,13 +46,9 @@ const FIRST_INTRO = [
 /* ── DOOR OPTIONS ────────────────────────────────── */
 /* "Surprise me." loads last — rewarding patience/exploration */
 const ALL_DOORS = [
-  "What kind of work do you do?",
-  "I need a video made.",
-  "We're thinking about rebranding.",
   "Show me something.",
-  "How do I get more conversions?",
-  "Can you make a poster?",
-  "Predict my future?",
+  "Who is Ben?",
+  "Predict my future.",
   "Surprise me."
 ];
 
@@ -246,7 +242,7 @@ const INTENTS = [
   /* ── WHAT IS THIS ────────────────────────────────── */
   {
     id: 'what_do_you_do',
-    patterns: ['what do you do','what does ben do','what is this','what kind of work','services','what can you make','what can you do','what is this site'],
+    patterns: ['what do you do','what does ben do','what is this','what kind of work','services','what can you make','what can you do','what is this site','i need something made','need something made','something made'],
     beats: [
       { text: "Depends what you need done.", pause: 600 },
       { text: "What are you working on?", pause: 0 }
@@ -254,12 +250,13 @@ const INTENTS = [
   },
   {
     id: 'who_is_ben',
-    patterns: ['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this'],
+    patterns: ['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'],
     beats: [
-      { text: "Creative producer and graphic designer, Los Angeles. Currently the in-house designer at Blue Note Los Angeles.", pause: 600 },
-      { text: "Before that: defense contractor work, a couple of independent video productions, some brand projects. The through-line is hard to summarize except that it keeps getting weirder.", pause: 700 },
-      { text: "What are you trying to make?", pause: 0 }
-    ]
+      { text: "Graphic designer and creative producer. Los Angeles.", pause: 500 },
+      { text: "10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600 },
+      { text: "What do you need?", pause: 0 }
+    ],
+    chips: [{ label: "Show me the work.", route: "show_work" }, { label: "What's Blue Note?", route: "blue_note" }, { label: "Are you available?", route: "available" }]
   },
   {
     id: 'what_is_benos',
@@ -339,7 +336,8 @@ const INTENTS = [
       { text: "What's it for?", pause: 0 }
     ],
     topic: 'video',
-    chips: [{ label: "Brand / product.", route: "need_video" }, { label: "Music video.", route: "need_video" }, { label: "Event coverage.", route: "need_video" }, { label: "Something else.", route: "what_do_you_do" }]
+    media: 'video',
+    chips: [{ label: "Brand / product.", route: "video_vs_static" }, { label: "Music video.", route: "show_video" }, { label: "Event coverage.", route: "show_video" }, { label: "Something else.", route: "what_do_you_do" }]
   },
   {
     id: 'show_video',
@@ -406,12 +404,14 @@ const INTENTS = [
   /* ── PORTFOLIO ───────────────────────────────────── */
   {
     id: 'show_work',
-    patterns: ['show me something','show me work','show me your work','portfolio','examples','what have you made','past work','see your work'],
+    patterns: ['show me something','show me work','show me your work','portfolio','examples','what have you made','past work','see your work','show me examples','show me recent projects','most recent projects','recent work','show me ben'],
     beats: [
-      { text: "What are you looking for — video, design, motion, something else?", pause: 0 }
+      { text: "Here's a range.", pause: 400 },
+      { text: "What else do you want to see?", pause: 0 }
     ],
     topic: 'portfolio',
-    chips: [{ label: "Video.", route: "show_video" }, { label: "Design.", route: "show_design" }, { label: "Motion graphics.", route: "show_work" }, { label: "All of it.", route: "show_work" }]
+    media: 'design',
+    chips: [{ label: "Video work.", route: "show_video" }, { label: "More design.", route: "show_design" }, { label: "Tell me about a project.", route: "chess_prediction" }, { label: "Who is Ben?", route: "who_is_ben" }]
   },
   {
     id: 'portfolio_pdf',
@@ -584,21 +584,25 @@ const INTENTS = [
 ];
 
 /* ── MEDIA CATALOG ───────────────────────────────── */
+/* src: thumbnail shown in grid
+   fullSrc: image shown in lightbox (use same as src if no hi-res version)
+   label: title shown in lightbox
+   caseStudyUrl: optional — shows "View case study ↗" link in lightbox. null = no link. */
 const MEDIA = {
   posters: [
-    { src: 'https://benolivas.com/images/Thumbnails/onibabaSM.png',    label: 'Onibaba',           url: 'https://benolivas.com/images/GraphicDesign/OnibabaPoster.png' },
-    { src: 'https://benolivas.com/images/Thumbnails/swissstyleSM.png', label: 'Swiss Design',       url: 'https://benolivas.com/images/GraphicDesign/SwissStylePoster.png' },
-    { src: 'https://benolivas.com/images/Thumbnails/voltaireSM.png',   label: 'Voltaire',           url: 'https://benolivas.com/images/GraphicDesign/VoltairePoster.jpg' }
+    { src: 'https://benolivas.com/images/Thumbnails/onibabaSM.png',    fullSrc: 'https://benolivas.com/images/GraphicDesign/OnibabaPoster.png',  label: 'Onibaba',           caseStudyUrl: null },
+    { src: 'https://benolivas.com/images/Thumbnails/swissstyleSM.png', fullSrc: 'https://benolivas.com/images/GraphicDesign/SwissStylePoster.png', label: 'Swiss Design',      caseStudyUrl: null },
+    { src: 'https://benolivas.com/images/Thumbnails/voltaireSM.png',   fullSrc: 'https://benolivas.com/images/GraphicDesign/VoltairePoster.jpg',   label: 'Voltaire',          caseStudyUrl: null }
   ],
   video: [
-    { src: 'https://benolivas.com/images/Thumbnails/jump20SM.png',     label: 'JUMP 20',            url: 'https://www.youtube.com/watch?v=lxT9cGUEeZA' },
-    { src: 'https://benolivas.com/images/Thumbnails/crystal.png',      label: 'Asana',              url: 'https://www.youtube.com/watch?v=8bh_nmZqUu0' },
-    { src: 'https://benolivas.com/images/Thumbnails/stayoverSM.png',   label: 'NoMBe',              url: 'https://www.youtube.com/watch?v=n60cpM8_G-I' }
+    { src: 'https://benolivas.com/images/Thumbnails/jump20SM.png',     fullSrc: 'https://benolivas.com/images/Thumbnails/jump20SM.png',            label: 'JUMP 20',           caseStudyUrl: 'https://www.youtube.com/watch?v=lxT9cGUEeZA' },
+    { src: 'https://benolivas.com/images/Thumbnails/crystal.png',      fullSrc: 'https://benolivas.com/images/Thumbnails/crystal.png',             label: 'Asana',             caseStudyUrl: 'https://www.youtube.com/watch?v=8bh_nmZqUu0' },
+    { src: 'https://benolivas.com/images/Thumbnails/stayoverSM.png',   fullSrc: 'https://benolivas.com/images/Thumbnails/stayoverSM.png',          label: 'NoMBe',             caseStudyUrl: 'https://www.youtube.com/watch?v=n60cpM8_G-I' }
   ],
   design: [
-    { src: 'https://benolivas.com/images/CaseStudies/afterhours.gif',  label: 'After Hours',        url: 'https://benolivas.com/#design' },
-    { src: 'https://benolivas.com/images/CaseStudies/misfortunes.gif', label: 'Misfortune Cookies', url: 'https://misfortunes.net' },
-    { src: 'https://benolivas.com/images/CaseStudies/chess.gif',       label: 'Man Ray Chess',      url: 'https://benolivas.com/#chess' }
+    { src: 'https://benolivas.com/images/CaseStudies/afterhours.gif',  fullSrc: 'https://benolivas.com/images/CaseStudies/afterhours.gif',         label: 'After Hours',       caseStudyUrl: null },
+    { src: 'https://benolivas.com/images/CaseStudies/misfortunes.gif', fullSrc: 'https://benolivas.com/images/CaseStudies/misfortunes.gif',        label: 'Misfortune Cookies', caseStudyUrl: 'https://misfortunes.net' },
+    { src: 'https://benolivas.com/images/CaseStudies/chess.gif',       fullSrc: 'https://benolivas.com/images/CaseStudies/chess.gif',              label: 'Man Ray Chess',     caseStudyUrl: null }
   ]
 };
 
@@ -853,15 +857,74 @@ function renderImageGrid(key) {
   const items = MEDIA[key]; if (!items) return;
   const grid = document.createElement('div'); grid.className = 'img-grid';
   items.slice(0,3).forEach((item,idx) => {
-    const a = document.createElement('a');
+    const a = document.createElement('div');
     a.className = 'img-grid-item';
-    a.href = item.url; a.target = '_blank'; a.rel = 'noopener';
     a.style.animationDelay = `${idx*0.1}s`;
+    a.style.cursor = 'pointer';
     a.innerHTML = `<img src="${item.src}" alt="${item.label}" loading="lazy"><div class="img-grid-label">${item.label}</div>`;
+    a.addEventListener('click', () => openLightbox(item));
     grid.appendChild(a);
   });
   chatWindow.appendChild(grid);
   scrollBottom();
+}
+
+/* ── LIGHTBOX ────────────────────────────────────── */
+function openLightbox(item) {
+  // Remove any existing lightbox
+  const existing = document.getElementById('lightbox');
+  if (existing) existing.remove();
+
+  const lb = document.createElement('div');
+  lb.id = 'lightbox';
+  lb.className = 'lightbox';
+
+  const inner = document.createElement('div');
+  inner.className = 'lightbox-inner';
+
+  // Close button
+  const close = document.createElement('button');
+  close.className = 'lightbox-close';
+  close.textContent = '×';
+  close.addEventListener('click', () => lb.remove());
+
+  // Image
+  const img = document.createElement('img');
+  img.className = 'lightbox-img';
+  img.src = item.fullSrc;
+  img.alt = item.label;
+
+  // Footer — title + optional case study link
+  const footer = document.createElement('div');
+  footer.className = 'lightbox-footer';
+  const title = document.createElement('span');
+  title.className = 'lightbox-title';
+  title.textContent = item.label;
+  footer.appendChild(title);
+
+  if (item.caseStudyUrl) {
+    const link = document.createElement('a');
+    link.className = 'lightbox-link';
+    link.href = item.caseStudyUrl;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'View ↗';
+    footer.appendChild(link);
+  }
+
+  inner.appendChild(close);
+  inner.appendChild(img);
+  inner.appendChild(footer);
+  lb.appendChild(inner);
+
+  // Click outside to close
+  lb.addEventListener('click', e => { if (e.target === lb) lb.remove(); });
+
+  // Escape to close
+  const onKey = e => { if (e.key === 'Escape') { lb.remove(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+
+  document.body.appendChild(lb);
 }
 
 /* ── CHIPS ───────────────────────────────────────── */
@@ -1098,7 +1161,7 @@ function buildDoors() {
     const btn = document.createElement('button');
     btn.className = 'door';
     btn.textContent = text;
-    const baseDelay = i < 3 ? i * 1.2 : 5 + (i - 3) * 1.0;
+    const baseDelay = i * 0.12;
     btn.style.animationDelay = `${baseDelay}s`;
     btn.addEventListener('click', () => {
       const txt = btn.textContent;
@@ -1249,7 +1312,7 @@ function init() {
   const mem = MEM.get();
   if (mem?.dark) setDark(true);
   const isReturn = mem && mem.count > 1;
-  setTimeout(buildDoors, isReturn ? 5000 : 8000);
+  setTimeout(buildDoors, isReturn ? 1500 : 3000);
   setupContactPopup();
   userInput.focus();
 
