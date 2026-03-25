@@ -6,34 +6,151 @@
 
 ## HOW TO READ THIS
 
-**BEAT** = one typed message. Pause in milliseconds before next beat. Last beat always pause 0.
-**CHIPS** = clickable buttons. Each routes directly to an intent by ID — no ambiguity.
-**→** = hard-wired destination. Same label can appear in 10 places, routes differently each time.
-**TRIGGERS** = words/phrases user might type that fire this intent.
-**MEDIA** = image grid shown inline (posters / video / design). Clicking opens lightbox.
-**MEMEBOT** = second character. Types slow, human-paced. Images blur-to-sharp on load.
-**[greentext]** = comes in line by line, brisk but readable.
-**[image: id]** = meme image from assets/memes/. Must match filename.
+This document controls everything BEN OS says and does. Edit it, share with Claude, Claude converts to code. You never need to touch chat.js for script changes.
 
 ---
 
-## BEAT TYPES
-*How consecutive beats from the same speaker connect visually.*
+### STRUCTURE OF AN INTENT
+
+An intent is one conversational branch — a thing the user might say, and what happens in response.
+
+```
+=== INTENT: intent_id ===
+TRIGGERS: phrase one, phrase two, another way they might say it
+
+> Beat one text.  *(pause 600ms, newline)*
+> Beat two text.  *(pause 0)*
+
+[MEDIA: grid-name]
+
+*Topic saved: topic-name*
+
+CHIPS:
+  "Button label."     → intent_id
+  "Another button."   → another_intent_id
+```
+
+---
+
+### BEATS
+Each `>` line is one typed message — a "beat."
+
+**Pause** = gap in milliseconds before the next beat.
+- `*(pause 0)*` = no gap (use on the last beat always)
+- `*(pause 400ms)*` = short gap
+- `*(pause 600ms)*` = medium gap
+- `*(pause 900ms)*` = long, dramatic gap
+
+**Beat types** control how consecutive beats from the same speaker connect visually:
 
 | Type | What it does | When to use |
 |---|---|---|
 | *(default — no type)* | New row, new label | New speaker, or a genuinely distinct thought |
-| `inline` | Appends to same line, no break | Mid-sentence pause, dramatic hesitation, em dash moment |
-| `newline` | New line in same row, no label | Same speaker continuing, new sentence |
+| `*(pause Xms, inline)*` | Appends to same line, no break | Mid-sentence pause, dramatic hesitation, em dash moment |
+| `*(pause Xms, newline)*` | New line in same row, no new label | Same speaker continuing, new sentence |
 
-**Example:**
+**Examples:**
+
+Same row, flowing paragraph:
 ```
-> "The Whisper MK-I is a fictional product —"  *(pause 400ms, inline)*
-> " in the sense that the datasheet is a design exercise."  *(pause 600ms, newline)*
-> "The actual device is real."  *(pause 600ms, newline)*
-> "The datasheet is the interesting part."  *(pause 0)*
+> Graphic designer and creative producer. Los Angeles.  *(pause 500ms, newline)*
+> 10 years across video production, motion graphics, and brand design.  *(pause 0)*
 ```
-Renders as one BEN OS row, flowing naturally, with a hesitation mid-sentence.
+
+Mid-sentence dramatic pause (inline):
+```
+> "It's a speaker."  *(pause 600ms, inline)*
+> " A very directional one."  *(pause 0)*
+```
+
+New row (default — new label appears):
+```
+> Take care.
+
+**MEMEBOT:** [image: temporary-person]
+```
+
+---
+
+### MEDIA
+`[MEDIA: grid-name]` on its own line renders an image grid at that point in the conversation. Clicking any thumbnail opens a fullscreen lightbox (stays on site).
+
+```
+> Here's a range.  *(pause 400ms)*
+[MEDIA: design grid]
+> What else do you want to see?  *(pause 0)*
+```
+
+The grid appears between the two beats — after "Here's a range." and before "What else do you want to see?"
+
+**Available grids:**
+- `design grid` — After Hours, Misfortune Cookies, Man Ray Chess, Onibaba, Swiss Design, Voltaire *(6 items, placeholder — needs Blue Note work added)*
+- `video grid` — JUMP 20, Asana, NoMBe *(3 items)*
+- `posters grid` — Onibaba, Swiss Design, Voltaire *(3 items)*
+
+⚠️ All images currently pulled from old benolivas.com — needs migration before old site goes down.
+
+---
+
+### CHIPS
+Clickable buttons shown after the response. Each chip routes directly to an intent by ID — no ambiguity, no pattern matching.
+
+```
+CHIPS:
+  "Button label."       → intent_id
+  "Another button."     → another_intent_id
+```
+
+The same label can appear in multiple places and route to different intents each time. "Yes." can mean different things in different branches — no conflict.
+
+---
+
+### MEMEBOT
+Second character. Types slow and human-paced. Always appears as a new row with its own label.
+
+```
+**MEMEBOT:** [image: meme-id]
+```
+or
+```
+**MEMEBOT:** [greentext]
+  > line one
+  > line two
+  > line three
+```
+
+Greentext comes in line by line, like 4chan. Each line types out character by character with a pause between lines.
+
+**Available memes:**
+| ID | Description | Currently used in |
+|---|---|---|
+| skeleton-boredom | Skeleton at computer, boredom intensifies | Fact 1 (sonic weapon) |
+| eye-roll-stanley | Stanley from The Office slow eye roll | Fact 3 (career pivot) |
+| full-of-soup | Tiny kitten, round belly, "full of soup" | Fact 5 (cookies), vignette: overwhelmed |
+| temporary-person | Dark painted dog, "temporary person" | Vignette: goodbye |
+| all-ears | Man covered in ears | Vignette: all-ears |
+| drake-little-yachty-oh | Drake and Lil Yachty "oh" reaction | **Unassigned — available** |
+
+---
+
+### TOPICS
+`*Topic saved: topic-name*` means this intent saves a topic to the user's memory. Used to personalize the return-visitor greeting.
+
+Available topics: `video`, `design`, `branding`, `conversions`, `projects`, `portfolio`, `availability`
+
+---
+
+### VIGNETTES
+Vignettes are MemeBot scripted moments that can fire on specific phrases regardless of where the user is in the conversation. Format is the same as intents but uses `=== VIGNETTE ===` header.
+
+---
+
+### ROUTING CONVENTIONS
+- `→ intent_id` = routes directly to that intent
+- `→ surprise` = picks next unseen Surprise Me fact
+- `*TODO*` = placeholder, not yet built
+- `*NOTE*` = important context, not shown to user
+- `*(loops)*` = chip currently routes back to itself, needs a real destination
 
 ---
 
@@ -164,7 +281,9 @@ TRIGGERS: predict my future, predict future, tell my fortune, fortune, my future
 === INTENT: dark_mode ===
 TRIGGERS: dark mode, turn off lights, it's 3am, its 3am, turn dark, dark theme, light mode, turn on lights, bright, lights on, lights off
 
-*Handled by code. Responds: "Done. Easier on the eyes." or "Back to daylight." or "Already dark/light."*
+*Handled by code. No beats.*
+*Responds: "Done. Easier on the eyes." / "Back to daylight." / "Already dark." / "Already light."*
+*Persists across sessions via localStorage.*
 
 ---
 
@@ -178,16 +297,16 @@ TRIGGERS: dark mode, turn off lights, it's 3am, its 3am, turn dark, dark theme, 
 === FACT 1: sonic weapon ===
 
 > **BEN OS:** Did you know that Ben once built a directional sound weapon—
->
-> **MEMEBOT:** [image: skeleton-boredom]
->
+
+**MEMEBOT:** [image: skeleton-boredom]
+
 > **BEN OS:** …you again.
->
-> **MEMEBOT:** [greentext]
->   > be portfolio site
->   > supposed to show work
->   > opens with sonic weapon
->   > this is fine
+
+**MEMEBOT:** [greentext]
+  > be portfolio site
+  > supposed to show work
+  > opens with sonic weapon
+  > this is fine
 
 CHIPS:
   "Tell me about the weapon."   → whisper
@@ -199,22 +318,22 @@ CHIPS:
 === FACT 2: chess set ===
 
 > **BEN OS:** Did you know that Ben's chess set is based on Man Ray's 1920 designs—
->
-> **MEMEBOT:** [greentext]
->   > be artist
->   > die in 1976
->   > some guy 3D prints your chess set
->   > didn't ask
->   > but honestly fair
->
+
+**MEMEBOT:** [greentext]
+  > be artist
+  > die in 1976
+  > some guy 3D prints your chess set
+  > didn't ask
+  > but honestly fair
+
 > **BEN OS:** …Man Ray would have found this acceptable.
->
-> **MEMEBOT:** [greentext]
->   > be BEN OS
->   > portfolio site
->   > explains Man Ray's entire artistic philosophy
->   > unprompted
->   > on a Tuesday
+
+**MEMEBOT:** [greentext]
+  > be BEN OS
+  > portfolio site
+  > explains Man Ray's entire artistic philosophy
+  > unprompted
+  > on a Tuesday
 
 CHIPS:
   "Tell me about the chess set."  → chess
@@ -226,16 +345,16 @@ CHIPS:
 === FACT 3: career pivot ===
 
 > **BEN OS:** Did you know that Ben went from defense contractor to jazz—
->
-> **MEMEBOT:** [image: eye-roll-stanley]
->
+
+**MEMEBOT:** [image: eye-roll-stanley]
+
 > **BEN OS:** …it made sense at the time.
->
-> **MEMEBOT:** [greentext]
->   > it made sense at the time
->   > he said
->   > about the weapons to jazz pipeline
->   > okay man
+
+**MEMEBOT:** [greentext]
+  > it made sense at the time
+  > he said
+  > about the weapons to jazz pipeline
+  > okay man
 
 CHIPS:
   "Tell me about Blue Note."    → blue_note
@@ -247,20 +366,20 @@ CHIPS:
 === FACT 4: classified PDF ===
 
 > **BEN OS:** Did you know that Ben's portfolio PDF is classified—
->
-> **MEMEBOT:** [greentext]
->   > UNCLASSIFIED
->   > *sweating*
->   > UNCLASSIFIED
->
+
+**MEMEBOT:** [greentext]
+  > UNCLASSIFIED
+  > *sweating*
+  > UNCLASSIFIED
+
 > **BEN OS:** …the cover says UNCLASSIFIED. That part is accurate.
->
-> **MEMEBOT:** [greentext]
->   > designer makes government doc
->   > puts UNCLASSIFIED on the cover
->   > for a portfolio
->   > in Los Angeles
->   > no notes actually this rules
+
+**MEMEBOT:** [greentext]
+  > designer makes government doc
+  > puts UNCLASSIFIED on the cover
+  > for a portfolio
+  > in Los Angeles
+  > no notes actually this rules
 
 CHIPS:
   "Show me the portfolio."      → portfolio_pdf
@@ -272,17 +391,17 @@ CHIPS:
 === FACT 5: Misfortune Cookies ===
 
 > **BEN OS:** Did you know that Misfortune Cookies tells you what you don't want to hear—
->
-> **MEMEBOT:** [image: full-of-soup]
->
+
+**MEMEBOT:** [image: full-of-soup]
+
 > **BEN OS:** …that was the point.
->
-> **MEMEBOT:** [greentext]
->   > fortune cookie company
->   > but make it depressing
->   > Swiss modernist design
->   > for sad cookies
->   > honestly respect
+
+**MEMEBOT:** [greentext]
+  > fortune cookie company
+  > but make it depressing
+  > Swiss modernist design
+  > for sad cookies
+  > honestly respect
 
 CHIPS:
   "Tell me about Misfortune Cookies."   → misfortunes
@@ -294,22 +413,22 @@ CHIPS:
 === FACT 6: Man Ray ===
 
 > **BEN OS:** Did you know that Man Ray designed chess pieces nobody played with—
->
-> **MEMEBOT:** [greentext]
->   > be dadaist
->   > make chess pieces
->   > literally no one plays chess with them
->   > this was the plan all along
->
+
+**MEMEBOT:** [greentext]
+  > be dadaist
+  > make chess pieces
+  > literally no one plays chess with them
+  > this was the plan all along
+
 > **BEN OS:** …Ben identified with that.
->
-> **MEMEBOT:** [greentext]
->   > guy identifies with
->   > an artist whose whole thing
->   > was making art no one used
->   > builds entire brand around it
->   > .
->   > okay that actually tracks
+
+**MEMEBOT:** [greentext]
+  > guy identifies with
+  > an artist whose whole thing
+  > was making art no one used
+  > builds entire brand around it
+  > .
+  > okay that actually tracks
 
 CHIPS:
   "Tell me about Man Ray."      → man_ray_who
@@ -344,7 +463,9 @@ TRIGGERS: i need a video, need a video, video production, make a video, produce 
 
 > What's it for?
 
-*Topic saved: video | Media: video grid*
+[MEDIA: video grid]
+
+*Topic saved: video*
 
 CHIPS:
   "Brand / product."    → video_vs_static
@@ -359,15 +480,15 @@ TRIGGERS: show me video, video examples, your videos, show videos
 
 > A few directions.
 
-*Topic saved: video | Media: video grid*
+[MEDIA: video grid]
+
+*Topic saved: video*
 
 CHIPS:
-  "Music videos specifically."    → show_video
-  "Corporate / brand work."       → show_video
-  "Defense / technical."          → show_video
+  "Music videos specifically."    → show_video  *(loops — needs dedicated intent)*
+  "Corporate / brand work."       → show_video  *(loops — needs dedicated intent)*
+  "Defense / technical."          → show_video  *(loops — needs dedicated intent)*
   "What else?"                    → what_do_you_do
-
-*NOTE: video chip routes are placeholder — need dedicated intents per category*
 
 ---
 
@@ -392,13 +513,11 @@ TRIGGERS: i need a designer, need design, graphic design, need branding, design 
 *Topic saved: design*
 
 CHIPS:
-  "Logo / identity."      → need_design
-  "Print."                → need_design
-  "Digital / web."        → need_design
-  "Packaging."            → need_design
-  "Something weird."      → need_design
-
-*NOTE: all loop — need dedicated responses per category*
+  "Logo / identity."      → need_design  *(loops — needs dedicated intent)*
+  "Print."                → need_design  *(loops — needs dedicated intent)*
+  "Digital / web."        → need_design  *(loops — needs dedicated intent)*
+  "Packaging."            → need_design  *(loops — needs dedicated intent)*
+  "Something weird."      → need_design  *(loops — needs dedicated intent)*
 
 ---
 
@@ -407,12 +526,14 @@ TRIGGERS: poster, make a poster, design a poster, need a poster, can you make a 
 
 > Something like these.
 
-*Topic saved: design | Media: posters grid*
+[MEDIA: posters grid]
+
+*Topic saved: design*
 
 CHIPS:
-  "More editorial."               → need_poster
-  "Something darker."             → need_poster
-  "Different style entirely."     → need_poster
+  "More editorial."               → need_poster  *(loops)*
+  "Something darker."             → need_poster  *(loops)*
+  "Different style entirely."     → need_poster  *(loops)*
   "What's it for?"                → what_do_you_do
 
 ---
@@ -422,12 +543,14 @@ TRIGGERS: show me design, design examples, your design work, show design
 
 > Here's a range.
 
-*Topic saved: design | Media: design grid*
+[MEDIA: design grid]
+
+*Topic saved: design*
 
 CHIPS:
-  "More branding."        → show_design
-  "Packaging work."       → show_design
-  "Something weirder."    → show_design
+  "More branding."        → show_design  *(loops)*
+  "Packaging work."       → show_design  *(loops)*
+  "Something weirder."    → show_design  *(loops)*
   "What else?"            → what_do_you_do
 
 ---
@@ -448,10 +571,13 @@ TRIGGERS: color psychology, colours in branding, brand colors, what colors, colo
 === INTENT: show_work ===
 TRIGGERS: show me something, show me work, show me your work, portfolio, examples, what have you made, past work, see your work, show me examples, show me recent projects, most recent projects, recent work, show me ben
 
-> Here's a range.  *(pause 400ms, newline)*
-> What else do you want to see?
+> Here's a range.  *(pause 400ms)*
 
-*Topic saved: portfolio | Media: design grid*
+[MEDIA: design grid]
+
+> What else do you want to see?  *(pause 0)*
+
+*Topic saved: portfolio*
 
 CHIPS:
   "Video work."               → show_video
@@ -483,12 +609,10 @@ TRIGGERS: rebrand, rebranding, new brand, brand refresh, update our brand, brand
 *Topic saved: branding*
 
 CHIPS:
-  "Looks dated."                  → rebrand
-  "Doesn't reflect us anymore."   → rebrand
-  "Leadership change."            → rebrand
-  "Honestly not sure."            → rebrand
-
-*NOTE: all chips loop — need follow-up responses per reason*
+  "Looks dated."                  → rebrand  *(loops — needs dedicated intent)*
+  "Doesn't reflect us anymore."   → rebrand  *(loops — needs dedicated intent)*
+  "Leadership change."            → rebrand  *(loops — needs dedicated intent)*
+  "Honestly not sure."            → rebrand  *(loops — needs dedicated intent)*
 
 ---
 
@@ -514,8 +638,8 @@ TRIGGERS: conversions, more conversions, conversion rate, get more sales, increa
 CHIPS:
   "Static images."    → conversions_static
   "Short video."      → need_video
-  "Long-form copy."   → conversions
-  "Mix of things."    → conversions
+  "Long-form copy."   → conversions  *(loops — needs dedicated intent)*
+  "Mix of things."    → conversions  *(loops — needs dedicated intent)*
 
 ---
 
@@ -578,10 +702,8 @@ TRIGGERS: chess set, man ray, chess pieces, the chess set, chess project, surrea
 
 CHIPS:
   "Tell me about Man Ray."              → man_ray_who
-  "What does the packaging look like?"  → chess
+  "What does the packaging look like?"  → chess  *(loops — needs images)*
   "Can I buy one?"                      → can_buy_chess
-
-*NOTE: "What does the packaging look like?" loops — needs dedicated intent + images*
 
 ---
 
@@ -595,19 +717,17 @@ TRIGGERS: misfortune cookies, fortune cookies, misfortunes, misfortunes.net, bad
 *Topic saved: projects*
 
 CHIPS:
-  "What does it look like?"     → misfortunes
+  "What does it look like?"     → misfortunes  *(loops — needs images)*
   "What's the worst fortune?"   → worst_fortune
   "Is it for sale?"             → can_buy_chess
-
-*NOTE: "What does it look like?" loops — needs images/lightbox*
 
 ---
 
 === INTENT: whisper ===
 TRIGGERS: whisper gun, whisper mk, lrad, sound weapon, acoustic device, directional sound, ultrasonic, the weapon, show me the datasheet, tell me about the weapon
 
-> "The Whisper MK-I is a fictional product —"  *(pause 400ms, inline)*
-> " in the sense that the datasheet is a design exercise."  *(pause 600ms, newline)*
+> The Whisper MK-I is a fictional product —  *(pause 400ms, inline)*
+> in the sense that the datasheet is a design exercise.  *(pause 600ms, newline)*
 > The actual device is real. Portable directional sound using ultrasonic transducers and PWM signal generation. Built and documented.  *(pause 600ms, newline)*
 > The datasheet is the interesting part. Government document parody. Very dry.
 
@@ -615,7 +735,7 @@ TRIGGERS: whisper gun, whisper mk, lrad, sound weapon, acoustic device, directio
 
 CHIPS:
   "Show me the datasheet."  → portfolio_pdf
-  "How does it work?"       → whisper
+  "How does it work?"       → whisper  *(loops — needs dedicated response)*
   "Is this legal?"          → weapon_legal
 
 ---
@@ -623,8 +743,8 @@ CHIPS:
 === INTENT: weapon_legal ===
 TRIGGERS: is this legal, is that legal, is the weapon legal, can you do that
 
-> "It's a speaker."  *(pause 600ms, inline)*
-> " A very directional one."
+> It's a speaker.  *(pause 600ms, inline)*
+> A very directional one.
 
 ---
 
@@ -636,10 +756,8 @@ TRIGGERS: blue note, jazz club, jazz venue, where does ben work, current job, cu
 
 CHIPS:
   "What does he do there?"      → blue_note_work
-  "What kind of jazz?"          → blue_note
+  "What kind of jazz?"          → blue_note  *(loops — needs a response)*
   "What do you actually do?"    → what_do_you_do
-
-*NOTE: "What kind of jazz?" loops — needs a response*
 
 ---
 
@@ -652,6 +770,8 @@ TRIGGERS: what does he do there, what does ben do at blue note, his work at blue
 CHIPS:
   "Show me examples."           → show_work
   "What do you actually do?"    → what_do_you_do
+
+*NOTE: "Show me examples." shows design grid for now. Blue Note work to be added to MEDIA catalog.*
 
 ---
 
@@ -692,7 +812,9 @@ TRIGGERS: what's the worst fortune, worst fortune, most brutal fortune, saddest 
 TRIGGERS: i'm listening, im listening, all ears, i'm a woman, im a woman, she her, go on, continue
 
 > **BEN OS:** Good to know.
-> **MEMEBOT:** [image: all-ears]
+
+**MEMEBOT:** [image: all-ears]
+
 > **BEN OS:** Anyway. Is this for a client or something you're building yourself?
 
 CHIPS:
@@ -706,8 +828,10 @@ CHIPS:
 TRIGGERS: i don't know where to start, dont know where to start, overwhelmed, too many options, i have a lot to say, so much
 
 > **BEN OS:** Start anywhere.
-> **MEMEBOT:** [image: full-of-soup]
-> **BEN OS:** That's — not helpful.  *(pause, newline)*
+
+**MEMEBOT:** [image: full-of-soup]
+
+> **BEN OS:** That's — not helpful.  *(pause 500ms, newline)*
 > Video or design?
 
 CHIPS:
@@ -721,49 +845,33 @@ CHIPS:
 TRIGGERS: bye, goodbye, see ya, later, peace, gotta go, ttyl, cya
 
 > **BEN OS:** Take care.
-> **MEMEBOT:** [image: temporary-person]
-> *BEN OS says nothing. Conversation ends.*
 
----
+**MEMEBOT:** [image: temporary-person]
 
-## MEME LIBRARY
-*Images in assets/memes/ — filename must match ID exactly.*
-
-| ID | File | Used in |
-|---|---|---|
-| skeleton-boredom | skeleton-boredom.webp | Fact 1 (sonic weapon) |
-| eye-roll-stanley | eye-roll-stanley.gif | Fact 3 (career pivot) |
-| full-of-soup | full-of-soup.jpg | Fact 5 (cookies), vignette: overwhelmed |
-| temporary-person | temporary-person.jpg | Vignette: goodbye |
-| all-ears | all-ears.jpeg | Vignette: all-ears |
-| drake-little-yachty-oh | drake-little-yachty-oh.gif | **Unassigned — available** |
-
----
-
-## MEDIA CATALOG
-*Image grids in chat. Clicking opens lightbox (stays on site).*
-*⚠️ All images currently pulled from old benolivas.com — needs migration before old site goes down.*
-
-**design grid:** After Hours · Misfortune Cookies · Man Ray Chess
-**video grid:** JUMP 20 · Asana · NoMBe
-**posters grid:** Onibaba · Swiss Design · Voltaire
+*BEN OS says nothing after this. Conversation ends.*
 
 ---
 
 ## KNOWN GAPS / TODO
-*Paths that exist but loop or have placeholder responses.*
+*Every loop, placeholder, and incomplete path. This is the writing agenda.*
 
-- **predict_future** — placeholder only. Planned: draggable fake browser popup → misfortunes.net
-- **need_design chips** — all loop back to need_design. Need per-category responses
-- **rebrand chips** — all loop. Need follow-up per reason (dated / doesn't reflect us / leadership)
-- **show_video chips** — music/corporate/defense all loop. Need dedicated responses
-- **blue_note "What kind of jazz?"** — loops, needs a response
-- **chess "What does the packaging look like?"** — loops, needs images
-- **misfortunes "What does it look like?"** — loops, needs images
-- **Media migration** — all portfolio images need to move from benolivas.com/images/ to assets/portfolio/
-- **Project pages** — lightbox "View ↗" links have nowhere to go yet for most items
-- **Blue Note work** — to be added to MEDIA catalog when assets are ready
-- **drake-little-yachty-oh.gif** — in meme library, unassigned, waiting for the right moment
+**Script gaps — need new content:**
+- `predict_future` — placeholder only. Build: draggable fake browser popup → misfortunes.net
+- `need_design` chips — logo / print / digital / packaging / weird all loop back
+- `rebrand` chips — dated / doesn't reflect us / leadership / not sure all loop back
+- `show_video` chips — music / corporate / defense all loop back
+- `blue_note` — "What kind of jazz?" loops
+- `chess` — "What does the packaging look like?" loops, needs images
+- `misfortunes` — "What does it look like?" loops, needs images
+- `whisper` — "How does it work?" loops
+
+**Asset gaps — need media:**
+- Blue Note work → add to MEDIA catalog when assets ready
+- Project pages → lightbox "View ↗" links need destinations
+- Media migration → all images on old benolivas.com need moving to assets/portfolio/
+
+**Unassigned:**
+- `drake-little-yachty-oh.gif` — in meme library, waiting for the right moment
 
 ---
 
