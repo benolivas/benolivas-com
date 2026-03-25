@@ -1,9 +1,9 @@
 {
-  "_readme": "Meme library. Each entry is either a 'finished' meme or a 'raw' template for MemeBot to generate new ones. Annotations drive MemeBot's situational awareness.",
+  "_readme": "Meme library. Each entry is either a 'finished' meme or a 'raw' template. Annotations drive MemeBot's situational awareness. Extensions must match actual files in assets/memes/.",
   "finished": [
     {
       "id": "skeleton-boredom",
-      "file": "assets/memes/skeleton-boredom.jpg",
+      "file": "assets/memes/skeleton-boredom.webp",
       "alt": "Skeleton sitting at computer, death by boredom intensifies",
       "format": "image",
       "emotions": ["bored", "dead inside", "waiting", "unbothered"],
@@ -44,26 +44,12 @@
       "notes": "Fires when user seems overwhelmed or says they don't know where to start."
     },
     {
-      "id": "depressed-but-horny",
-      "file": "assets/memes/depressed-but-horny.jpg",
-      "alt": "Fluffy dog with tongue out, text: depressed but horny and thats okay",
-      "format": "image",
-      "emotions": ["complicated", "chaotic", "conflicted", "oddly positive"],
-      "situations": ["user is having a day", "existential moment", "its complicated", "memebot introduction"],
-      "style": "wholesome chaos",
-      "caption_needed": false,
-      "greentext_compatible": false,
-      "memebot_state": "current mood",
-      "source": "uploaded",
-      "notes": "MemeBot's general vibe. Good for early appearances."
-    },
-    {
       "id": "temporary-person",
       "file": "assets/memes/temporary-person.jpg",
       "alt": "Black dog with yellow eyes, text: i feel like such a temporary person in everyones life",
       "format": "image",
       "emotions": ["melancholy", "existential", "sad", "resigned"],
-      "situations": ["goodbye", "end of conversation", "user leaving", "benos reflecting"],
+      "situations": ["goodbye", "end of conversation", "user leaving"],
       "style": "art meme, painted",
       "caption_needed": false,
       "greentext_compatible": false,
@@ -73,7 +59,7 @@
     },
     {
       "id": "all-ears",
-      "file": "assets/memes/all-ears.jpg",
+      "file": "assets/memes/all-ears.jpeg",
       "alt": "Man covered in ears all over his body",
       "format": "image",
       "emotions": ["listening", "attentive", "absurd", "literal"],
@@ -86,33 +72,38 @@
       "notes": "Fires when user says listening-related phrases. Technically relevant, completely absurd."
     },
     {
-      "id": "it-hurts",
-      "file": "assets/memes/it-hurts.jpg",
-      "alt": "Loading spinner on dark screen, text: IT HURTS...",
-      "format": "image",
-      "emotions": ["pain", "loading", "processing", "suffering"],
-      "situations": ["bad rebrand mentioned", "ceo picked colors", "terrible design", "buffering", "processing"],
-      "style": "memebot screen state",
+      "id": "drake-little-yachty-oh",
+      "file": "assets/memes/drake-little-yachty-oh.gif",
+      "alt": "Drake and Lil Yachty 'oh' reaction gif",
+      "format": "gif",
+      "emotions": ["mild surprise", "acknowledgment", "that's a thing", "hm okay"],
+      "situations": ["unassigned — available for script use"],
+      "style": "reaction gif",
       "caption_needed": false,
       "greentext_compatible": false,
-      "memebot_state": "IT HURTS",
-      "source": "generated",
-      "notes": "MemeBot's pain state. Good response to bad design decisions."
+      "memebot_state": "oh",
+      "source": "uploaded",
+      "notes": "Available — not wired to any path yet. Assign when moment is identified."
+    }
+  ],
+  "inactive": [
+    {
+      "id": "depressed-but-horny",
+      "file": "assets/memes/depressed-but-horny.jpg",
+      "alt": "Fluffy dog with tongue out, text: depressed but horny and thats okay",
+      "notes": "Inactive — no image yet. Re-enable when sourced."
     },
     {
       "id": "play-with-me",
       "file": "assets/memes/play-with-me.jpg",
-      "alt": "Excited puppy or cat looking directly at camera, PLAY WITH ME energy",
-      "format": "image",
-      "emotions": ["excited", "wanting", "begging", "chaotic joy"],
-      "situations": ["surprise me button", "memebot first appearance", "memebot wants attention"],
-      "style": "memebot screen state",
-      "caption_needed": true,
-      "default_caption": "PLAY WITH ME",
-      "greentext_compatible": false,
-      "memebot_state": "PLAY WITH ME",
-      "source": "needed",
-      "notes": "MemeBot's first appearance image. Needs sourcing — should be irresistibly cute animal."
+      "alt": "Excited animal, PLAY WITH ME energy",
+      "notes": "Inactive — MemeBot first appearance candidate. Re-enable when sourced."
+    },
+    {
+      "id": "it-hurts",
+      "file": "assets/memes/it-hurts.jpg",
+      "alt": "Loading spinner on dark screen, text: IT HURTS...",
+      "notes": "Inactive — no image yet. Re-enable when sourced."
     }
   ],
   "raw_templates": [

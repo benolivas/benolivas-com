@@ -11,14 +11,14 @@
 <body>
 <div id="app">
 
-  <!-- POST-IT — in normal flow, scrolls with page -->
+  <!-- POST-IT LOGO — local asset -->
   <div id="logo-wrap">
     <img id="site-logo"
-      src="https://benolivas.com/images/BenOlivasLogo3.png"
+      src="./assets/logo/BenOlivasLogo3.png"
       alt="Ben Olivas">
   </div>
 
-  <!-- HEADER — pushed down so post-it clips only "Creative" -->
+  <!-- HEADER -->
   <header id="header">
     <nav class="header-nav">
       <a href="https://benolivas.com/portfolio" target="_blank" rel="noopener">Portfolio PDF ↗</a>
@@ -29,7 +29,7 @@
   <!-- CONTACT POPUP -->
   <div id="contact-popup" class="contact-popup" aria-hidden="true">
     <div class="contact-popup-inner">
-      <a href="/cdn-cgi/l/email-protection#0163646f6e6d6877607241666c60686d2f626e6c"><span class="__cf_email__" data-cfemail="96f4f3f8f9faffe0f7e5d6f1fbf7fffab8f5f9fb">[email&#160;protected]</span></a>
+      <a href="mailto:benolivas@gmail.com">benolivas@gmail.com</a>
       <a href="https://www.linkedin.com/in/benolivas" target="_blank" rel="noopener">LinkedIn ↗</a>
       <a href="https://www.behance.net/benolivas" target="_blank" rel="noopener">Behance ↗</a>
     </div>
@@ -39,10 +39,10 @@
 
   <div class="header-sub">Creative Producer · Graphic Designer · Los Angeles</div>
 
-  <!-- CHAT — grows here -->
+  <!-- CHAT -->
   <main id="chat-window"></main>
 
-  <!-- INPUT — sticky to bottom once chat fills viewport -->
+  <!-- INPUT -->
   <div id="input-area">
     <div class="input-wrap">
       <span class="input-prompt">BEN OS ›</span>
@@ -61,5 +61,15 @@
     </div>
   </div>
 
-  <!-- SUGGESTION BUTTONS — below input, fade in slowly -->
-  <div id="idle-doors" class="idle-doors"></di
+  <!-- SUGGESTION DOORS -->
+  <div id="idle-doors" class="idle-doors"></div>
+
+  <div class="page-end-pad"></div>
+
+</div>
+
+<div id="watermark">BEN OS v2.2</div>
+
+<script src="chat.js"></script>
+</body>
+</html>

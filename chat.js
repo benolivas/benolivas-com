@@ -143,12 +143,8 @@ const INTENTS = [
 
   { id:'surprise',
     patterns:['surprise me','random','something random','impress me','go ahead','just show me'],
-    beats:[
-      {text:"Ben once built a directional sound weapon and wrote a fake government datasheet for it.",pause:700},
-      {text:"This is not the most unusual thing about him.",pause:600},
-      {text:"You're going to ask what the most unusual thing is.",pause:0}
-    ],
-    chips:["What's the most unusual thing?","Tell me more.","Show me the datasheet."] },
+    beats:[], // handled by playSurprise()
+    special:'surprise' },
 
   { id:'predict_future',
     patterns:['predict my future','predict future','tell my fortune','fortune','my future','what will happen','crystal ball'],
@@ -450,6 +446,13 @@ function setupContactPopup() {
   });
 }
 
+/* ── WAITING STATE — lock input visually ─────────── */
+function setWaiting(on) {
+  isWaiting = on;
+  const inputArea = document.getElementById('input-area');
+  if (inputArea) inputArea.classList.toggle('is-waiting', on);
+}
+
 /* ── SCROLL ──────────────────────────────────────── */
 function scrollBottom() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -572,6 +575,139 @@ function renderGreentext(lines) {
   scrollBottom();
 }
 
+/* ── SURPRISE ME ─────────────────────────────────── */
+function getSeenFacts() {
+  try { return JSON.parse(localStorage.getItem('bo_seen_facts') || '[]'); }
+  catch(e) { return []; }
+}
+function markFactSeen(id) {
+  try {
+    const seen = getSeenFacts();
+    if (!seen.includes(id)) seen.push(id);
+    localStorage.setItem('bo_seen_facts', JSON.stringify(seen));
+  } catch(e) {}
+}
+function resetSeenFacts() {
+  try { localStorage.removeItem('bo_seen_facts'); } catch(e) {}
+}
+function pickFact() {
+  const facts = FACTS_DATA.facts;
+  if (!facts.length) return null;
+  const seen = getSeenFacts();
+  const unseen = facts.filter(f => !seen.includes(f.id));
+  if (!unseen.length) { resetSeenFacts(); return facts[Math.floor(Math.random() * facts.length)]; }
+  return unseen[Math.floor(Math.random() * unseen.length)];
+}
+
+// Append a label row with no body yet — label "appears as if to start speaking"
+function appendLabelOnly(role, who) {
+  const row  = document.createElement('div');
+  row.className = 'msg-row';
+  const wDiv = document.createElement('div');
+  wDiv.className = 'msg-who ' + role;
+  wDiv.textContent = who;
+  const body = document.createElement('div');
+  body.className = 'msg-body ' + role;
+  row.appendChild(wDiv);
+  row.appendChild(body);
+  chatWindow.appendChild(row);
+  scrollBottom();
+  return body;
+}
+
+function playSurprise(typingBody) {
+  const fact = pickFact();
+
+  // Fallback if data not loaded (file:// protocol, no Live Server)
+  if (!fact) {
+    typewriter(typingBody,
+      "Ben once built a directional sound weapon and wrote a fake government datasheet for it. This is not the most unusual thing about him.",
+      () => {
+        setTimeout(() => renderChips(["What's the most unusual thing?", "Show me the datasheet.", "Surprise me again."]), 300);
+        setWaiting(false);
+      }
+    );
+    return;
+  }
+
+  markFactSeen(fact.id);
+
+  // Step 1 — label appears, brief pause, then BEN OS types the fact (gets cut off mid-sentence)
+  typingBody.classList.remove('typing');
+  typingBody.textContent = '';
+
+  setTimeout(() => {
+    typewriter(typingBody, fact.text, () => {
+
+      // Step 2 — short beat, then MemeBot appears
+      setTimeout(() => {
+        const hasMeme      = fact.memebot_meme && MEMES_DATA.finished.find(m => m.id === fact.memebot_meme);
+        const hasGreentext = fact.memebot_greentext?.length;
+
+        if (hasMeme || hasGreentext) {
+          // MemeBot label appears, brief pause, then content
+          const mbBody = appendLabelOnly('memebot', 'MEMEBOT');
+
+          setTimeout(() => {
+            if (hasMeme) {
+              renderMemebotImage(fact.memebot_meme, null);
+            } else {
+              renderGreentext(fact.memebot_greentext);
+            }
+
+            // Step 3 — BEN OS reacts
+            setTimeout(() => fireSurpriseReaction(fact), 900);
+
+          }, 500 + Math.random() * 300);
+
+        } else {
+          // No MemeBot image/greentext — go straight to BEN OS reaction
+          fireSurpriseReaction(fact);
+        }
+
+      }, 400);
+    });
+  }, 600); // the "name appears, brief pause" beat
+}
+
+function fireSurpriseReaction(fact) {
+  const reactBody = appendLabelOnly('sys', 'BEN OS');
+  setTimeout(() => {
+    typewriter(reactBody, fact.benos_reaction, () => {
+
+      // Step 4 — second MemeBot greentext beat (if exists)
+      if (fact.memebot_greentext_2?.length) {
+        setTimeout(() => {
+          appendLabelOnly('memebot', 'MEMEBOT');
+          setTimeout(() => {
+            renderGreentext(fact.memebot_greentext_2);
+
+            // Step 5 — chips appear after second MemeBot beat
+            setTimeout(() => {
+              const chips = fact.chips?.length
+                ? fact.chips
+                : ["Tell me more.", "Surprise me again.", "What do you actually do?"];
+              renderChips(chips);
+              setWaiting(false);
+            }, 400);
+
+          }, 500 + Math.random() * 300);
+        }, 600);
+
+      } else {
+        // No second MemeBot beat — chips appear after BEN OS reaction
+        setTimeout(() => {
+          const chips = fact.chips?.length
+            ? fact.chips
+            : ["Tell me more.", "Surprise me again.", "What do you actually do?"];
+          renderChips(chips);
+          setWaiting(false);
+        }, 300);
+      }
+    });
+  }, 300);
+}
+
 /* ── VIGNETTE RENDERER ───────────────────────────── */
 function playVignette(vignette, typingBody) {
   // BEN OS setup line (uses existing typing bubble)
@@ -610,7 +746,7 @@ function fireMemebotPart(vignette) {
 function fireMemebotReaction(vignette) {
   if (!vignette.benos_reaction) {
     // End of vignette — e.g. goodbye
-    isWaiting = false;
+    setWaiting(false);
     return;
   }
 
@@ -621,12 +757,12 @@ function fireMemebotReaction(vignette) {
         const { body: r2 } = appendMsg('sys', '', 'BEN OS', { typing: true });
         typewriter(r2, vignette.benos_reaction2, () => {
           if (vignette.buttons?.length) renderChips(vignette.buttons);
-          isWaiting = false;
+          setWaiting(false);
         });
       }, 500);
     } else {
       if (vignette.buttons?.length) renderChips(vignette.buttons);
-      isWaiting = false;
+      setWaiting(false);
     }
   });
 }
@@ -748,7 +884,7 @@ function restoreDoors() {
 /* ── SEND MESSAGE ────────────────────────────────── */
 async function sendMessage(text) {
   if (isWaiting || !text.trim()) return;
-  isWaiting = true;
+  setWaiting(true);
 
   const input = text.trim();
   userInput.value = '';
@@ -767,7 +903,7 @@ async function sendMessage(text) {
   if (filtered) {
     const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
     await new Promise(r => setTimeout(r, 200));
-    typewriter(typingBody, filtered, () => { isWaiting = false; });
+    typewriter(typingBody, filtered, () => { setWaiting(false); });
     return;
   }
 
@@ -787,6 +923,11 @@ async function sendMessage(text) {
 
   if (intent) {
     // Special handlers
+    if (intent.special === 'surprise') {
+      playSurprise(typingBody);
+      return; // setWaiting(false) called inside playSurprise flow
+    }
+
     if (intent.special === 'dark_mode') {
       const lower = normalize(input);
       const turningOn = lower.includes('dark') || lower.includes('3am') || lower.includes('lights off') || lower.includes('off');
@@ -801,7 +942,7 @@ async function sendMessage(text) {
       } else {
         response = isDark ? "Already dark." : "Already light.";
       }
-      typewriter(typingBody, response, () => { isWaiting = false; statusLabel.textContent = ''; });
+      typewriter(typingBody, response, () => { setWaiting(false); statusLabel.textContent = ''; });
       conversationHistory.push({ role: 'assistant', content: response });
       return;
     }
@@ -821,7 +962,7 @@ async function sendMessage(text) {
             }, 1200);
           }, 600);
         } else {
-          isWaiting = false;
+          setWaiting(false);
         }
       });
       conversationHistory.push({ role: 'assistant', content: 'Take care.' });
@@ -834,14 +975,14 @@ async function sendMessage(text) {
       if (intent.chips) setTimeout(() => renderChips(intent.chips), intent.media ? 600 : 200);
       conversationHistory.push({ role: 'assistant', content: intent.beats[intent.beats.length-1].text });
       statusLabel.textContent = '';
-      isWaiting = false;
+      setWaiting(false);
     });
   } else {
     // ── CLAUDE API FALLBACK
     statusLabel.textContent = '...';
     const response = await callClaude(conversationHistory.slice(-10));
     conversationHistory.push({ role: 'assistant', content: response });
-    typewriter(typingBody, response, () => { statusLabel.textContent = ''; isWaiting = false; });
+    typewriter(typingBody, response, () => { statusLabel.textContent = ''; setWaiting(false); });
   }
 }
 

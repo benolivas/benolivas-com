@@ -470,11 +470,31 @@ body.dark #input-area.is-sticky .input-wrap {
 /* ── CHIPS inside chat ───────────────────────────── */
 .chips {
   display: flex; flex-wrap: wrap; gap: 6px;
-  margin-top: 10px; grid-column: 2;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  grid-column: 2;
 }
 
 /* ── PAGE END PAD ────────────────────────────────── */
-.page-end-pad { height: 40px; flex-shrink: 0; }
+/* Tall enough that last message/chip clears sticky input (~90px) */
+.page-end-pad { height: 120px; flex-shrink: 0; }
+
+/* ── INPUT WAITING STATE — AIs are talking ──────── */
+/* Applied to #input-area via JS when isWaiting=true */
+#input-area.is-waiting .input-wrap {
+  opacity: 0.4;
+  pointer-events: none;
+  border-color: transparent;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+#input-area.is-waiting #user-input {
+  cursor: default;
+}
+
+#input-area.is-waiting .input-prompt {
+  color: var(--faint);
+}
 
 /* ── WATERMARK ───────────────────────────────────── */
 #watermark {

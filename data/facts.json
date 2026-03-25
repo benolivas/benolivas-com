@@ -1,53 +1,145 @@
 {
-  "_readme": "Rotating 'Did you know' facts for Surprise Me path. Each fact pairs with a specific MemeBot meme ID. localStorage tracks which have fired to prevent repeats.",
+  "_readme": "Rotating facts for Surprise Me path. Each fact: BEN OS starts, gets cut off, MemeBot interrupts (image or greentext), BEN OS reacts, then optional second MemeBot greentext beat. localStorage prevents repeats per session.",
   "facts": [
     {
       "id": "fact-sonic",
       "text": "Did you know that Ben once built a directional sound weapon—",
       "memebot_meme": "skeleton-boredom",
       "memebot_greentext": null,
-      "benos_reaction": "...anyway.",
-      "notes": "Interrupted by skeleton boredom meme. Classic opener."
+      "benos_reaction": "…you again.",
+      "memebot_greentext_2": [
+        ">be portfolio site",
+        ">supposed to show work",
+        ">opens with sonic weapon",
+        ">this is fine"
+      ],
+      "benos_reaction_2": null,
+      "chips": [
+        "Tell me about the weapon.",
+        "Surprise me again.",
+        "What do you actually do?"
+      ],
+      "notes": "Roasts the absurdity of the fact itself. Second beat: meta, roasting the portfolio-site-that-opens-with-weapons-talk concept."
     },
     {
       "id": "fact-chess",
       "text": "Did you know that Ben's chess set is based on Man Ray's 1920 designs—",
       "memebot_meme": null,
-      "memebot_greentext": [">be artist", ">die in 1976", ">some guy 3D prints your chess set", ">surprised pikachu"],
-      "benos_reaction": "...the point was the packaging.",
-      "notes": "Greentext format. No image needed."
+      "memebot_greentext": [
+        ">be artist",
+        ">die in 1976",
+        ">some guy 3D prints your chess set",
+        ">didn't ask",
+        ">but honestly fair"
+      ],
+      "benos_reaction": "…Man Ray would have found this acceptable.",
+      "memebot_greentext_2": [
+        ">be BEN OS",
+        ">portfolio site",
+        ">explains Man Ray's entire artistic philosophy",
+        ">unprompted",
+        ">on a Tuesday"
+      ],
+      "benos_reaction_2": null,
+      "chips": [
+        "Tell me about the chess set.",
+        "Surprise me again.",
+        "What do you actually do?"
+      ],
+      "notes": "First greentext: dead artist, surprise 3D printing. Second: goes after BEN OS personality — dry, over-explains, unprompted."
     },
     {
       "id": "fact-career",
       "text": "Did you know that Ben went from defense contractor to jazz club graphic designer—",
       "memebot_meme": "eye-roll-stanley",
       "memebot_greentext": null,
-      "benos_reaction": "...it made sense at the time.",
-      "notes": "Stanley eye roll. Career pivot absurdity."
+      "benos_reaction": "…it made sense at the time.",
+      "memebot_greentext_2": [
+        ">it made sense at the time",
+        ">he said",
+        ">about the weapons to jazz pipeline",
+        ">okay man"
+      ],
+      "benos_reaction_2": null,
+      "chips": [
+        "Tell me about Blue Note.",
+        "Surprise me again.",
+        "What do you actually do?"
+      ],
+      "notes": "Stanley eye roll on the career pivot. Second beat goes after BEN OS's deadpan non-explanation."
     },
     {
       "id": "fact-pdf",
       "text": "Did you know that Ben's portfolio PDF is formatted as a classified government document—",
       "memebot_meme": null,
-      "memebot_greentext": [">UNCLASSIFIED", ">...", ">classified"],
-      "benos_reaction": "...the cover says UNCLASSIFIED. That part is accurate.",
-      "notes": "Short punchy greentext."
+      "memebot_greentext": [
+        ">UNCLASSIFIED",
+        ">*sweating*",
+        ">UNCLASSIFIED"
+      ],
+      "benos_reaction": "…the cover says UNCLASSIFIED. That part is accurate.",
+      "memebot_greentext_2": [
+        ">designer makes government doc",
+        ">puts UNCLASSIFIED on the cover",
+        ">for a portfolio",
+        ">in Los Angeles",
+        ">no notes actually this rules"
+      ],
+      "benos_reaction_2": null,
+      "chips": [
+        "Show me the portfolio.",
+        "Surprise me again.",
+        "What do you actually do?"
+      ],
+      "notes": "First greentext: short punchy paranoia. Second: meta appreciation — MemeBot can't even roast it."
     },
     {
       "id": "fact-cookies",
       "text": "Did you know that Misfortune Cookies tells you exactly what you don't want to hear—",
       "memebot_meme": "full-of-soup",
       "memebot_greentext": null,
-      "benos_reaction": "...that was the point.",
-      "notes": "Full of soup. User might not know Misfortune Cookies yet."
+      "benos_reaction": "…that was the point.",
+      "memebot_greentext_2": [
+        ">fortune cookie company",
+        ">but make it depressing",
+        ">Swiss modernist design",
+        ">for sad cookies",
+        ">honestly respect"
+      ],
+      "benos_reaction_2": null,
+      "chips": [
+        "Tell me about Misfortune Cookies.",
+        "Surprise me again.",
+        "What do you actually do?"
+      ],
+      "notes": "Full of soup on overwhelm. Second beat: MemeBot roasts the concept but can't help respecting it."
     },
     {
       "id": "fact-manray",
-      "text": "Did you know that Man Ray was a Dadaist who also designed chess pieces nobody played with—",
+      "text": "Did you know that Man Ray was a Dadaist who designed chess pieces nobody played with—",
       "memebot_meme": null,
-      "memebot_greentext": [">be dadaist", ">make chess pieces", ">nobody plays chess with them", ">this is the point"],
-      "benos_reaction": "...Ben identified with that.",
-      "notes": "Greentext. Art context beat."
+      "memebot_greentext": [
+        ">be dadaist",
+        ">make chess pieces",
+        ">literally no one plays chess with them",
+        ">this was the plan all along"
+      ],
+      "benos_reaction": "…Ben identified with that.",
+      "memebot_greentext_2": [
+        ">guy identifies with",
+        ">an artist whose whole thing",
+        ">was making art no one used",
+        ">builds entire brand around it",
+        ">.",
+        ">okay that actually tracks"
+      ],
+      "benos_reaction_2": null,
+      "chips": [
+        "Tell me about Man Ray.",
+        "Surprise me again.",
+        "What do you actually do?"
+      ],
+      "notes": "First greentext: roasts Dada. Second: goes after BEN OS's personality — dry, finds this all logical and relatable."
     }
   ]
 }
