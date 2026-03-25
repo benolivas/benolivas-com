@@ -847,20 +847,36 @@ function renderBeats(beats, who, onComplete) {
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
-function renderMemebotImage(memeId, targetBody) {
+/* Calls onDone after a short display pause so next     */
+/* speaker doesn't fire before user sees the image.     */
+function renderMemebotImage(memeId, targetBody, onDone) {
   const meme = MEMES.find(m => m.id === memeId);
-  if (!meme) return;
+  if (!meme) { if (onDone) onDone(); return; }
   const img = document.createElement('img');
   img.className = 'memebot-img';
   img.alt = meme.id;
   img.src = meme.file;
-  img.onload = () => img.classList.add('loaded');
+  img.onload = () => {
+    img.classList.add('loaded');
+    // Wait for user to actually see the image before continuing
+    setTimeout(() => { if (onDone) onDone(); }, 900);
+  };
+  // If image fails to load or is cached, still continue
+  img.onerror = () => { if (onDone) onDone(); };
   const container = targetBody || chatWindow;
   container.appendChild(img);
   scrollBottom();
+  // Fallback: if onload never fires (e.g. gif already cached), continue after 1.5s
+  setTimeout(() => {
+    if (!img.classList.contains('loaded')) {
+      img.classList.add('loaded');
+      if (onDone) onDone();
+    }
+  }, 1500);
 }
 
 /* ── MEMEBOT GREENTEXT — line by line, human paced ── */
+/* Always calls onDone when all lines finish typing.    */
 function renderGreentext(lines, targetBody, onDone) {
   const container = targetBody || chatWindow;
   let i = 0;
@@ -869,39 +885,35 @@ function renderGreentext(lines, targetBody, onDone) {
     const line = lines[i++];
     const span = document.createElement('div');
     span.className = 'gt-line';
-    span.style.opacity = '0';
     container.appendChild(span);
     scrollBottom();
-    // Type each line character by character at human pace
     const text = line.replace(/^>/, '').trim();
-    span.style.opacity = '1';
     let c = 0;
     function typeChar() {
       if (c < text.length) {
         span.textContent = text.slice(0, c+1);
         scrollBottom();
-        // Greentext types briskly but humanly — faster than MemeBot prose
         const delay = text[c] === ' ' ? 60 + Math.random()*40 : 30 + Math.random()*30;
         c++;
         setTimeout(typeChar, delay);
       } else {
-        // Pause between lines — feels like thinking
-        setTimeout(nextLine, 280 + Math.random()*180);
+        setTimeout(nextLine, 260 + Math.random()*160);
       }
     }
-    setTimeout(typeChar, 60 + Math.random()*60);
+    setTimeout(typeChar, 50 + Math.random()*50);
   }
   nextLine();
 }
 
 /* ── IMAGE GRID ──────────────────────────────────── */
-function renderImageGrid(key) {
-  const items = MEDIA[key]; if (!items) return;
+function renderImageGrid(key, onDone) {
+  const items = MEDIA[key];
+  if (!items) { if (onDone) onDone(); return; }
   const grid = document.createElement('div'); grid.className = 'img-grid';
   items.slice(0,6).forEach((item,idx) => {
     const a = document.createElement('div');
     a.className = 'img-grid-item';
-    a.style.animationDelay = `${idx*0.1}s`;
+    a.style.animationDelay = `${idx*0.08}s`;
     a.style.cursor = 'pointer';
     a.innerHTML = `<img src="${item.src}" alt="${item.label}" loading="lazy"><div class="img-grid-label">${item.label}</div>`;
     a.addEventListener('click', () => openLightbox(item));
@@ -909,6 +921,9 @@ function renderImageGrid(key) {
   });
   chatWindow.appendChild(grid);
   scrollBottom();
+  // Grid fades in via CSS animation — wait for last item to finish before continuing
+  const animDuration = (items.slice(0,6).length - 1) * 80 + 600; // last delay + fadein duration
+  setTimeout(() => { if (onDone) onDone(); }, animDuration);
 }
 
 /* ── LIGHTBOX ────────────────────────────────────── */
@@ -1043,40 +1058,34 @@ async function fireIntent(intentId, label) {
 function playIntent(intent) {
   const beats = intent.beats || [];
   const mediaKey = intent.media;
-  const mediaAfter = intent.mediaAfterBeat ?? null; // beat index after which media appears
+  const mediaAfter = intent.mediaAfterBeat ?? null;
+
+  const finish = () => {
+    renderChips(intent.chips);
+    conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
+    statusLabel.textContent = '';
+    setWaiting(false);
+  };
 
   if (mediaKey && mediaAfter !== null) {
-    // Split beats: before media, after media
     const beforeBeats = beats.slice(0, mediaAfter + 1);
     const afterBeats  = beats.slice(mediaAfter + 1);
-
     renderBeats(beforeBeats, 'BEN OS', () => {
-      setTimeout(() => {
-        renderImageGrid(mediaKey);
-        setTimeout(() => {
-          if (afterBeats.length) {
-            renderBeats(afterBeats, 'BEN OS', () => {
-              if (intent.chips) setTimeout(() => renderChips(intent.chips), 200);
-              conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
-              statusLabel.textContent = '';
-              setWaiting(false);
-            });
-          } else {
-            if (intent.chips) setTimeout(() => renderChips(intent.chips), 200);
-            conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
-            statusLabel.textContent = '';
-            setWaiting(false);
-          }
-        }, 300);
-      }, 200);
+      renderImageGrid(mediaKey, () => {
+        if (afterBeats.length) {
+          renderBeats(afterBeats, 'BEN OS', finish);
+        } else {
+          finish();
+        }
+      });
     });
   } else {
     renderBeats(beats, 'BEN OS', () => {
-      if (mediaKey)      setTimeout(() => renderImageGrid(mediaKey), 200);
-      if (intent.chips)  setTimeout(() => renderChips(intent.chips), mediaKey ? 600 : 200);
-      conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
-      statusLabel.textContent = '';
-      setWaiting(false);
+      if (mediaKey) {
+        renderImageGrid(mediaKey, finish);
+      } else {
+        finish();
+      }
     });
   }
 }
@@ -1106,86 +1115,73 @@ function playSurprise(typingBody) {
   const fact = pickFact();
   markFactSeen(fact.id);
 
-  // Label appears, brief pause, then BEN OS types and gets cut off
   typingBody.classList.remove('typing');
   typingBody.textContent = '';
 
+  // Each step only fires when the previous one calls its onDone callback.
+  // No guessed timeouts. Fully sequential.
+
+  // Step 1: BEN OS types the fact and gets cut off
   setTimeout(() => {
     typewriter(typingBody, fact.text, () => {
-      setTimeout(() => {
 
-        const hasMeme      = fact.memebot_meme && MEMES.find(m => m.id === fact.memebot_meme);
-        const hasGreentext = fact.memebot_greentext?.length;
+      const hasMeme      = fact.memebot_meme && MEMES.find(m => m.id === fact.memebot_meme);
+      const hasGreentext = fact.memebot_greentext?.length;
 
-        if (hasMeme || hasGreentext) {
-          const mb1Body = appendLabelOnly('memebot', 'MEMEBOT');
-          setTimeout(() => {
-            if (hasMeme)      renderMemebotImage(fact.memebot_meme, mb1Body);
-            else              renderGreentext(fact.memebot_greentext, mb1Body);
+      // Step 2: MemeBot appears (image or greentext)
+      const afterMemebot = () => {
 
-            // BEN OS reacts
-            setTimeout(() => {
-              const reactBody = appendLabelOnly('sys', 'BEN OS');
-              setTimeout(() => {
-                typewriter(reactBody, fact.benos_reaction, () => {
+        // Step 3: BEN OS reacts
+        const reactBody = appendLabelOnly('sys', 'BEN OS');
+        typewriter(reactBody, fact.benos_reaction, () => {
 
-                  // Second MemeBot greentext beat
-                  if (fact.memebot_greentext_2?.length) {
-                    setTimeout(() => {
-                      const mb2Body = appendLabelOnly('memebot', 'MEMEBOT');
-                      setTimeout(() => {
-                        renderGreentext(fact.memebot_greentext_2, mb2Body);
-                        setTimeout(() => { renderChips(fact.chips); setWaiting(false); }, 400);
-                      }, 500 + Math.random()*300);
-                    }, 600);
-                  } else {
-                    setTimeout(() => { renderChips(fact.chips); setWaiting(false); }, 300);
-                  }
-                });
-              }, 300);
-            }, 900);
-          }, 500 + Math.random()*300);
+          // Step 4: Second MemeBot greentext (if exists)
+          if (fact.memebot_greentext_2?.length) {
+            const mb2Body = appendLabelOnly('memebot', 'MEMEBOT');
+            renderGreentext(fact.memebot_greentext_2, mb2Body, () => {
 
-        } else {
-          // No meme — BEN OS reacts directly
-          const reactBody = appendLabelOnly('sys', 'BEN OS');
-          setTimeout(() => {
-            typewriter(reactBody, fact.benos_reaction, () => {
-              if (fact.memebot_greentext_2?.length) {
-                setTimeout(() => {
-                  const mb3Body = appendLabelOnly('memebot', 'MEMEBOT');
-                  setTimeout(() => {
-                    renderGreentext(fact.memebot_greentext_2, mb3Body);
-                    setTimeout(() => { renderChips(fact.chips); setWaiting(false); }, 400);
-                  }, 500 + Math.random()*300);
-                }, 600);
-              } else {
-                setTimeout(() => { renderChips(fact.chips); setWaiting(false); }, 300);
-              }
+              // Step 5: Chips
+              renderChips(fact.chips);
+              setWaiting(false);
             });
-          }, 300);
-        }
+          } else {
+            renderChips(fact.chips);
+            setWaiting(false);
+          }
+        });
+      };
 
-      }, 400);
+      if (hasMeme) {
+        const mb1Body = appendLabelOnly('memebot', 'MEMEBOT');
+        renderMemebotImage(fact.memebot_meme, mb1Body, afterMemebot);
+      } else if (hasGreentext) {
+        const mb1Body = appendLabelOnly('memebot', 'MEMEBOT');
+        renderGreentext(fact.memebot_greentext, mb1Body, afterMemebot);
+      } else {
+        afterMemebot();
+      }
+
     });
-  }, 600);
+  }, 400);
 }
 
-/* ── VIGNETTE RENDERER ───────────────────────────── */
+/* ── VIGNETTE RENDERER — fully sequential ────────── */
 function playVignette(vignette, typingBody) {
   const doMemebot = () => {
     const mb = vignette.memebot;
     if (!mb) { fireVignetteReaction(vignette); return; }
     const vigMbBody = appendLabelOnly('memebot', 'MEMEBOT');
-    setTimeout(() => {
-      if (mb.type === 'image')      renderMemebotImage(mb.id, vigMbBody);
-      else if (mb.type === 'greentext') renderGreentext(mb.lines, vigMbBody);
-      setTimeout(() => fireVignetteReaction(vignette), 800);
-    }, 500 + Math.random()*300);
+    if (mb.type === 'image') {
+      renderMemebotImage(mb.id, vigMbBody, () => fireVignetteReaction(vignette));
+    } else if (mb.type === 'greentext') {
+      renderGreentext(mb.lines, vigMbBody, () => fireVignetteReaction(vignette));
+    } else {
+      fireVignetteReaction(vignette);
+    }
   };
 
   if (vignette.benos_setup) {
-    typewriter(typingBody, vignette.benos_setup, () => setTimeout(doMemebot, 600));
+    typewriter(typingBody, vignette.benos_setup, doMemebot);
   } else {
     typingBody.classList.remove('typing');
     typingBody.textContent = '';
@@ -1198,13 +1194,11 @@ function fireVignetteReaction(vignette) {
   const { body } = appendMsg('sys', '', 'BEN OS', { typing: true });
   typewriter(body, vignette.benos_reaction, () => {
     if (vignette.benos_reaction2) {
-      setTimeout(() => {
-        const { body: b2 } = appendMsg('sys', '', 'BEN OS', { typing: true });
-        typewriter(b2, vignette.benos_reaction2, () => {
-          renderChips(vignette.buttons);
-          setWaiting(false);
-        });
-      }, 500);
+      const { body: b2 } = appendMsg('sys', '', 'BEN OS', { typing: true });
+      typewriter(b2, vignette.benos_reaction2, () => {
+        renderChips(vignette.buttons);
+        setWaiting(false);
+      });
     } else {
       renderChips(vignette.buttons);
       setWaiting(false);
