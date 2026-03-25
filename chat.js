@@ -252,8 +252,8 @@ const INTENTS = [
     id: 'who_is_ben',
     patterns: ['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'],
     beats: [
-      { text: "Graphic designer and creative producer. Los Angeles.", pause: 500 },
-      { text: "10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600 },
+      { text: "Graphic designer and creative producer. Los Angeles.", pause: 500, type: 'newline' },
+      { text: "10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600, type: 'newline' },
       { text: "What do you need?", pause: 0 }
     ],
     chips: [{ label: "Show me the work.", route: "show_work" }, { label: "What's Blue Note?", route: "blue_note" }, { label: "Are you available?", route: "available" }]
@@ -315,7 +315,7 @@ const INTENTS = [
     id: 'available',
     patterns: ['are you available','is ben available','available for hire','taking projects','freelance','open to work','for hire','hire ben','can i hire you'],
     beats: [
-      { text: "Full-time at Blue Note Los Angeles right now. That will change. It always does.", pause: 600 },
+      { text: "Full-time at Blue Note Los Angeles right now. That will change. It always does.", pause: 600, type: 'newline' },
       { text: "In the meantime — the right project still gets a yes. What's yours?", pause: 0 }
     ],
     topic: 'availability'
@@ -411,6 +411,7 @@ const INTENTS = [
     ],
     topic: 'portfolio',
     media: 'design',
+    mediaAfterBeat: 0,
     chips: [{ label: "Video work.", route: "show_video" }, { label: "More design.", route: "show_design" }, { label: "Tell me about a project.", route: "chess_prediction" }, { label: "Who is Ben?", route: "who_is_ben" }]
   },
   {
@@ -427,8 +428,8 @@ const INTENTS = [
     id: 'rebrand',
     patterns: ['rebrand','rebranding','new brand','brand refresh','update our brand','brand identity','new look','redesign our brand'],
     beats: [
-      { text: "What broke?", pause: 600 },
-      { text: "Rebrands happen for one of three reasons — the brand no longer reflects what the company actually does, the market shifted and the visual language aged out, or someone new came in and wanted to mark the territory.", pause: 700 },
+      { text: "What broke?", pause: 600, type: 'newline' },
+      { text: "Rebrands happen for one of three reasons — the brand no longer reflects what the company actually does, the market shifted and the visual language aged out, or someone new came in and wanted to mark the territory.", pause: 700, type: 'newline' },
       { text: "Which one is it?", pause: 0 }
     ],
     topic: 'branding',
@@ -479,7 +480,7 @@ const INTENTS = [
     id: 'chess_prediction',
     patterns: ['personal projects','side projects','his projects','what projects','other projects'],
     beats: [
-      { text: "A few. A fortune cookie brand that gives bad advice. A chess set based on Man Ray's work. A fictional acoustic weapon with a real datasheet.", pause: 700 },
+      { text: "A few. A fortune cookie brand that gives bad advice. A chess set based on Man Ray's work. A fictional acoustic weapon with a real datasheet.", pause: 700, type: 'newline' },
       { text: "You're going to ask about the chess set.", pause: 0 }
     ],
     topic: 'projects',
@@ -499,7 +500,7 @@ const INTENTS = [
     id: 'chess',
     patterns: ['chess set','man ray','chess pieces','the chess set','chess project','surrealist chess'],
     beats: [
-      { text: "Man Ray designed chess pieces in the 1920s. Ben 3D modeled them, had them cast in resin, and packaged them as a collectible set.", pause: 600 },
+      { text: "Man Ray designed chess pieces in the 1920s. Ben 3D modeled them, had them cast in resin, and packaged them as a collectible set.", pause: 500, type: 'newline' },
       { text: "Man Ray was not consulted. I think he'd be fine with it.", pause: 0 }
     ],
     topic: 'projects',
@@ -509,8 +510,8 @@ const INTENTS = [
     id: 'misfortunes',
     patterns: ['misfortune cookies','fortune cookies','misfortunes','misfortunes.net','bad fortunes','the cookie','cookie project'],
     beats: [
-      { text: "Fortune cookies, but honest.", pause: 500 },
-      { text: "Swiss grid, stark type, dark palette — deliberately clinical against the warm expectations of the category. Packaging, web, copy. Fortunes are AI-generated from a curated dataset.", pause: 700 },
+      { text: "Fortune cookies, but honest.", pause: 500, type: 'newline' },
+      { text: "Swiss grid, stark type, dark palette — deliberately clinical against the warm expectations of the category. Packaging, web, copy. Fortunes are AI-generated from a curated dataset.", pause: 700, type: 'newline' },
       { text: "If you want to feel seen by a cookie: misfortunes.net.", pause: 0 }
     ],
     topic: 'projects',
@@ -520,8 +521,9 @@ const INTENTS = [
     id: 'whisper',
     patterns: ['whisper gun','whisper mk','lrad','sound weapon','acoustic device','directional sound','ultrasonic','the weapon','show me the datasheet','tell me about the weapon'],
     beats: [
-      { text: "The Whisper MK-I is a fictional product — in the sense that the datasheet is a design exercise.", pause: 600 },
-      { text: "The actual device is real. Portable directional sound using ultrasonic transducers and PWM signal generation. Built and documented.", pause: 600 },
+      { text: "The Whisper MK-I is a fictional product —", pause: 400, type: 'inline' },
+      { text: " in the sense that the datasheet is a design exercise.", pause: 600, type: 'newline' },
+      { text: "The actual device is real. Portable directional sound using ultrasonic transducers and PWM signal generation. Built and documented.", pause: 600, type: 'newline' },
       { text: "The datasheet is the interesting part. Government document parody. Very dry.", pause: 0 }
     ],
     topic: 'projects',
@@ -531,15 +533,15 @@ const INTENTS = [
     id: 'weapon_legal',
     patterns: ['is this legal','is that legal','is the weapon legal','can you do that'],
     beats: [
-      { text: "It's a speaker.", pause: 600 },
-      { text: "A very directional one.", pause: 0 }
+      { text: "It's a speaker.", pause: 600, type: 'inline' },
+      { text: " A very directional one.", pause: 0 }
     ]
   },
   {
     id: 'blue_note',
     patterns: ['blue note','jazz club','jazz venue','where does ben work','current job','current role','tell me about blue note'],
     beats: [
-      { text: "Blue Note Los Angeles — one of the iconic jazz franchise venues. Ben is the in-house graphic designer on the marketing team.", pause: 500 },
+      { text: "Blue Note Los Angeles — one of the iconic jazz franchise venues. Ben is the in-house graphic designer on the marketing team.", pause: 500, type: 'newline' },
       { text: "It is, in fact, a good sentence to have in a bio.", pause: 0 }
     ],
     chips: [{ label: "What does he do there?", route: "blue_note_work" }, "What kind of jazz?", { label: "What do you actually do?", route: "what_do_you_do" }]
@@ -548,7 +550,7 @@ const INTENTS = [
     id: 'blue_note_work',
     patterns: ['what does he do there','what does ben do at blue note','his work at blue note','blue note projects'],
     beats: [
-      { text: "Posters, social, print, digital — the full marketing stack for a live music venue.", pause: 600 },
+      { text: "Posters, social, print, digital — the full marketing stack for a live music venue.", pause: 500, type: 'newline' },
       { text: "Every week is a new show. Every show needs assets. It's fast.", pause: 0 }
     ],
     chips: [{ label: "Show me examples.", route: "show_work" }, { label: "What do you actually do?", route: "what_do_you_do" }]
@@ -559,7 +561,7 @@ const INTENTS = [
     id: 'man_ray_who',
     patterns: ['who is man ray','tell me about man ray','man ray artist','what is dada','dadaism'],
     beats: [
-      { text: "Man Ray was a Dadaist and Surrealist — photography, painting, objects. Active in Paris in the 1920s. Made things that deliberately resisted being useful.", pause: 700 },
+      { text: "Man Ray was a Dadaist and Surrealist — photography, painting, objects. Active in Paris in the 1920s. Made things that deliberately resisted being useful.", pause: 600, type: 'newline' },
       { text: "He also designed chess pieces. Never meant to be played with. Ben found this relatable.", pause: 0 }
     ],
     chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Surprise me again.", route: "surprise" }]
@@ -568,7 +570,7 @@ const INTENTS = [
     id: 'can_buy_chess',
     patterns: ['can i buy','is it for sale','where can i buy','how much','price','cost'],
     beats: [
-      { text: "Not currently. Limited run — most went to people Ben wanted to have them.", pause: 600 },
+      { text: "Not currently. Limited run — most went to people Ben wanted to have them.", pause: 500, type: 'newline' },
       { text: "That might change. benolivas@gmail.com if you're serious.", pause: 0 }
     ]
   },
@@ -576,7 +578,7 @@ const INTENTS = [
     id: 'worst_fortune',
     patterns: ["what's the worst fortune","worst fortune","most brutal fortune","saddest fortune","most depressing"],
     beats: [
-      { text: "They're all the worst fortune. That's the product.", pause: 600 },
+      { text: "They're all the worst fortune. That's the product.", pause: 600, type: 'newline' },
       { text: "The good ones are the ones that feel too specific.", pause: 0 }
     ]
   }
@@ -602,7 +604,10 @@ const MEDIA = {
   design: [
     { src: 'https://benolivas.com/images/CaseStudies/afterhours.gif',  fullSrc: 'https://benolivas.com/images/CaseStudies/afterhours.gif',         label: 'After Hours',       caseStudyUrl: null },
     { src: 'https://benolivas.com/images/CaseStudies/misfortunes.gif', fullSrc: 'https://benolivas.com/images/CaseStudies/misfortunes.gif',        label: 'Misfortune Cookies', caseStudyUrl: 'https://misfortunes.net' },
-    { src: 'https://benolivas.com/images/CaseStudies/chess.gif',       fullSrc: 'https://benolivas.com/images/CaseStudies/chess.gif',              label: 'Man Ray Chess',     caseStudyUrl: null }
+    { src: 'https://benolivas.com/images/CaseStudies/chess.gif',       fullSrc: 'https://benolivas.com/images/CaseStudies/chess.gif',              label: 'Man Ray Chess',     caseStudyUrl: null },
+    { src: 'https://benolivas.com/images/Thumbnails/onibabaSM.png',    fullSrc: 'https://benolivas.com/images/GraphicDesign/OnibabaPoster.png',    label: 'Onibaba',           caseStudyUrl: null },
+    { src: 'https://benolivas.com/images/Thumbnails/swissstyleSM.png', fullSrc: 'https://benolivas.com/images/GraphicDesign/SwissStylePoster.png', label: 'Swiss Design',      caseStudyUrl: null },
+    { src: 'https://benolivas.com/images/Thumbnails/voltaireSM.png',   fullSrc: 'https://benolivas.com/images/GraphicDesign/VoltairePoster.jpg',   label: 'Voltaire',          caseStudyUrl: null }
   ]
 };
 
@@ -766,16 +771,23 @@ function charDelay(text, i) {
   return 28 + Math.random()*28;
 }
 
-function typewriter(el, text, onDone, fast=true) {
-  el.classList.remove('typing');
-  el.textContent = '';
+function typewriter(el, text, onDone, fast=true, appendMode=false) {
+  // appendMode=true: adds to existing content (inline/newline beats)
+  // appendMode=false: clears and starts fresh (new row beats)
+  if (!appendMode) {
+    el.classList.remove('typing');
+    el.textContent = '';
+  }
   let i = 0;
-  // fast=true: BEN OS speed (LLM-like, snappy)
-  // fast=false: MemeBot speed (human-paced, deliberate)
   const spd = fast ? 1 : 2.8;
   function tick() {
     if (i < text.length) {
-      el.textContent += text[i];
+      // In append mode, use insertAdjacentText to add after existing content
+      if (appendMode) {
+        el.insertAdjacentText('beforeend', text[i]);
+      } else {
+        el.textContent += text[i];
+      }
       scrollBottom();
       setTimeout(tick, charDelay(text, i++) * spd);
     } else if (onDone) { onDone(); }
@@ -784,22 +796,52 @@ function typewriter(el, text, onDone, fast=true) {
 }
 
 /* ── RENDER BEATS ────────────────────────────────── */
+/* Beat types:
+   (default) — new row with label. New speaker or distinct thought.
+   inline    — appends to current line, no break. Mid-sentence pause.
+   newline   — new line in same row. Same speaker, new sentence.
+*/
 function renderBeats(beats, who, onComplete) {
-  const fast = (who !== 'MEMEBOT'); // BEN OS fast, MemeBot human-paced
+  const fast = (who !== 'MEMEBOT');
+  const role = who === 'MEMEBOT' ? 'memebot' : 'sys';
+  let currentBody = null; // tracks the active message body
+
   let i = 0;
   function next() {
     if (i >= beats.length) { if (onComplete) onComplete(); return; }
     const beat = beats[i++];
+    const after = () => beat.pause ? setTimeout(next, beat.pause) : next();
+
+    // First beat — reuse existing typing bubble if present (from sendMessage)
     if (i === 1) {
-      const typing = chatWindow.querySelector('.msg-body.typing');
-      if (typing) {
-        typewriter(typing, beat.text, () => beat.pause ? setTimeout(next, beat.pause) : next(), fast);
+      const existing = chatWindow.querySelector('.msg-body.typing');
+      if (existing) {
+        currentBody = existing;
+        typewriter(currentBody, beat.text, after, fast);
         return;
       }
     }
-    const role = who === 'MEMEBOT' ? 'memebot' : 'sys';
+
+    if (beat.type === 'inline' && currentBody) {
+      // Append to current line — no visual break, just a pause mid-thought
+      const prev = currentBody.textContent;
+      typewriter(currentBody, beat.text, after, fast, true); // appendMode=true
+      return;
+    }
+
+    if (beat.type === 'newline' && currentBody) {
+      // New line inside same row — same speaker, new sentence
+      const br = document.createElement('br');
+      currentBody.appendChild(br);
+      // typewriter in append mode on the same body
+      typewriter(currentBody, beat.text, after, fast, true);
+      return;
+    }
+
+    // Default — new row with label
     const { body } = appendMsg(role, '', who, { typing: true });
-    typewriter(body, beat.text, () => beat.pause ? setTimeout(next, beat.pause) : next(), fast);
+    currentBody = body;
+    typewriter(currentBody, beat.text, after, fast);
   }
   next();
 }
@@ -856,7 +898,7 @@ function renderGreentext(lines, targetBody, onDone) {
 function renderImageGrid(key) {
   const items = MEDIA[key]; if (!items) return;
   const grid = document.createElement('div'); grid.className = 'img-grid';
-  items.slice(0,3).forEach((item,idx) => {
+  items.slice(0,6).forEach((item,idx) => {
     const a = document.createElement('div');
     a.className = 'img-grid-item';
     a.style.animationDelay = `${idx*0.1}s`;
@@ -995,13 +1037,48 @@ async function fireIntent(intentId, label) {
   await new Promise(r => setTimeout(r, 280 + Math.random()*180));
 
   if (intent.topic) sessionTopics.push(intent.topic);
-  renderBeats(intent.beats, 'BEN OS', () => {
-    if (intent.media)  setTimeout(() => renderImageGrid(intent.media), 200);
-    if (intent.chips)  setTimeout(() => renderChips(intent.chips), intent.media ? 600 : 200);
-    conversationHistory.push({ role: 'assistant', content: intent.beats[intent.beats.length-1]?.text || '' });
-    statusLabel.textContent = '';
-    setWaiting(false);
-  });
+  playIntent(intent);
+}
+
+function playIntent(intent) {
+  const beats = intent.beats || [];
+  const mediaKey = intent.media;
+  const mediaAfter = intent.mediaAfterBeat ?? null; // beat index after which media appears
+
+  if (mediaKey && mediaAfter !== null) {
+    // Split beats: before media, after media
+    const beforeBeats = beats.slice(0, mediaAfter + 1);
+    const afterBeats  = beats.slice(mediaAfter + 1);
+
+    renderBeats(beforeBeats, 'BEN OS', () => {
+      setTimeout(() => {
+        renderImageGrid(mediaKey);
+        setTimeout(() => {
+          if (afterBeats.length) {
+            renderBeats(afterBeats, 'BEN OS', () => {
+              if (intent.chips) setTimeout(() => renderChips(intent.chips), 200);
+              conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
+              statusLabel.textContent = '';
+              setWaiting(false);
+            });
+          } else {
+            if (intent.chips) setTimeout(() => renderChips(intent.chips), 200);
+            conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
+            statusLabel.textContent = '';
+            setWaiting(false);
+          }
+        }, 300);
+      }, 200);
+    });
+  } else {
+    renderBeats(beats, 'BEN OS', () => {
+      if (mediaKey)      setTimeout(() => renderImageGrid(mediaKey), 200);
+      if (intent.chips)  setTimeout(() => renderChips(intent.chips), mediaKey ? 600 : 200);
+      conversationHistory.push({ role: 'assistant', content: beats[beats.length-1]?.text || '' });
+      statusLabel.textContent = '';
+      setWaiting(false);
+    });
+  }
 }
 
 /* ── SURPRISE ME ─────────────────────────────────── */
@@ -1265,13 +1342,7 @@ async function sendMessage(text) {
 
     // Normal intent
     if (intent.topic) sessionTopics.push(intent.topic);
-    renderBeats(intent.beats, 'BEN OS', () => {
-      if (intent.media)  setTimeout(() => renderImageGrid(intent.media), 200);
-      if (intent.chips)  setTimeout(() => renderChips(intent.chips), intent.media ? 600 : 200);
-      conversationHistory.push({ role: 'assistant', content: intent.beats[intent.beats.length-1]?.text || '' });
-      statusLabel.textContent = '';
-      setWaiting(false);
-    });
+    playIntent(intent);
 
   } else {
     // Claude API fallback — only works if proxy.php is present
