@@ -1,0 +1,140 @@
+{
+  "_readme": "Meme library. Each entry is either a 'finished' meme or a 'raw' template for MemeBot to generate new ones. Annotations drive MemeBot's situational awareness.",
+  "finished": [
+    {
+      "id": "skeleton-boredom",
+      "file": "assets/memes/skeleton-boredom.jpg",
+      "alt": "Skeleton sitting at computer, death by boredom intensifies",
+      "format": "image",
+      "emotions": ["bored", "dead inside", "waiting", "unbothered"],
+      "situations": ["benos speaking too long", "long monologue", "facts", "portfolio talk"],
+      "style": "classic image macro",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "dead inside",
+      "source": "uploaded",
+      "notes": "First MemeBot appearance on Surprise Me path. Fact 1 (sonic beam tech) pairing."
+    },
+    {
+      "id": "eye-roll-stanley",
+      "file": "assets/memes/eye-roll-stanley.gif",
+      "alt": "Stanley from The Office doing slow eye roll",
+      "format": "gif",
+      "emotions": ["unimpressed", "done", "eye roll", "mild contempt"],
+      "situations": ["defense contractor to jazz club fact", "benos being dry", "obvious statement"],
+      "style": "reaction gif",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "wrong one again",
+      "source": "uploaded",
+      "notes": "Best paired with jazz club / career pivot fact. No caption needed."
+    },
+    {
+      "id": "full-of-soup",
+      "file": "assets/memes/full-of-soup.jpg",
+      "alt": "Tiny kitten being held up, red arrow pointing at round belly, text: full of soup",
+      "format": "image",
+      "emotions": ["overwhelmed", "full", "too much", "confused but okay"],
+      "situations": ["user overwhelmed", "too many options", "dont know where to start", "information overload"],
+      "style": "classic image macro with arrow",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "full of soup",
+      "source": "uploaded",
+      "notes": "Fires when user seems overwhelmed or says they don't know where to start."
+    },
+    {
+      "id": "depressed-but-horny",
+      "file": "assets/memes/depressed-but-horny.jpg",
+      "alt": "Fluffy dog with tongue out, text: depressed but horny and thats okay",
+      "format": "image",
+      "emotions": ["complicated", "chaotic", "conflicted", "oddly positive"],
+      "situations": ["user is having a day", "existential moment", "its complicated", "memebot introduction"],
+      "style": "wholesome chaos",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "current mood",
+      "source": "uploaded",
+      "notes": "MemeBot's general vibe. Good for early appearances."
+    },
+    {
+      "id": "temporary-person",
+      "file": "assets/memes/temporary-person.jpg",
+      "alt": "Black dog with yellow eyes, text: i feel like such a temporary person in everyones life",
+      "format": "image",
+      "emotions": ["melancholy", "existential", "sad", "resigned"],
+      "situations": ["goodbye", "end of conversation", "user leaving", "benos reflecting"],
+      "style": "art meme, painted",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "sad n small",
+      "source": "uploaded",
+      "notes": "The goodbye meme. BEN OS says nothing after this. Conversation ends."
+    },
+    {
+      "id": "all-ears",
+      "file": "assets/memes/all-ears.jpg",
+      "alt": "Man covered in ears all over his body",
+      "format": "image",
+      "emotions": ["listening", "attentive", "absurd", "literal"],
+      "situations": ["user says they are listening", "im a woman", "tell me more", "go on", "i'm all ears"],
+      "style": "absurdist reaction",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "awkward reaction",
+      "source": "uploaded",
+      "notes": "Fires when user says listening-related phrases. Technically relevant, completely absurd."
+    },
+    {
+      "id": "it-hurts",
+      "file": "assets/memes/it-hurts.jpg",
+      "alt": "Loading spinner on dark screen, text: IT HURTS...",
+      "format": "image",
+      "emotions": ["pain", "loading", "processing", "suffering"],
+      "situations": ["bad rebrand mentioned", "ceo picked colors", "terrible design", "buffering", "processing"],
+      "style": "memebot screen state",
+      "caption_needed": false,
+      "greentext_compatible": false,
+      "memebot_state": "IT HURTS",
+      "source": "generated",
+      "notes": "MemeBot's pain state. Good response to bad design decisions."
+    },
+    {
+      "id": "play-with-me",
+      "file": "assets/memes/play-with-me.jpg",
+      "alt": "Excited puppy or cat looking directly at camera, PLAY WITH ME energy",
+      "format": "image",
+      "emotions": ["excited", "wanting", "begging", "chaotic joy"],
+      "situations": ["surprise me button", "memebot first appearance", "memebot wants attention"],
+      "style": "memebot screen state",
+      "caption_needed": true,
+      "default_caption": "PLAY WITH ME",
+      "greentext_compatible": false,
+      "memebot_state": "PLAY WITH ME",
+      "source": "needed",
+      "notes": "MemeBot's first appearance image. Needs sourcing — should be irresistibly cute animal."
+    }
+  ],
+  "raw_templates": [
+    {
+      "id": "raw-confused-animal",
+      "file": "assets/memes/raw/confused-animal.jpg",
+      "alt": "Animal looking confused at camera",
+      "format": "raw_template",
+      "emotions": ["confused", "uncertain", "questioning"],
+      "text_positions": ["top", "bottom"],
+      "layout": 1,
+      "notes": "Classic top/bottom text format"
+    },
+    {
+      "id": "raw-staring-dog",
+      "file": "assets/memes/raw/staring-dog.jpg",
+      "alt": "Dog staring directly into camera, neutral expression",
+      "format": "raw_template",
+      "emotions": ["unbothered", "staring", "judgment", "neutral"],
+      "text_positions": ["caption_below"],
+      "layout": 3,
+      "notes": "Caption below format, no text on image"
+    }
+  ]
+}

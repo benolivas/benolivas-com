@@ -1,0 +1,53 @@
+{
+  "_readme": "Rotating 'Did you know' facts for Surprise Me path. Each fact pairs with a specific MemeBot meme ID. localStorage tracks which have fired to prevent repeats.",
+  "facts": [
+    {
+      "id": "fact-sonic",
+      "text": "Did you know that Ben once built a directional sound weapon—",
+      "memebot_meme": "skeleton-boredom",
+      "memebot_greentext": null,
+      "benos_reaction": "...anyway.",
+      "notes": "Interrupted by skeleton boredom meme. Classic opener."
+    },
+    {
+      "id": "fact-chess",
+      "text": "Did you know that Ben's chess set is based on Man Ray's 1920 designs—",
+      "memebot_meme": null,
+      "memebot_greentext": [">be artist", ">die in 1976", ">some guy 3D prints your chess set", ">surprised pikachu"],
+      "benos_reaction": "...the point was the packaging.",
+      "notes": "Greentext format. No image needed."
+    },
+    {
+      "id": "fact-career",
+      "text": "Did you know that Ben went from defense contractor to jazz club graphic designer—",
+      "memebot_meme": "eye-roll-stanley",
+      "memebot_greentext": null,
+      "benos_reaction": "...it made sense at the time.",
+      "notes": "Stanley eye roll. Career pivot absurdity."
+    },
+    {
+      "id": "fact-pdf",
+      "text": "Did you know that Ben's portfolio PDF is formatted as a classified government document—",
+      "memebot_meme": null,
+      "memebot_greentext": [">UNCLASSIFIED", ">...", ">classified"],
+      "benos_reaction": "...the cover says UNCLASSIFIED. That part is accurate.",
+      "notes": "Short punchy greentext."
+    },
+    {
+      "id": "fact-cookies",
+      "text": "Did you know that Misfortune Cookies tells you exactly what you don't want to hear—",
+      "memebot_meme": "full-of-soup",
+      "memebot_greentext": null,
+      "benos_reaction": "...that was the point.",
+      "notes": "Full of soup. User might not know Misfortune Cookies yet."
+    },
+    {
+      "id": "fact-manray",
+      "text": "Did you know that Man Ray was a Dadaist who also designed chess pieces nobody played with—",
+      "memebot_meme": null,
+      "memebot_greentext": [">be dadaist", ">make chess pieces", ">nobody plays chess with them", ">this is the point"],
+      "benos_reaction": "...Ben identified with that.",
+      "notes": "Greentext. Art context beat."
+    }
+  ]
+}

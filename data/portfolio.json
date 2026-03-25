@@ -1,0 +1,187 @@
+{
+  "_readme": "Portfolio asset catalog. Each entry references either a URL (benolivas.com hosted) or a local file. Tags drive smart surfacing in chat.",
+  "items": [
+    {
+      "id": "jump20",
+      "title": "JUMP 20",
+      "type": "video",
+      "client": "AeroVironment",
+      "year": 2024,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/jump20SM.png",
+      "inline_gif": null,
+      "url": "https://www.youtube.com/watch?v=lxT9cGUEeZA",
+      "tags": ["defense", "drone", "technical", "corporate", "video", "recent"],
+      "description": "Maritime-capable UAS video. Produced, shot, motion graphics.",
+      "services": ["producing", "cinematography", "motion graphics"]
+    },
+    {
+      "id": "nombe-summers-gone",
+      "title": "NoMBe — Summer's Gone",
+      "type": "video",
+      "client": "TH3RD BRAIN Records",
+      "year": 2018,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/stayoverSM.png",
+      "inline_gif": null,
+      "url": "https://www.youtube.com/watch?v=n60cpM8_G-I",
+      "tags": ["music video", "artist", "creative", "video", "archive"],
+      "description": "Music video for NoMBe featuring Thutmose.",
+      "services": ["video producing", "editing", "vhs camera"]
+    },
+    {
+      "id": "asana-meet-team",
+      "title": "Asana — Meet Our Team",
+      "type": "video",
+      "client": "Asana",
+      "year": 2019,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/crystal.png",
+      "inline_gif": null,
+      "url": "https://www.youtube.com/watch?v=8bh_nmZqUu0",
+      "tags": ["tech", "corporate", "recruiting", "brand video", "video"],
+      "description": "Lifestyle series for Asana recruiting and advertising.",
+      "services": ["producing", "cinematography", "sound", "editing"]
+    },
+    {
+      "id": "misfortune-cookies",
+      "title": "Misfortune Cookies",
+      "type": "design",
+      "client": "Fake World Inc.",
+      "year": 2025,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/onibabaSM.png",
+      "inline_gif": "https://benolivas.com/images/CaseStudies/misfortunes.gif",
+      "url": "https://benolivas.net/misfortune-cookies",
+      "tags": ["branding", "packaging", "ui/ux", "web", "personal", "recent", "dark", "experimental"],
+      "description": "Subversive fortune cookie brand. Packaging, web, copy.",
+      "services": ["copywriting", "packaging design", "ui/ux", "web design"]
+    },
+    {
+      "id": "after-hours",
+      "title": "After Hours Coffee",
+      "type": "design",
+      "client": "After Hours Coffee",
+      "year": 2025,
+      "thumbnail": null,
+      "inline_gif": "https://benolivas.com/images/CaseStudies/afterhours.gif",
+      "url": "https://benolivas.com/#design",
+      "tags": ["branding", "packaging", "coffee", "dark", "atmospheric", "recent"],
+      "description": "Specialty coffee brand identity. Late-night ritual aesthetic.",
+      "services": ["branding", "packaging design", "look dev"]
+    },
+    {
+      "id": "man-ray-chess",
+      "title": "Man Ray Chess Set",
+      "type": "design",
+      "client": "self",
+      "year": 2024,
+      "thumbnail": null,
+      "inline_gif": "https://benolivas.com/images/CaseStudies/chess.gif",
+      "url": "https://benolivas.net/man-ray-chess-set",
+      "tags": ["3d", "product", "packaging", "personal", "surrealist", "recent"],
+      "description": "Modernist chess set based on Man Ray. 3D modeled, cast, packaged.",
+      "services": ["3d modeling", "3d printing", "packaging design"]
+    },
+    {
+      "id": "whisper-mk1",
+      "title": "Whisper MK-I Datasheet",
+      "type": "design",
+      "client": "Fake World Inc.",
+      "year": 2024,
+      "thumbnail": null,
+      "inline_gif": null,
+      "url": "https://benolivas.com/images/GraphicDesign/whisper.webp",
+      "tags": ["technical", "document", "defense-parody", "personal", "experimental", "recent"],
+      "description": "Technical datasheet for fictional acoustic device.",
+      "services": ["graphic design", "product design"]
+    },
+    {
+      "id": "av-homepage",
+      "title": "AeroVironment Homepage",
+      "type": "design",
+      "client": "AeroVironment",
+      "year": 2023,
+      "thumbnail": null,
+      "inline_gif": "https://benolivas.com/images/CaseStudies/AVHomepage1.gif",
+      "url": "https://www.behance.net/gallery/220697855/AeroVironment-Homepage",
+      "tags": ["motion graphics", "defense", "corporate", "after effects", "cinema4d", "recent"],
+      "description": "Motion graphics homepage loop. After Effects + Cinema 4D.",
+      "services": ["video editing", "graphic design", "motion graphics"]
+    },
+    {
+      "id": "onibaba-poster",
+      "title": "Onibaba Poster",
+      "type": "design",
+      "client": "self",
+      "year": null,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/onibabaSM.png",
+      "inline_gif": null,
+      "url": "https://benolivas.com/images/GraphicDesign/OnibabaPoster.png",
+      "tags": ["poster", "film", "editorial", "dark", "personal"],
+      "description": "Film poster design for Onibaba.",
+      "services": ["graphic design"]
+    },
+    {
+      "id": "voltaire-poster",
+      "title": "Voltaire",
+      "type": "design",
+      "client": "self",
+      "year": null,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/voltaireSM.png",
+      "inline_gif": null,
+      "url": "https://benolivas.com/images/GraphicDesign/VoltairePoster.jpg",
+      "tags": ["poster", "editorial", "swiss", "typography", "personal"],
+      "description": "Editorial poster. Swiss grid influence.",
+      "services": ["graphic design"]
+    },
+    {
+      "id": "swiss-design-poster",
+      "title": "Swiss Design",
+      "type": "design",
+      "client": "self",
+      "year": null,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/swissstyleSM.png",
+      "inline_gif": null,
+      "url": "https://benolivas.com/images/GraphicDesign/SwissStylePoster.png",
+      "tags": ["poster", "swiss", "grid", "typography", "modernist", "personal"],
+      "description": "Swiss modernist poster study.",
+      "services": ["graphic design"]
+    },
+    {
+      "id": "switchblade-300",
+      "title": "Switchblade 300",
+      "type": "video",
+      "client": "AeroVironment",
+      "year": 2023,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/sb300SM2.png",
+      "inline_gif": null,
+      "url": "https://vimeo.com/1062962263",
+      "tags": ["defense", "drone", "technical", "corporate", "video", "recent"],
+      "description": "Video for AeroVironment Switchblade 300 loitering munition.",
+      "services": ["producing", "motion graphics"]
+    },
+    {
+      "id": "specter-sunglasses",
+      "title": "Specter Sunglasses",
+      "type": "video",
+      "client": "Specter",
+      "year": 2025,
+      "thumbnail": "https://benolivas.com/images/Thumbnails/SpectreSM.png",
+      "inline_gif": null,
+      "url": "https://vimeo.com/1065671328",
+      "tags": ["fashion", "product", "brand video", "video", "recent"],
+      "description": "Brand video for Specter Sunglasses.",
+      "services": ["video production"]
+    }
+  ],
+  "tag_groups": {
+    "by_type": {
+      "video": ["jump20", "nombe-summers-gone", "asana-meet-team", "switchblade-300", "specter-sunglasses"],
+      "design": ["misfortune-cookies", "after-hours", "man-ray-chess", "whisper-mk1", "av-homepage", "onibaba-poster", "voltaire-poster", "swiss-design-poster"]
+    },
+    "by_mood": {
+      "dark": ["misfortune-cookies", "after-hours", "onibaba-poster"],
+      "technical": ["jump20", "whisper-mk1", "av-homepage", "switchblade-300"],
+      "editorial": ["onibaba-poster", "voltaire-poster", "swiss-design-poster"],
+      "personal": ["man-ray-chess", "misfortune-cookies", "whisper-mk1", "onibaba-poster", "voltaire-poster", "swiss-design-poster"],
+      "recent": ["jump20", "misfortune-cookies", "after-hours", "man-ray-chess", "whisper-mk1", "av-homepage", "switchblade-300", "specter-sunglasses"]
+    }
+  }
+}

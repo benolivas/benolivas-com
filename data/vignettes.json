@@ -1,0 +1,60 @@
+{
+  "_readme": "Self-contained three-beat MemeBot vignette moments. Each has trigger patterns, a BEN OS setup line, a MemeBot response (image or greentext), BEN OS reaction, and follow-up buttons.",
+  "vignettes": [
+    {
+      "id": "all-ears",
+      "triggers": ["i'm listening", "im listening", "all ears", "i'm a woman", "im a woman", "she her", "tell me more", "go on", "continue"],
+      "benos_setup": "Good to know.",
+      "memebot": { "type": "image", "id": "all-ears", "caption": null },
+      "benos_reaction": "Anyway. Is this for a client or something you're building yourself?",
+      "buttons": ["client work", "personal project", "what was that"]
+    },
+    {
+      "id": "full-of-soup",
+      "triggers": ["i don't know where to start", "dont know where to start", "so much", "overwhelmed", "too many options", "i have a lot to say"],
+      "benos_setup": "Start anywhere.",
+      "memebot": { "type": "image", "id": "full-of-soup", "caption": null },
+      "benos_reaction": "That's — not helpful.",
+      "benos_reaction2": "Video or design?",
+      "buttons": ["video", "design work", "same actually"]
+    },
+    {
+      "id": "it-hurts",
+      "triggers": ["our branding is awful", "terrible branding", "ceo picked the colors", "boss chose the colors", "rebrand gone wrong", "our logo is bad", "inherited this brand"],
+      "benos_setup": "That's more common than it should be.",
+      "memebot": { "type": "image", "id": "it-hurts", "caption": null },
+      "benos_reaction": "What's the actual problem with it?",
+      "buttons": ["looks dated", "doesn't reflect us", "someone just wanted change"]
+    },
+    {
+      "id": "current-mood",
+      "triggers": ["i don't know what i'm doing", "is any of this worth it", "existential", "honestly no idea", "lost", "stressed"],
+      "benos_setup": "That's a reasonable thing to feel.",
+      "memebot": { "type": "image", "id": "depressed-but-horny", "caption": "current mood" },
+      "benos_reaction": "What are you working on?",
+      "buttons": ["a rebrand", "starting something new", "honestly no idea"]
+    },
+    {
+      "id": "temporary-person",
+      "triggers": ["bye", "goodbye", "see ya", "later", "peace", "gotta go", "take care", "ttyl", "cya", "leaving"],
+      "benos_setup": "Take care.",
+      "memebot": { "type": "image", "id": "temporary-person", "caption": null },
+      "benos_reaction": null,
+      "buttons": [],
+      "notes": "BEN OS says nothing after this. Conversation ends here."
+    },
+    {
+      "id": "misfortune-conspiracy",
+      "triggers": ["_memebot_only_"],
+      "benos_setup": null,
+      "memebot": {
+        "type": "greentext",
+        "lines": ["ok so.", "between us.", "if you say 'misfortune cookies' he gets weird about it", "just saying"]
+      },
+      "benos_reaction": "I can see this conversation.",
+      "memebot_reaction": { "type": "state", "state": "tilted-away" },
+      "buttons": ["say it anyway", "pretend I didn't see that"],
+      "notes": "MemeBot-only trigger. Fires after 6+ exchanges when MemeBot is active."
+    }
+  ]
+}
