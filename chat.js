@@ -585,6 +585,66 @@ const INTENTS = [
 
 ];
 
+
+/* ── EXACT TRIGGERS ──────────────────────────────── */
+/* Checked BEFORE normalization. Case-insensitive but  */
+/* must match the full input exactly (trimmed).        */
+/* Use for easter eggs, passwords, secret paths.       */
+/* memebot_image: file path, or null                   */
+/* benos_beats: array of {text, pause, type} beats     */
+const EXACT_TRIGGERS = [
+  {
+    id: 'open_sesame',
+    match: 'open sesame',
+    memebot_image: 'assets/memes/open-sesame.gif',
+    benos_beats: [
+      { text: "...how did you know that.", pause: 0 }
+    ],
+    chips: [
+      { label: "Know what?", route: "what_is_benos" },
+      { label: "I have my ways.", route: "unusual" }
+    ]
+  }
+];
+
+/* ── EXACT TRIGGER MATCHING ──────────────────────── */
+function matchExact(input) {
+  const t = input.trim().toLowerCase();
+  return EXACT_TRIGGERS.find(e => e.match.toLowerCase() === t) || null;
+}
+
+/* ── PLAY EXACT TRIGGER ──────────────────────────── */
+function playExactTrigger(trigger, typingBody) {
+  // MemeBot appears first if image exists
+  const fireBenosResponse = () => {
+    if (trigger.benos_beats?.length) {
+      // Clear the existing typing body first beat
+      renderBeats(trigger.benos_beats, 'BEN OS', () => {
+        renderChips(trigger.chips);
+        setWaiting(false);
+      });
+    } else {
+      renderChips(trigger.chips);
+      setWaiting(false);
+    }
+  };
+
+  if (trigger.memebot_image) {
+    // Dismiss the BEN OS typing bubble — MemeBot goes first
+    typingBody.classList.remove('typing');
+    typingBody.remove();
+    const mbBody = appendLabelOnly('memebot', 'MEMEBOT');
+    renderMemebotImage(trigger.memebot_image, mbBody, () => {
+      fireBenosResponse();
+    });
+  } else {
+    // No image — just BEN OS responds
+    typingBody.classList.remove('typing');
+    typingBody.textContent = '';
+    fireBenosResponse();
+  }
+}
+
 /* ── MEDIA CATALOG ───────────────────────────────── */
 /* src: thumbnail shown in grid
    fullSrc: image shown in lightbox (use same as src if no hi-res version)
@@ -1301,6 +1361,14 @@ async function sendMessage(text) {
 
   const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
   await new Promise(r => setTimeout(r, 280 + Math.random()*180));
+
+  // Exact trigger check — before normalization, before everything
+  const exactTrigger = matchExact(input);
+  if (exactTrigger) {
+    playExactTrigger(exactTrigger, typingBody);
+    conversationHistory.push({ role: 'assistant', content: exactTrigger.benos_beats?.[0]?.text || '...' });
+    return;
+  }
 
   // Vignette check first
   const vignette = matchVignette(input);
