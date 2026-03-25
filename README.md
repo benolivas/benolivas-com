@@ -1,131 +1,151 @@
-# benolivas.com — chat interface
-## BEN OS v2.2
+# benolivas.com — BEN OS v2.2
 
-## File structure
+## The short version
+
+**To change what BEN OS says:** open a file in `data/`, edit the text, save, refresh the browser.
+
+**To push changes to GitHub:** three commands in the terminal (see bottom of this file).
+
+**Never need to touch:** `chat.js`, `style.css`, `index.html` — unless something structural is changing.
+
+---
+
+## The files and what they do
+
 ```
 benolivas.com/
-├── index.html           ← markup shell
-├── style.css            ← styling, dark mode, DM Sans
-├── chat.js              ← intent engine, vignettes, MemeBot scaffolding, pacing
-├── proxy.php            ← Anthropic API proxy (NOT in git — contains API key)
-├── .gitignore           ← keeps proxy.php off GitHub
-├── README.md
-├── data/
-│   ├── memes.json       ← annotated meme library
-│   ├── facts.json       ← rotating "Did you know" facts for Surprise Me path
-│   ├── vignettes.json   ← MemeBot three-beat moments
-│   └── portfolio.json   ← work catalog with tags
+│
+├── index.html        ← the page itself. Don't touch unless changing layout.
+├── style.css         ← colors, fonts, spacing. Don't touch unless changing visuals.
+├── chat.js           ← the engine. Don't touch unless adding a new feature type.
+│
+├── data/             ← EDIT THESE. This is where the script lives.
+│   ├── intents.json      ← every response BEN OS gives to user input
+│   ├── facts.json        ← the Surprise Me rotating facts + MemeBot reactions
+│   ├── vignettes.json    ← MemeBot scripted moments (triggered by specific phrases)
+│   ├── memes.json        ← meme image library (filenames, alt text, when to use)
+│   └── portfolio.json    ← work catalog (not fully wired yet)
+│
 └── assets/
-    ├── memes/           ← finished meme images + raw templates
-    │   └── .gitkeep
-    └── memebot/         ← MemeBot character state crops
-        └── .gitkeep
-```
-
-## Local setup
-Open `index.html` directly in a browser. The Claude API fallback requires a local server + proxy (CORS), but the full static intent tree, vignettes, and MemeBot rendering work offline once meme assets are added to `assets/memes/`.
-
-For API testing locally: use VS Code Live Server or `python -m http.server 8000` and make sure proxy.php is served by a local PHP server.
-
----
-
-## What changed in v2.2
-
-- **New intents:** `who_is_ben`, `what_is_benos`, `im_ben`, `predict_future`, `dark_mode`
-- **Door update:** "Predict my future?" replaces "What's Misfortune Cookies?"
-- **Contact popup:** nav "Contact" link now opens inline popup with email, LinkedIn, Behance
-- **Dark mode:** toggle via text ("dark mode", "it's 3am", etc.) — persisted in localStorage
-- **Vignette system wired:** `vignettes.json` matched against user input, MemeBot renders image + greentext
-- **MemeBot rendering:** blur-to-sharp image load, greentext style, separate label color (#C4622D)
-- **Pre-filters:** long input redirect, keyboard smash detection, hate mail catch
-- **Typewriter:** MemeBot types slow (buffering), BEN OS fast — same `charDelay()` function with speed multiplier
-- **Goodbye beat:** "Take care." → MemeBot temporary-person image → BEN OS says nothing
-- **dismissDoors fixed:** removed redundant if/else branch
-- **JSON data loading:** all four data files fetched from `data/` on init (non-blocking, falls back gracefully)
-- **Dark mode persistence:** restored on return visits via localStorage
-
----
-
-## GitHub setup (first time)
-
-### 1. Make sure Git is installed
-```bash
-git --version
-# If not installed: https://git-scm.com/download/win
-```
-
-### 2. Run the setup script
-Double-click `github-setup.bat` from inside your `benolivas.com/` folder, or run it from terminal:
-```bash
-cd C:\Users\benol\websites\benolivas.com
-github-setup.bat
-```
-The script pauses mid-way so you can create the empty GitHub repo before pushing.
-
-### 3. Verify after push
-Open your GitHub repo in a browser. Confirm:
-- `proxy.php` does NOT appear
-- `.gitignore` IS visible
-- `data/` contains the four JSON files
-- `assets/memes/` and `assets/memebot/` exist (with `.gitkeep`)
-
----
-
-## Deployment to sandbox.benolivas.com
-
-### One-time Dreamhost Git setup
-1. Dreamhost panel → Websites → sandbox.benolivas.com → Git → Create repository
-2. Connect to GitHub repo `benolivas-com`
-3. Copy Dreamhost webhook URL
-4. GitHub repo → Settings → Webhooks → Add webhook → paste URL
-5. Push = auto-deploy
-
-### API proxy (manual, one-time)
-1. Open `proxy.php` locally, replace `YOUR_ANTHROPIC_API_KEY_HERE` with your key
-2. Upload via Dreamhost File Manager to: `sandbox.benolivas.com/benolivas.com/proxy.php`
-3. Never commit this file
-
-### Ongoing deploy
-```bash
-git add -A
-git commit -m "your message"
-git push
-# Dreamhost webhook triggers automatic pull
+    ├── logo/             ← BenOlivasLogo3.png goes here
+    ├── memes/            ← meme image files go here
+    ├── memebot/          ← MemeBot character face crops (future)
+    └── portfolio/        ← portfolio images (future)
 ```
 
 ---
 
-## Adding meme assets
+## How to edit the script
 
-Drop finished memes into `assets/memes/` matching the `file` paths in `data/memes.json`:
-```
-assets/memes/skeleton-boredom.webp   ✓
-assets/memes/eye-roll-stanley.gif    ✓
-assets/memes/full-of-soup.jpg        ← needed
-assets/memes/temporary-person.jpg    ← needed
-assets/memes/all-ears.jpg            ← needed
-assets/memes/it-hurts.jpg            ← needed
-assets/memes/depressed-but-horny.jpg ← needed
-assets/memes/play-with-me.jpg        ← needed (URGENT — first MemeBot appearance)
-```
+### Changing what BEN OS says to a specific question
 
-MemeBot character state crops go in `assets/memebot/`.
+Open `data/intents.json`. Find the entry by its `_note` or `id`. Change the text in `"beats"`.
 
----
-
-## Extending the intent tree
-Add new objects to the `INTENTS` array in `chat.js`:
-```js
+Example — changing the greeting:
+```json
 {
-  id: 'your_intent',
-  patterns: ['phrase one', 'phrase two', 'synonym'],
-  beats: [
-    { text: "First sentence.", pause: 600 },
-    { text: "Second sentence.", pause: 0 }
-  ],
-  chips: ["Follow-up option"],  // optional
-  media: 'posters',             // optional — key into MEDIA object
-  topic: 'design',              // optional — saved to localStorage for return visits
-  special: 'dark_mode'          // optional — triggers special handler in sendMessage
+  "id": "greeting",
+  "_note": "Fires when someone just says hi",
+  "patterns": ["hi", "hello", "hey"],
+  "beats": [
+    { "text": "Hey. What do you need?", "pause": 0 }
+  ]
 }
+```
+Change `"Hey. What do you need?"` to whatever you want. Save. Refresh browser.
+
+### Adding a pause between sentences
+
+Each beat is one typed message. Add another beat object with a `pause` value (milliseconds).
+`pause: 600` = 0.6 second gap. `pause: 0` = no gap (always use 0 on the last beat).
+
+```json
+"beats": [
+  { "text": "First sentence.", "pause": 700 },
+  { "text": "Second sentence.", "pause": 500 },
+  { "text": "Final question?", "pause": 0 }
+]
+```
+
+### Adding a new response branch
+
+Add a new object to the `"intents"` array in `intents.json`:
+
+```json
+{
+  "id": "something_unique",
+  "_note": "What this is for — your own reference, not shown to users",
+  "patterns": ["phrase that triggers it", "another way they might say it"],
+  "beats": [
+    { "text": "BEN OS response here.", "pause": 0 }
+  ]
+}
+```
+
+### Adding follow-up buttons after a response
+
+Add a `"chips"` field:
+```json
+"chips": ["Button one", "Button two", "Button three"]
+```
+
+### Changing a Surprise Me fact
+
+Open `data/facts.json`. Each fact has:
+- `"text"` — what BEN OS starts saying (gets cut off by MemeBot mid-sentence)
+- `"memebot_meme"` — image MemeBot posts (must match an id in memes.json)
+- `"memebot_greentext"` — if MemeBot posts text lines instead of an image
+- `"benos_reaction"` — BEN OS one-liner after MemeBot
+- `"memebot_greentext_2"` — MemeBot's second beat after BEN OS reacts
+- `"chips"` — buttons shown at the end
+
+### Adding a new meme
+
+1. Drop the image into `assets/memes/`
+2. Add an entry to `data/memes.json` in the `"finished"` array:
+```json
+{
+  "id": "your-meme-name",
+  "file": "assets/memes/your-meme-name.jpg",
+  "alt": "describe what's in the image",
+  "format": "image",
+  "notes": "when to use this"
+}
+```
+3. Reference it in `facts.json` or `vignettes.json` by its id.
+
+---
+
+## Previewing locally
+
+Direct double-click on `index.html` will not load JSON files — browser security blocks it.
+
+**One-time setup:**
+1. Open VSCode
+2. Extensions panel (square icon, left sidebar) → search **Live Server** → Install (by Ritwick Dey)
+
+**Every session:**
+- Right-click `index.html` in the Explorer panel → **Open with Live Server**
+- Browser opens at `http://127.0.0.1:5500` and everything works
+
+---
+
+## Pushing changes to GitHub
+
+Open terminal in VSCode (Ctrl + backtick) → select Command Prompt → run:
+
+```
+git add -A
+git commit -m "describe what you changed"
+git push
+```
+
+---
+
+## Quick verification commands
+
+```
+ls assets/memes/
+git status
+git diff --name-only
 ```

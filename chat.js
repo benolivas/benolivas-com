@@ -9,21 +9,24 @@ let MEMES_DATA     = { finished: [], raw_templates: [] };
 let VIGNETTES_DATA = { vignettes: [] };
 let PORTFOLIO_DATA = { items: [], tag_groups: {} };
 let FACTS_DATA     = { facts: [] };
+let INTENTS_DATA   = { intents: [] }; // loaded from intents.json
 
 async function loadData() {
   try {
-    const [memes, vignettes, portfolio, facts] = await Promise.all([
+    const [memes, vignettes, portfolio, facts, intents] = await Promise.all([
       fetch('./data/memes.json').then(r => r.json()),
       fetch('./data/vignettes.json').then(r => r.json()),
       fetch('./data/portfolio.json').then(r => r.json()),
-      fetch('./data/facts.json').then(r => r.json())
+      fetch('./data/facts.json').then(r => r.json()),
+      fetch('./data/intents.json').then(r => r.json())
     ]);
     MEMES_DATA     = memes;
     VIGNETTES_DATA = vignettes;
     PORTFOLIO_DATA = portfolio;
     FACTS_DATA     = facts;
+    INTENTS_DATA   = intents;
   } catch(e) {
-    // Non-fatal — static intents and hardcoded MEDIA still work
+    // Non-fatal — hardcoded INTENTS fallback still works
     console.warn('Could not load data JSON:', e);
   }
 }
@@ -109,226 +112,23 @@ function preFilter(input) {
 }
 
 /* ── INTENT TREE ─────────────────────────────────── */
-const INTENTS = [
-  { id:'greeting',
-    patterns:['hi','hello','hey','yo','sup','good morning','good afternoon','morning','evening','hiya','howdy'],
-    beats:[{text:"Hey. What do you need?",pause:0}] },
+/* ── INTENTS — loaded from data/intents.json ────── */
+// Falls back to empty array if JSON hasn't loaded yet.
+// The full intent list lives in data/intents.json — edit there.
+function getIntents() {
+  return INTENTS_DATA.intents.length ? INTENTS_DATA.intents : INTENTS_FALLBACK;
+}
 
-  { id:'what_do_you_do',
-    patterns:['what do you do','what does ben do','what is this','what kind of work','services','what can you make','what can you do','what is this site'],
-    beats:[{text:"Depends what you need done.",pause:600},{text:"What are you working on?",pause:0}] },
-
-  { id:'who_is_ben',
-    patterns:['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this'],
-    beats:[
-      {text:"Creative producer and graphic designer, Los Angeles. Currently the in-house designer at Blue Note Los Angeles.",pause:600},
-      {text:"Before that: defense contractor work, a couple of independent video productions, some brand projects. The through-line is hard to summarize except that it keeps getting weirder.",pause:700},
-      {text:"What are you trying to make?",pause:0}
-    ] },
-
-  { id:'what_is_benos',
-    patterns:['what is ben os','what is benos','who am i talking to','what is this ai','explain ben os'],
-    beats:[
-      {text:"BEN OS. An AI running on Ben Olivas's portfolio site.",pause:500},
-      {text:"Powered by Claude. Not Ben. If you want Ben: benolivas@gmail.com.",pause:600},
-      {text:"What do you need?",pause:0}
-    ] },
-
-  { id:'im_ben',
-    patterns:["i'm ben","i am ben","this is ben","hey it's ben","im ben"],
-    beats:[
-      {text:"Sure.",pause:500},
-      {text:"benolivas@gmail.com if that's true and you need to send yourself something.",pause:0}
-    ] },
-
-  { id:'surprise',
-    patterns:['surprise me','random','something random','impress me','go ahead','just show me'],
-    beats:[], // handled by playSurprise()
-    special:'surprise' },
-
-  { id:'predict_future',
-    patterns:['predict my future','predict future','tell my fortune','fortune','my future','what will happen','crystal ball'],
-    beats:[
-      {text:"You're going to ask about something you've been putting off.",pause:600},
-      {text:"It's going to go better than you think.",pause:500},
-      {text:"That's all you're getting. What do you actually need?",pause:0}
-    ] },
-
-  { id:'is_ai',
-    patterns:['are you an ai','are you real','is this ai','is this a bot','who is typing','are you ben','chatbot','ai or human','what are you'],
-    beats:[
-      {text:"Yes. You were going to ask that eventually.",pause:500},
-      {text:"Running on Claude — made by Anthropic. Ben isn't typing. For actual Ben: benolivas@gmail.com.",pause:0}
-    ] },
-
-  { id:'how_works',
-    patterns:['how does this work','how does the site work','what is happening','what am i talking to','explain yourself'],
-    beats:[
-      {text:"You typed something. The system read it. A response appeared. You're now considering whether to type again.",pause:700},
-      {text:"This is the same loop that keeps people on social media. Variable reward, minimal friction, the sense that the next response might be more interesting than the last.",pause:600},
-      {text:"It's also how this site works. You're already several exchanges in.",pause:0}
-    ] },
-
-  { id:'dark_mode',
-    patterns:['dark mode','turn off lights','it\'s 3am','its 3am','turn dark','dark theme','light mode','turn on lights','bright'],
-    beats:[], // handled specially in sendMessage
-    special: 'dark_mode' },
-
-  { id:'need_video',
-    patterns:['i need a video','need a video','video production','make a video','produce a video','brand video','product video','commercial','music video','video work'],
-    beats:[{text:"What's it for?",pause:0}], topic:'video' },
-
-  { id:'need_design',
-    patterns:['i need a designer','need design','graphic design','need branding','design work','need a logo','logo design','visual identity'],
-    beats:[{text:"What kind?",pause:0}], topic:'design' },
-
-  { id:'need_poster',
-    patterns:['poster','make a poster','design a poster','need a poster','like a poster','can you make a poster','posters'],
-    beats:[{text:"Something like these.",pause:0}],
-    media:'posters',
-    chips:["More editorial.","Something darker.","Different style entirely.","What's it for?"] },
-
-  { id:'show_work',
-    patterns:['show me something','show me work','show me your work','portfolio','examples','what have you made','past work','see your work'],
-    beats:[{text:"What are you looking for — video, design, motion, something else?",pause:0}], topic:'portfolio' },
-
-  { id:'show_video',
-    patterns:['show me video','video examples','your videos','show videos'],
-    beats:[{text:"A few directions.",pause:0}],
-    media:'video',
-    chips:["Music videos specifically.","Corporate / brand work.","Defense / technical.","What else?"] },
-
-  { id:'show_design',
-    patterns:['show me design','design examples','your design work','show design'],
-    beats:[{text:"Here's a range.",pause:0}],
-    media:'design',
-    chips:["More branding.","Packaging work.","Something weirder.","What else?"] },
-
-  { id:'rebrand',
-    patterns:['rebrand','rebranding','new brand','brand refresh','update our brand','brand identity','new look','redesign our brand'],
-    beats:[
-      {text:"What broke?",pause:600},
-      {text:"Rebrands happen for one of three reasons — the brand no longer reflects what the company actually does, the market shifted and the visual language aged out, or someone new came in and wanted to mark the territory.",pause:700},
-      {text:"Which one is it?",pause:0}
-    ], topic:'branding' },
-
-  { id:'conversions',
-    patterns:['conversions','more conversions','conversion rate','get more sales','increase sales','more clicks','engagement','marketing','ad performance','not converting'],
-    beats:[{text:"What's the page doing right now — video, static images, long-form copy?",pause:0}], topic:'conversions' },
-
-  { id:'conversions_static',
-    patterns:['static images','just images','mostly images','static','image and copy'],
-    beats:[
-      {text:"Static images convert worse than video at the consideration stage. Not because video is flashier — because it reduces the cognitive load of imagining the product in use. The brain fills in gaps with doubt. Video fills them for you.",pause:700},
-      {text:"What's the product?",pause:0}
-    ], topic:'conversions' },
-
-  { id:'color_psychology',
-    patterns:['color psychology','colours in branding','brand colors','what colors','color theory'],
-    beats:[
-      {text:"Color in branding isn't about preference — it's about expectation. Consumers already have associations baked in by decades of category convention. Blue is trustworthy. Red is urgent. Green is natural or financial depending on the decade.",pause:700},
-      {text:"Breaking those conventions can work, but it requires enough brand equity to carry the dissonance. Most don't have that.",pause:500},
-      {text:"What's the category?",pause:0}
-    ], topic:'design' },
-
-  { id:'video_vs_static',
-    patterns:['video or images','video vs static','should i use video','does video convert','static vs video'],
-    beats:[
-      {text:"Video wins at consideration. Static wins at awareness — lower cognitive load, faster impression, easier to scroll past without feeling like you missed something.",pause:700},
-      {text:"The mistake most brands make is using video everywhere because it feels premium. A six-second autoplay with no sound in a feed is doing the job of a static image, just worse.",pause:600},
-      {text:"What stage is your audience at when they see it?",pause:0}
-    ], topic:'video' },
-
-  { id:'why_rebrand_fail',
-    patterns:['why do rebrands fail','rebrand mistakes','rebrand gone wrong','failed rebrand','bad rebrand'],
-    beats:[
-      {text:"Usually one of two things. Either the new brand solves an internal problem instead of an audience problem. Or the visual change outpaces the operational change. You can't redesign your logo into a better company.",pause:700},
-      {text:"The ones that work have a clear answer to: who did we think we were talking to, and who are we actually talking to now?",pause:0}
-    ], topic:'branding' },
-
-  { id:'social_proof',
-    patterns:['social proof','testimonials','reviews','trust signals','build trust','credibility'],
-    beats:[
-      {text:"Social proof works because humans are lazy evaluators. When something is hard to assess, we use other people's behavior as a shortcut.",pause:600},
-      {text:"The trick is specificity. 'Great product!' means nothing. 'Increased our conversion rate by 34% in six weeks' means something.",pause:700},
-      {text:"Also: negative reviews increase overall trust as long as they're not about core functionality. They signal authenticity.",pause:0}
-    ], topic:'conversions' },
-
-  { id:'available',
-    patterns:['are you available','is ben available','available for hire','taking projects','freelance','open to work','for hire','hire ben','can i hire you'],
-    beats:[
-      {text:"Full-time at Blue Note Los Angeles right now. That will change. It always does.",pause:600},
-      {text:"In the meantime — the right project still gets a yes. What's yours?",pause:0}
-    ], topic:'availability' },
-
-  { id:'contact',
-    patterns:['how do i contact','contact info','email','reach out','get in touch','how to reach ben','benolivas@gmail.com'],
-    beats:[{text:"benolivas@gmail.com. He reads it.",pause:0}] },
-
-  { id:'chess',
-    patterns:['chess set','man ray','chess pieces','the chess set','chess project','surrealist chess'],
-    beats:[
-      {text:"Man Ray designed chess pieces in the 1920s. Ben 3D modeled them, had them cast in resin, and packaged them as a collectible set.",pause:600},
-      {text:"Man Ray was not consulted. I think he'd be fine with it.",pause:0}
-    ], topic:'projects' },
-
-  { id:'misfortunes',
-    patterns:['misfortune cookies','fortune cookies','misfortunes','misfortunes.net','bad fortunes','the cookie','cookie project'],
-    beats:[
-      {text:"Fortune cookies, but honest.",pause:500},
-      {text:"Swiss grid, stark type, dark palette — deliberately clinical against the warm expectations of the category. Packaging, web, copy. Fortunes are AI-generated from a curated dataset.",pause:700},
-      {text:"If you want to feel seen by a cookie: misfortunes.net.",pause:0}
-    ], topic:'projects' },
-
-  { id:'whisper',
-    patterns:['whisper gun','whisper mk','lrad','sound weapon','acoustic device','directional sound','ultrasonic','the weapon','show me the datasheet'],
-    beats:[
-      {text:"The Whisper MK-I is a fictional product — in the sense that the datasheet is a design exercise.",pause:600},
-      {text:"The actual device is real. Portable directional sound using ultrasonic transducers and PWM signal generation. Built and documented.",pause:600},
-      {text:"The datasheet is the interesting part. Government document parody. Very dry.",pause:0}
-    ], topic:'projects' },
-
-  { id:'unusual',
-    patterns:["what's the most unusual","most unusual thing","strangest thing","weirdest thing","unusual about him","what else is unusual","tell me more"],
-    beats:[
-      {text:"Harder to rank than you'd think.",pause:500},
-      {text:"There's the sound weapon. The surrealist chess set. The fortune cookie company. The government document that isn't classified. The defense contractor work followed immediately by a jazz club.",pause:700},
-      {text:"The through-line is probably: he makes things that shouldn't exist as if they obviously should.",pause:0}
-    ], topic:'projects' },
-
-  { id:'blue_note',
-    patterns:['blue note','jazz club','jazz venue','where does ben work','current job','current role'],
-    beats:[
-      {text:"Blue Note Los Angeles — one of the iconic jazz franchise venues. Ben is the in-house graphic designer on the marketing team.",pause:500},
-      {text:"It is, in fact, a good sentence to have in a bio.",pause:0}
-    ] },
-
-  { id:'portfolio_pdf',
-    patterns:['pdf','resume','cv','portfolio pdf','download','the document','unclassified'],
-    beats:[
-      {text:"The portfolio PDF is at benolivas.com/portfolio.",pause:400},
-      {text:"It's formatted as a government document. The cover page says UNCLASSIFIED. This was intentional.",pause:0}
-    ] },
-
-  { id:'chess_prediction',
-    patterns:['personal projects','side projects','his projects','what projects','other projects'],
-    beats:[
-      {text:"A few. A fortune cookie brand that gives bad advice. A chess set based on Man Ray's work. A fictional acoustic weapon with a real datasheet.",pause:700},
-      {text:"You're going to ask about the chess set.",pause:0}
-    ], topic:'projects' },
-
-  { id:'thanks',
-    patterns:['thanks','thank you','thx','ty','cheers','appreciate it','helpful','that helped','great'],
-    beats:[{text:"Sure.",pause:0}] },
-
-  { id:'ok',
-    patterns:['ok','okay','cool','got it','makes sense','noted','understood','alright','sounds good','nice','interesting','fair','word'],
-    beats:[{text:"What else?",pause:0}] },
-
-  { id:'goodbye',
-    patterns:['bye','goodbye','see ya','later','peace','gotta go','take care','ttyl','cya'],
-    beats:[{text:"Take care.",pause:0}],
-    special: 'goodbye' }
+/* ── INTENTS FALLBACK — used if JSON fails to load ─ */
+// Minimal set so the site doesn't break on file:// protocol.
+// For script editing always use data/intents.json instead.
+const INTENTS_FALLBACK = [
+  { id:'greeting',      patterns:['hi','hello','hey','yo'],          beats:[{text:"Hey. What do you need?",pause:0}] },
+  { id:'surprise',      patterns:['surprise me'],                    beats:[], special:'surprise' },
+  { id:'thanks',        patterns:['thanks','thank you','thx'],       beats:[{text:"Sure.",pause:0}] },
+  { id:'ok',            patterns:['ok','okay','cool','got it'],      beats:[{text:"What else?",pause:0}] },
+  { id:'goodbye',       patterns:['bye','goodbye','see ya','later'], beats:[{text:"Take care.",pause:0}], special:'goodbye' },
+  { id:'dark_mode',     patterns:['dark mode','its 3am'],            beats:[], special:'dark_mode' }
 ];
 
 /* ── MEDIA CATALOG (hardcoded fallback) ──────────── */
@@ -355,7 +155,7 @@ function normalize(s) { return s.toLowerCase().replace(/[^\w\s]/g,'').trim(); }
 function matchIntent(input) {
   const n = normalize(input), words = n.split(/\s+/);
   let best = null, top = 0;
-  for (const intent of INTENTS) {
+  for (const intent of getIntents()) {
     for (const p of intent.patterns) {
       const pn = normalize(p); let score = 0;
       if (n === pn)            score = 100;
