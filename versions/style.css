@@ -351,7 +351,7 @@ body.dark #input-area.is-sticky .input-wrap {
   white-space: nowrap;
   align-self: start;
   /* Optical alignment: vertically center label with cap-height of first text line */
-  margin-top: calc((1.7em - 1em) / 2 + 1px);
+  margin-top: calc((1.7em - 1em) / 2 + 4px);
 }
 
 .msg-who.user    { color: var(--accent); }
