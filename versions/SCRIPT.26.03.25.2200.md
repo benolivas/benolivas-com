@@ -1,5 +1,7 @@
 # BEN OS — Script
-**Version: 2.3**
+**Version: 2.3 — ARCHIVED SNAPSHOT: 26.03.25.2200**
+*Read-only. Edit SCRIPT.md in root.*
+*Git commit: [paste from `git log --oneline -1`]*
 **Date: 2026-03-25**
 **Status: Active — edit this file, share with Claude, Claude converts to chat.js**
 
