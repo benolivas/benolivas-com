@@ -822,26 +822,29 @@ function matchIntent(input) {
   const n = normalize(input), words = n.split(/\s+/);
   let best = null, top = 0;
 
+  let wildcardIntent = null; // wildcard is last resort within a state
+
   for (const intent of INTENTS) {
     const patterns = intent.patterns || [];
     const nestedPatterns = intent.nestedPatterns || {};
 
-    // Check nested triggers for current state first (higher priority)
+    // Check nested triggers for current state — specific patterns first
     if (currentState && nestedPatterns[currentState]) {
       const np = nestedPatterns[currentState];
-      // Wildcard — matches anything in this state
       if (np.includes('*')) {
-        return intent;
-      }
-      for (const p of np) {
-        const pn = normalize(p); let score = 0;
-        if (n === pn)            score = 150; // nested match scores higher
-        else if (n.includes(pn)) score = 90 + pn.length;
-        else {
-          const pw = pn.split(/\s+/), hits = pw.filter(w => words.includes(w)).length;
-          if (hits) score = (hits/pw.length)*60 + hits*5;
+        // Save wildcard as fallback — only use if nothing else matches
+        wildcardIntent = intent;
+      } else {
+        for (const p of np) {
+          const pn = normalize(p); let score = 0;
+          if (n === pn)            score = 200; // nested specific = highest priority
+          else if (n.includes(pn)) score = 130 + pn.length;
+          else {
+            const pw = pn.split(/\s+/), hits = pw.filter(w => words.includes(w)).length;
+            if (hits) score = (hits/pw.length)*80 + hits*8;
+          }
+          if (score > top) { top = score; best = intent; }
         }
-        if (score > top) { top = score; best = intent; }
       }
     }
 
@@ -857,6 +860,9 @@ function matchIntent(input) {
       if (score > top) { top = score; best = intent; }
     }
   }
+
+  // If nothing scored above threshold, use wildcard state catch
+  if (top <= 18 && wildcardIntent) return wildcardIntent;
   return top > 18 ? best : null;
 }
 
