@@ -170,13 +170,14 @@ Vignettes are MemeBot scripted moments that can fire on specific phrases regardl
 
 **First visit:**
 > BEN OS — online.  *(pause 700ms)*
-> You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant. The distinction matters less than you'd think.  *(pause 900ms)*
-> What do you need made?
+> You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant. The distinction matters less than you'd think.  *(pause 1200ms)*
+> How may I help you?
 
 **Return visit (personalized by memory):**
 > BEN OS — back online.  *(pause 700ms)*
 > [one of the following based on days since last visit + last topic:]
-> — same day: "You were just here. Either you found something useful or you didn't. Which was it?"
+> - 2nd visit specifically: "You came back!"
+> — same hour: "You were just here. Either you found something useful or you didn't. Which was it?"
 > — within a week + has topic: "You're back. Last time you asked about [topic]. Did anything come of it?"
 > — within a month: "You've been here before. Things may or may not have changed. What do you need?"
 > — longer: "It's been a while. What are you working on now?"
@@ -192,25 +193,51 @@ TRIGGERS: hi, hello, hey, yo, sup, good morning, good afternoon, morning, evenin
 
 ---
 
+=== INTENT: user_name ===
+TRIGGERS: my name is, i'm called, call me, name's, my name's
+
+// Saves name to localStorage as mem.name. Used in return greeting.
+
+> [NAME].  *(pause 400ms, inline)*  Good to know.  *(pause 500ms, newline)*
+> What do you need?
+
+---
+
 === INTENT: thanks ===
 TRIGGERS: thanks, thank you, thx, ty, cheers, appreciate it, helpful, that helped
 
-> Sure.
+> For sure. *(pause 900ms)*
+> How else may I help you?
 
 ---
 
 === INTENT: ok ===
 TRIGGERS: ok, okay, cool, got it, makes sense, noted, understood, alright, sounds good, nice, interesting, fair, word
 
-> What else?
+> *(pause 600ms)* [ECHO: capitalize, add !] *(pause 400ms, newline)*
+> How else may I help you?
 
 ---
 
 === INTENT: im_ben ===
 TRIGGERS: i'm ben, i am ben, this is ben, hey it's ben, im ben
+STATE: identity_theft
 
-> Sure.  *(pause 500ms, newline)*
-> benolivas@gmail.com if that's true and you need to send yourself something.
+> Really.  *(pause 600ms, inline)*  Nice to meet you.  *(pause 500ms, newline)*
+> I am also Ben.  *(pause 400ms, inline)*  BEN OS, that is.
+
+CHIPS:
+  "No really I'm Ben."  → identity_theft_pt2
+  "I'm Ben Olivas"      → identity_theft_pt2
+
+---
+
+=== INTENT: identity_theft_pt2 ===
+NESTED TRIGGERS (identity_theft): i'm ben, i am ben, this is ben, hey it's ben, im ben
+TRIGGERS: i'm ben olivas, my name is ben olivas
+STATE: identity_theft_pt2
+
+> Sure thing.  *(pause 400ms, inline)*  You should have built me better to deal with all the clowns we get around here.
 
 ---
 
@@ -219,7 +246,9 @@ TRIGGERS: i'm ben, i am ben, this is ben, hey it's ben, im ben
 === INTENT: what_do_you_do ===
 TRIGGERS: what do you do, what does ben do, what is this, what kind of work, services, what can you make, what can you do, what is this site, i need something made, need something made
 
-> Depends what you need done.  *(pause 600ms, newline)*
+> I can help with a variety of tasks, such as presenting work examples...  *(pause 200ms, newline)*
+>[GIF: assets/portfolio/sizzle-reel.gif]  *(pause 600ms, newline)*
+> ...provide resources, connect you to Ben — or generate something.  *(pause 900ms, newline)*
 > What are you working on?
 
 ---
@@ -227,8 +256,21 @@ TRIGGERS: what do you do, what does ben do, what is this, what kind of work, ser
 === INTENT: who_is_ben ===
 TRIGGERS: who is ben, tell me about ben, who made this, about ben, ben olivas, who built this, who are you
 
-> Graphic designer and creative producer. Los Angeles.  *(pause 500ms, newline)*
-> 10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.  *(pause 600ms, newline)*
+> Ben Olivas is a graphic designer and creative producer based in Los Angeles.  *(pause 500ms, inline)* 10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.  *(pause 600ms, newline)*
+> What do you need?
+
+CHIPS:
+  "Show me the work."     → show_work
+  "What's Blue Note?"     → blue_note
+  "Are you available?"    → available
+
+---
+
+=== INTENT: who_is_ben_pt2 ===
+TRIGGERS: who the fuck is ben olivas, who does ben olivas think he is
+NESTED TRIGGERS (who_is_ben): what, go again, who is ben, tell me about ben, who made this, about ben, ben olivas, who built this, who are you
+
+> A graphic designer and creative producer. *(pause 500ms, inline)*  Based in Los Angeles. *(pause 400ms, inline)* Working at Blue Note. *(pause 600ms, newline)*
 > What do you need?
 
 CHIPS:
@@ -365,7 +407,7 @@ CHIPS:
 
 === FACT 4: classified PDF ===
 
-> **BEN OS:** Did you know that Ben's portfolio PDF is classified—
+> **BEN OS:** Did you know that AeroVironment is accused of transporting a live warhead on a commercial fli—
 
 **MEMEBOT:** [greentext]
   > UNCLASSIFIED
@@ -800,6 +842,53 @@ TRIGGERS: what's the worst fortune, worst fortune, most brutal fortune, saddest 
 
 > They're all the worst fortune. That's the product.  *(pause 600ms, newline)*
 > The good ones are the ones that feel too specific.
+
+---
+
+## MAGIC TRICKS
+
+---
+
+=== INTENT: generate_image ===
+TRIGGERS: generate something, generate an image, make me something, create something, 
+make an image, generate, make something visual, show me something you made,
+can you generate, make me art
+STATE: generation_flow
+
+// AUTHOR'S NOTE: No real generation. Pull from prerendered assets/generated/ folder, no repeats per session. Assets should loosely match common prompt patterns — abstract, portrait, landscape, product, etc. User thinks they prompted it.
+
+> What should I make?  *(pause 0)*
+
+---
+
+=== INTENT: generation_response ===
+NESTED TRIGGERS (generation_flow): *
+STATE: generation_flow
+
+// AUTHOR'S NOTE: Whatever the user says here, we pick the closest prerendered asset and present it as if generated. Categories: abstract, portrait, dark, colorful, minimal, chaotic. Map user words to categories, serve asset, never break the illusion.
+
+> Generating...  *(pause 1200ms, newline)*
+> [GIF: assets/generated/[matched-asset].gif]  *(pause 800ms, newline)*
+> There.
+
+CHIPS:
+  "Make another."     → generate_image
+  "What is this?"     → generate_explain
+  "I like this."      → generate_save
+
+---
+
+=== INTENT: generate_interactive ===
+NESTED TRIGGERS (generation_flow): interactive, something interactive, 
+make it interactive, a toggle, something i can use
+
+> Generating...  *(pause 1200ms, newline)*
+> [TOGGLE: dark_mode]  *(pause 800ms, newline)*
+> There.
+
+CHIPS:
+  "What is this?"    → generate_explain
+  "Make another."    → generate_image
 
 ---
 
