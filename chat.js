@@ -20,27 +20,45 @@ const MEM = {
       last:   now,
       count:  ex ? ex.count + 1 : 1,
       topics: topics || (ex ? ex.topics : []),
-      dark:   ex ? ex.dark : false
+      dark:   ex ? ex.dark : false,
+      name:   ex ? ex.name : null
     };
     this.set(d); return d;
+  },
+  setName(name) {
+    const d = this.get() || {};
+    d.name = name;
+    this.set(d);
+  },
+  getName() {
+    return this.get()?.name || null;
   }
 };
 
 /* ── RETURN GREETING ─────────────────────────────── */
 function returnGreeting(mem) {
   const days  = Math.floor((Date.now() - mem.last) / 86400000);
+  const hours = Math.floor((Date.now() - mem.last) / 3600000);
   const topic = mem.topics?.length ? mem.topics[mem.topics.length - 1] : null;
-  if (days < 1)          return "You were just here. Either you found something useful or you didn't. Which was it?";
-  if (days < 7 && topic) return `You're back. Last time you asked about ${topic}. Did anything come of it?`;
-  if (days < 30)         return "You've been here before. Things may or may not have changed. What do you need?";
+  const name  = mem.name ? mem.name + '. ' : '';
+  // 2nd visit specifically
+  if (mem.count === 2) return `${name}You came back.`;
+  // Same hour
+  if (hours < 1)       return "You were just here. Either you found something useful or you didn't. Which was it?";
+  // Same day
+  if (days < 1)        return `${name}Back again. What do you need?`;
+  // Within a week with topic
+  if (days < 7 && topic) return `${name}You're back. Last time you asked about ${topic}. Did anything come of it?`;
+  // Within a month
+  if (days < 30)       return "You've been here before. Things may or may not have changed. What do you need?";
   return "It's been a while. What are you working on now?";
 }
 
 /* ── INTRO BEATS ─────────────────────────────────── */
 const FIRST_INTRO = [
-  { text: 'BEN OS — online.',                                                                                             pause: 700  },
-  { text: "You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant. The distinction matters less than you'd think.", pause: 900 },
-  { text: 'What do you need made?',                                                                                       pause: 0    }
+  { text: 'BEN OS — online.', pause: 700 },
+  { text: "You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant. The distinction matters less than you'd think.", pause: 1200, type: 'newline' },
+  { text: 'How may I help you?', pause: 0 }
 ];
 
 /* ── DOOR OPTIONS ────────────────────────────────── */
@@ -121,7 +139,7 @@ const FACTS = [
   },
   {
     id: 'fact-pdf',
-    text: "Did you know that Ben's portfolio PDF is classified—",
+    text: "Did you know that AeroVironment is accused of transporting a live warhead on a commercial fli—",
     memebot_meme: null,
     memebot_greentext: [
       ">UNCLASSIFIED",
@@ -220,23 +238,42 @@ const INTENTS = [
     id: 'thanks',
     patterns: ['thanks','thank you','thx','ty','cheers','appreciate it','helpful','that helped'],
     beats: [
-      { text: "Sure.", pause: 0 }
+      { text: "For sure.", pause: 900, type: 'newline' },
+      { text: "How else may I help you?", pause: 0 }
     ]
   },
   {
     id: 'ok',
     patterns: ['ok','okay','cool','got it','makes sense','noted','understood','alright','sounds good','nice','interesting','fair','word'],
     beats: [
-      { text: "What else?", pause: 0 }
+      { text: "[ECHO: capitalize, add !]", pause: 400, type: 'newline' },
+      { text: "How else may I help you?", pause: 0 }
     ]
   },
   {
     id: 'im_ben',
     patterns: ["i'm ben","i am ben","this is ben","hey it's ben","im ben"],
     beats: [
-      { text: "Sure.", pause: 500 },
-      { text: "benolivas@gmail.com if that's true and you need to send yourself something.", pause: 0 }
+      { text: "Really.", pause: 600, type: 'inline' },
+      { text: " Nice to meet you.", pause: 500, type: 'newline' },
+      { text: "I am also Ben.", pause: 400, type: 'inline' },
+      { text: " BEN OS, that is.", pause: 0 }
+    ],
+    state: 'identity_theft',
+    chips: [
+      { label: "No really I'm Ben.", route: "identity_theft_pt2" },
+      { label: "I'm Ben Olivas", route: "identity_theft_pt2" }
     ]
+  },
+  {
+    id: 'identity_theft_pt2',
+    patterns: ["i'm ben olivas","my name is ben olivas"],
+    nestedPatterns: { 'identity_theft': ["i'm ben","i am ben","this is ben","hey it's ben","im ben"] },
+    beats: [
+      { text: "Sure thing.", pause: 400, type: 'inline' },
+      { text: " You should have built me better to deal with all the clowns we get around here.", pause: 0 }
+    ],
+    state: 'identity_theft_pt2'
   },
 
   /* ── WHAT IS THIS ────────────────────────────────── */
@@ -252,8 +289,21 @@ const INTENTS = [
     id: 'who_is_ben',
     patterns: ['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'],
     beats: [
-      { text: "Graphic designer and creative producer. Los Angeles.", pause: 500, type: 'newline' },
-      { text: "10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600, type: 'newline' },
+      { text: "Ben Olivas is a graphic designer and creative producer based in Los Angeles.", pause: 500, type: 'inline' },
+      { text: " 10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600, type: 'newline' },
+      { text: "What do you need?", pause: 0 }
+    ],
+    state: 'who_is_ben',
+    chips: [{ label: "Show me the work.", route: "show_work" }, { label: "What's Blue Note?", route: "blue_note" }, { label: "Are you available?", route: "available" }]
+  },
+  {
+    id: 'who_is_ben_pt2',
+    patterns: ['who the fuck is ben olivas','who does ben olivas think he is'],
+    nestedPatterns: { 'who_is_ben': ['what','go again','who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'] },
+    beats: [
+      { text: "A graphic designer and creative producer.", pause: 500, type: 'inline' },
+      { text: " Based in Los Angeles.", pause: 400, type: 'inline' },
+      { text: " Working at Blue Note.", pause: 600, type: 'newline' },
       { text: "What do you need?", pause: 0 }
     ],
     chips: [{ label: "Show me the work.", route: "show_work" }, { label: "What's Blue Note?", route: "blue_note" }, { label: "Are you available?", route: "available" }]
@@ -477,6 +527,70 @@ const INTENTS = [
 
   /* ── PROJECTS ────────────────────────────────────── */
   {
+    id: 'generate_image',
+    patterns: ['generate something','generate an image','make me something','create something','make an image','generate','make something visual','show me something you made','can you generate','make me art'],
+    beats: [
+      { text: "What should I make?", pause: 0 }
+    ],
+    state: 'generation_flow'
+  },
+  {
+    id: 'generation_response',
+    patterns: [],
+    nestedPatterns: { 'generation_flow': ['*'] },
+    beats: [
+      { text: "Generating...", pause: 1200, type: 'newline' },
+      { text: "[GIF: assets/generated/placeholder.gif]", pause: 800, type: 'newline' },
+      { text: "There.", pause: 0 }
+    ],
+    state: 'generation_flow',
+    chips: [
+      { label: "Make another.", route: "generate_image" },
+      { label: "What is this?", route: "generate_explain" },
+      { label: "I like this.", route: "generate_save" },
+      { label: "Let's make something real.", route: "what_do_you_do" }
+    ]
+  },
+  {
+    id: 'generate_interactive',
+    patterns: [],
+    nestedPatterns: { 'generation_flow': ['interactive','something interactive','make it interactive','a toggle','something i can use'] },
+    beats: [
+      { text: "Generating...", pause: 1200, type: 'newline' },
+      { text: "[TOGGLE: dark_mode]", pause: 800, type: 'newline' },
+      { text: "There.", pause: 0 }
+    ],
+    chips: [
+      { label: "What is this?", route: "generate_explain" },
+      { label: "Make another.", route: "generate_image" },
+      { label: "Let's make something real.", route: "what_do_you_do" }
+    ]
+  },
+  {
+    id: 'generate_explain',
+    patterns: ['what is this','what did you make','explain this','what am i looking at'],
+    beats: [
+      { text: "Something made from available assets.", pause: 500, type: 'newline' },
+      { text: "The prompt shapes the category. The category shapes the result.", pause: 0 }
+    ],
+    chips: [
+      { label: "Make another.", route: "generate_image" },
+      { label: "Let's make something real.", route: "what_do_you_do" }
+    ]
+  },
+  {
+    id: 'generate_save',
+    patterns: ['i like this','save this','keep this'],
+    beats: [
+      { text: "Right-click. Save image.", pause: 500, type: 'newline' },
+      { text: "Low-tech but it works.", pause: 0 }
+    ],
+    chips: [
+      { label: "Make another.", route: "generate_image" },
+      { label: "Let's make something real.", route: "what_do_you_do" }
+    ]
+  },
+  {
     id: 'chess_prediction',
     patterns: ['personal projects','side projects','his projects','what projects','other projects'],
     beats: [
@@ -693,8 +807,32 @@ function normalize(s) { return s.toLowerCase().replace(/[^\w\s]/g,'').trim(); }
 function matchIntent(input) {
   const n = normalize(input), words = n.split(/\s+/);
   let best = null, top = 0;
+
   for (const intent of INTENTS) {
-    for (const p of intent.patterns) {
+    const patterns = intent.patterns || [];
+    const nestedPatterns = intent.nestedPatterns || {};
+
+    // Check nested triggers for current state first (higher priority)
+    if (currentState && nestedPatterns[currentState]) {
+      const np = nestedPatterns[currentState];
+      // Wildcard — matches anything in this state
+      if (np.includes('*')) {
+        return intent;
+      }
+      for (const p of np) {
+        const pn = normalize(p); let score = 0;
+        if (n === pn)            score = 150; // nested match scores higher
+        else if (n.includes(pn)) score = 90 + pn.length;
+        else {
+          const pw = pn.split(/\s+/), hits = pw.filter(w => words.includes(w)).length;
+          if (hits) score = (hits/pw.length)*60 + hits*5;
+        }
+        if (score > top) { top = score; best = intent; }
+      }
+    }
+
+    // Global patterns
+    for (const p of patterns) {
       const pn = normalize(p); let score = 0;
       if (n === pn)            score = 100;
       else if (n.includes(pn)) score = 60 + pn.length;
@@ -749,6 +887,8 @@ let sessionTopics       = [];
 let doorsBuilt          = false;
 let introPlayed         = false;
 let introTimer          = null;
+let currentState        = null;  // tracks conversation state for nested triggers
+let lastUserInput       = '';    // for [ECHO] annotation
 
 /* ── WAITING STATE ───────────────────────────────── */
 function setWaiting(on) {
@@ -793,13 +933,32 @@ function appendMsg(role, text, who, opts={}) {
   wDiv.textContent = who;
   const body = document.createElement('div');
   body.className = 'msg-body ' + role;
-  if (opts.typing) body.classList.add('typing');
-  else body.textContent = text || '';
+  if (opts.typing) {
+    body.classList.add('typing');
+  } else if (text) {
+    renderTextWithActions(body, text);
+  }
   row.appendChild(wDiv);
   row.appendChild(body);
   chatWindow.appendChild(row);
   scrollBottom();
   return { row, body };
+}
+
+/* ── ACTION TEXT — renders *emotes* with distinct style ── */
+function renderTextWithActions(el, text) {
+  // Split on *action* patterns and render them distinctly
+  const parts = text.split(/(\*[^*]+\*)/g);
+  parts.forEach(part => {
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      const em = document.createElement('em');
+      em.className = 'action-text';
+      em.textContent = part; // keep asterisks — they're part of the style
+      el.appendChild(em);
+    } else if (part) {
+      el.appendChild(document.createTextNode(part));
+    }
+  });
 }
 
 /* Append label only — label appears, then content fills in after a pause */
@@ -832,27 +991,93 @@ function charDelay(text, i) {
 }
 
 function typewriter(el, text, onDone, fast=true, appendMode=false) {
-  // appendMode=true: adds to existing content (inline/newline beats)
-  // appendMode=false: clears and starts fresh (new row beats)
   if (!appendMode) {
     el.classList.remove('typing');
-    el.textContent = '';
+    el.innerHTML = '';
   }
+  // Resolve special annotations before typing
+  let resolved = text;
+  // [ECHO: capitalize, add !] — echo user input
+  if (resolved.includes('[ECHO')) {
+    const stripped = lastUserInput.replace(/[.,!?…]+$/, '').trim();
+    const capitalized = stripped.charAt(0).toUpperCase() + stripped.slice(1);
+    resolved = resolved.replace(/\[ECHO[^\]]*\]/, capitalized + '!');
+  }
+  // [NAME] — extract and echo name
+  if (resolved.includes('[NAME]')) {
+    const name = extractName(lastUserInput);
+    MEM.setName(name);
+    resolved = resolved.replace('[NAME]', name);
+  }
+  // [LINK: url | text] — replace with placeholder during typing, swap after
+  // (links are rendered after typing completes)
+
   let i = 0;
   const spd = fast ? 1 : 2.8;
+  // Build a plain-text version for character-by-character typing
+  // Action text (*...*) types normally, styled on completion
   function tick() {
-    if (i < text.length) {
-      // In append mode, use insertAdjacentText to add after existing content
+    if (i < resolved.length) {
       if (appendMode) {
-        el.insertAdjacentText('beforeend', text[i]);
+        el.insertAdjacentText('beforeend', resolved[i]);
       } else {
-        el.textContent += text[i];
+        el.textContent += resolved[i];
       }
       scrollBottom();
-      setTimeout(tick, charDelay(text, i++) * spd);
-    } else if (onDone) { onDone(); }
+      setTimeout(tick, charDelay(resolved, i++) * spd);
+    } else {
+      // After typing, re-render with action styling and links
+      const finalText = el.textContent;
+      el.innerHTML = '';
+      renderTextWithLinks(el, finalText);
+      if (onDone) onDone();
+    }
   }
   setTimeout(tick, fast ? 40 + Math.random()*40 : 120 + Math.random()*80);
+}
+
+/* ── RENDER TEXT WITH LINKS AND ACTIONS ─────────────── */
+function renderTextWithLinks(el, text) {
+  // Handle [LINK: url | display] annotations
+  const linkPattern = /\[LINK:\s*([^|\]]+)(?:\|([^\]]+))?\]/g;
+  let last = 0, match;
+  const parts = [];
+  while ((match = linkPattern.exec(text)) !== null) {
+    if (match.index > last) parts.push({ type: 'text', content: text.slice(last, match.index) });
+    parts.push({ type: 'link', url: match[1].trim(), label: (match[2] || match[1]).trim() });
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push({ type: 'text', content: text.slice(last) });
+
+  parts.forEach(part => {
+    if (part.type === 'link') {
+      const a = document.createElement('a');
+      a.href = part.url.startsWith('http') || part.url.startsWith('mailto') ? part.url : 'https://' + part.url;
+      a.textContent = part.label;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'inline-link';
+      el.appendChild(a);
+    } else {
+      renderTextWithActions(el, part.content);
+    }
+  });
+}
+
+/* ── EXTRACT NAME FROM INPUT ────────────────────────── */
+function extractName(input) {
+  const t = input.trim();
+  // Strip common prefixes
+  const prefixes = ['my name is ', "i'm called ", 'call me ', "name's ", "my name's ", "i'm ", 'im '];
+  for (const p of prefixes) {
+    if (t.toLowerCase().startsWith(p)) {
+      const name = t.slice(p.length).trim();
+      // Capitalize first letter
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+  }
+  // Fallback — just use the whole input capitalized
+  return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
 /* ── RENDER BEATS ────────────────────────────────── */
@@ -864,7 +1089,7 @@ function typewriter(el, text, onDone, fast=true, appendMode=false) {
 function renderBeats(beats, who, onComplete) {
   const fast = (who !== 'MEMEBOT');
   const role = who === 'MEMEBOT' ? 'memebot' : 'sys';
-  let currentBody = null; // tracks the active message body
+  let currentBody = null;
 
   let i = 0;
   function next() {
@@ -872,7 +1097,20 @@ function renderBeats(beats, who, onComplete) {
     const beat = beats[i++];
     const after = () => beat.pause ? setTimeout(next, beat.pause) : next();
 
-    // First beat — reuse existing typing bubble if present (from sendMessage)
+    // Special beat annotations — [GIF:], [TOGGLE:]
+    if (beat.text && beat.text.startsWith('[GIF:')) {
+      const path = beat.text.replace('[GIF:', '').replace(']', '').trim();
+      renderInlineGif(path, currentBody, after);
+      return;
+    }
+
+    if (beat.text && beat.text.startsWith('[TOGGLE:')) {
+      const type = beat.text.replace('[TOGGLE:', '').replace(']', '').trim();
+      renderInlineToggle(type, currentBody, after);
+      return;
+    }
+
+    // First beat — reuse existing typing bubble
     if (i === 1) {
       const existing = chatWindow.querySelector('.msg-body.typing');
       if (existing) {
@@ -883,17 +1121,13 @@ function renderBeats(beats, who, onComplete) {
     }
 
     if (beat.type === 'inline' && currentBody) {
-      // Append to current line — no visual break, just a pause mid-thought
-      const prev = currentBody.textContent;
-      typewriter(currentBody, beat.text, after, fast, true); // appendMode=true
+      typewriter(currentBody, beat.text, after, fast, true);
       return;
     }
 
     if (beat.type === 'newline' && currentBody) {
-      // New line inside same row — same speaker, new sentence
       const br = document.createElement('br');
       currentBody.appendChild(br);
-      // typewriter in append mode on the same body
       typewriter(currentBody, beat.text, after, fast, true);
       return;
     }
@@ -904,6 +1138,73 @@ function renderBeats(beats, who, onComplete) {
     typewriter(currentBody, beat.text, after, fast);
   }
   next();
+}
+
+/* ── INLINE GIF — BEN OS drops a gif mid-speech ──── */
+function renderInlineGif(path, targetBody, onDone) {
+  const container = targetBody || chatWindow;
+  const img = document.createElement('img');
+  img.className = 'inline-gif';
+  img.src = path;
+  img.onload = () => {
+    img.classList.add('loaded');
+    setTimeout(() => { if (onDone) onDone(); }, 600);
+  };
+  img.onerror = () => {
+    // Fallback — image didn't load, show a subtle placeholder text
+    const fallback = document.createElement('em');
+    fallback.className = 'action-text';
+    fallback.textContent = '*(image unavailable)*';
+    container.appendChild(fallback);
+    if (onDone) onDone();
+  };
+  // Timeout fallback
+  setTimeout(() => {
+    if (!img.classList.contains('loaded')) {
+      img.classList.add('loaded');
+      if (onDone) onDone();
+    }
+  }, 2000);
+  container.appendChild(img);
+  scrollBottom();
+}
+
+/* ── INLINE TOGGLE — renders a clickable dark mode switch ── */
+function renderInlineToggle(type, targetBody, onDone) {
+  const container = targetBody || chatWindow;
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-toggle-wrap';
+
+  const toggle = document.createElement('button');
+  toggle.className = 'inline-toggle';
+  const isDark = document.body.classList.contains('dark');
+  toggle.setAttribute('aria-checked', String(isDark));
+  toggle.setAttribute('role', 'switch');
+
+  const track = document.createElement('span');
+  track.className = 'toggle-track';
+  const thumb = document.createElement('span');
+  thumb.className = 'toggle-thumb';
+  track.appendChild(thumb);
+
+  const label = document.createElement('span');
+  label.className = 'toggle-label';
+  label.textContent = isDark ? 'dark' : 'light';
+
+  toggle.appendChild(track);
+  toggle.appendChild(label);
+  wrap.appendChild(toggle);
+
+  toggle.addEventListener('click', () => {
+    const nowDark = !document.body.classList.contains('dark');
+    setDark(nowDark);
+    toggle.setAttribute('aria-checked', String(nowDark));
+    label.textContent = nowDark ? 'dark' : 'light';
+  });
+
+  container.appendChild(wrap);
+  scrollBottom();
+  setTimeout(() => { if (onDone) onDone(); }, 400);
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
@@ -1116,6 +1417,9 @@ async function fireIntent(intentId, label) {
 }
 
 function playIntent(intent) {
+  // Set state if intent defines one
+  if (intent.state !== undefined) currentState = intent.state;
+
   const beats = intent.beats || [];
   const mediaKey = intent.media;
   const mediaAfter = intent.mediaAfterBeat ?? null;
@@ -1341,12 +1645,13 @@ async function sendMessage(text) {
   setWaiting(true);
 
   const input = text.trim();
+  lastUserInput = input; // track for [ECHO]
   userInput.value = '';
   autoResize();
   if (doorsBuilt) dismissDoors();
   clearTimeout(introTimer);
 
-  appendMsg('user', input, 'You');
+  appendMsg('user', input, 'You', { isAction: input.startsWith('*') && input.endsWith('*') });
   conversationHistory.push({ role: 'user', content: input });
   statusLabel.textContent = '';
 

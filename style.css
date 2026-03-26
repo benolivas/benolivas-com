@@ -593,6 +593,92 @@ body.dark #input-area.is-sticky .input-wrap {
 
 .lightbox-link:hover { opacity: 0.7; }
 
+
+/* ── ACTION TEXT — *emotes* ─────────────────────────── */
+.action-text {
+  font-style: italic;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+/* ── INLINE LINK ─────────────────────────────────────── */
+a.inline-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(184,145,42,0.4);
+  text-underline-offset: 2px;
+  transition: opacity 0.15s;
+}
+a.inline-link:hover { opacity: 0.75; }
+
+/* ── INLINE GIF ──────────────────────────────────────── */
+.inline-gif {
+  display: block;
+  max-width: 320px;
+  max-height: 240px;
+  margin: 6px 0;
+  filter: blur(6px);
+  transition: filter 0.5s ease;
+}
+.inline-gif.loaded { filter: blur(0); }
+
+/* ── INLINE TOGGLE ───────────────────────────────────── */
+.inline-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.inline-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 0.5px solid var(--rule);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.inline-toggle:hover { border-color: var(--muted); }
+
+.toggle-track {
+  width: 32px;
+  height: 16px;
+  background: var(--rule);
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.inline-toggle[aria-checked="true"] .toggle-track {
+  background: var(--accent);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  transition: transform 0.2s;
+}
+
+.inline-toggle[aria-checked="true"] .toggle-thumb {
+  transform: translateX(16px);
+}
+
+.toggle-label {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 /* ── ANIMATIONS ──────────────────────────────────── */
 @keyframes fadein {
   from { opacity:0; transform:translateY(3px); }
