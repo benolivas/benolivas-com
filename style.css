@@ -344,7 +344,7 @@ body.dark #input-area.is-sticky .input-wrap {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--faint);
-  padding-top: 3px;
+  padding-top: 9px;
   line-height: 1;
   text-align: right;
   user-select: none;
@@ -360,7 +360,6 @@ body.dark #input-area.is-sticky .input-wrap {
   font-weight: 400;
   line-height: 1.7;
   color: var(--text2);
-  margin-top: -3px;
 }
 
 .msg-body.user { color: var(--text); font-weight: 400; }
@@ -666,6 +665,18 @@ body.dark .toggle-track {
   box-shadow:
     inset 2px 2px 5px rgba(28,28,24,0.2),
     inset -1px -1px 3px rgba(238,234,226,0.5);
+}
+
+/* Toggle row fades in with blur */
+.inline-toggle-wrap {
+  opacity: 0;
+  filter: blur(4px);
+  animation: togglefadein 0.5s ease 0.2s forwards;
+}
+
+@keyframes togglefadein {
+  from { opacity: 0; filter: blur(4px); transform: translateY(2px); }
+  to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
 }
 
 /* Thumb — raised pill */
