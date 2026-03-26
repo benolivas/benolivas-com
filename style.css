@@ -622,62 +622,95 @@ a.inline-link:hover { opacity: 0.75; }
 }
 .inline-gif.loaded { filter: blur(0); }
 
-/* ── INLINE TOGGLE ───────────────────────────────────── */
+/* ── INLINE TOGGLE — neumorphic pill ─────────────────── */
+/* Appears inline in chat, unlabeled, line-height sized.  */
+/* Flips dark/light mode on click.                        */
 .inline-toggle-wrap {
   display: inline-flex;
   align-items: center;
-  margin: 8px 0;
+  margin: 4px 0 6px;
 }
 
 .inline-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   background: none;
-  border: 0.5px solid var(--rule);
-  padding: 6px 12px;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  transition: border-color 0.2s;
+  outline: none;
 }
 
-.inline-toggle:hover { border-color: var(--muted); }
-
+/* Neumorphic track — soft inset shadow */
 .toggle-track {
-  width: 32px;
-  height: 16px;
-  background: var(--rule);
-  border-radius: 8px;
+  width: 36px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--bg2);
+  box-shadow:
+    inset 2px 2px 4px rgba(28,28,24,0.15),
+    inset -2px -2px 4px rgba(238,234,226,0.6);
   position: relative;
-  transition: background 0.2s;
+  transition: box-shadow 0.25s ease;
   flex-shrink: 0;
 }
 
-.inline-toggle[aria-checked="true"] .toggle-track {
-  background: var(--accent);
+body.dark .toggle-track {
+  box-shadow:
+    inset 2px 2px 4px rgba(0,0,0,0.4),
+    inset -2px -2px 4px rgba(255,255,255,0.04);
 }
 
+.inline-toggle[aria-checked="true"] .toggle-track {
+  box-shadow:
+    inset 2px 2px 5px rgba(28,28,24,0.2),
+    inset -1px -1px 3px rgba(238,234,226,0.5);
+}
+
+/* Thumb — raised pill */
 .toggle-thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
+  top: 3px;
+  left: 3px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
   background: var(--bg);
-  transition: transform 0.2s;
+  box-shadow:
+    1px 1px 3px rgba(28,28,24,0.2),
+    -1px -1px 2px rgba(238,234,226,0.7);
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), background 0.2s;
+}
+
+body.dark .toggle-thumb {
+  background: var(--bg2);
+  box-shadow:
+    1px 1px 3px rgba(0,0,0,0.5),
+    -1px -1px 2px rgba(255,255,255,0.05);
 }
 
 .inline-toggle[aria-checked="true"] .toggle-thumb {
-  transform: translateX(16px);
+  transform: translateX(18px);
+  background: var(--accent);
+  box-shadow:
+    1px 1px 3px rgba(184,145,42,0.4),
+    -1px -1px 2px rgba(238,234,226,0.3);
 }
 
+/* Label hidden by default — appears on hover */
 .toggle-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--faint);
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
+
+.inline-toggle-wrap:hover .toggle-label { opacity: 1; }
 
 /* ── ANIMATIONS ──────────────────────────────────── */
 @keyframes fadein {

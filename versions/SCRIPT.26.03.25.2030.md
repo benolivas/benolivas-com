@@ -1,6 +1,10 @@
 # BEN OS — Script v2.2
-*Human-readable script. Edit here, share with Claude, Claude converts to chat.js.*
-*Last updated: March 2026*
+*Versioned snapshot: 26.03.25.2030*
+*Git commit: [paste hash from `git log --oneline -1`]*
+*This file is read-only archive. Edit SCRIPT.md in root, not this file.*
+
+---
+
 
 ---
 

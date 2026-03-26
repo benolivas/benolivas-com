@@ -227,6 +227,20 @@ const VIGNETTES = [
 const INTENTS = [
 
   /* ── SMALL TALK ──────────────────────────────────── */
+  /* ── EDGE CASES ────────────────────────────────── */
+  {
+    id: 'distress',
+    patterns: [
+      'i wanna die','want to die','kill myself','end it all',
+      'i hate myself','i want to disappear','suicidal',
+      "i'm worthless",'i give up completely'
+    ],
+    beats: [
+      { text: "[response TBD — write in SCRIPT.md distress intent]", pause: 0 }
+    ]
+  },
+
+  /* ── SMALL TALK ─────────────────────────────────── */
   {
     id: 'greeting',
     patterns: ['hi','hello','hey','yo','sup','good morning','good afternoon','morning','evening','hiya','howdy'],
@@ -1151,12 +1165,15 @@ function renderInlineGif(path, targetBody, onDone) {
     setTimeout(() => { if (onDone) onDone(); }, 600);
   };
   img.onerror = () => {
-    // Fallback — image didn't load, show a subtle placeholder text
-    const fallback = document.createElement('em');
-    fallback.className = 'action-text';
-    fallback.textContent = '*(image unavailable)*';
+    // Scripted fallback — image didn't load, BEN OS acknowledges it
+    const fallback = document.createElement('div');
+    fallback.className = 'msg-body sys';
+    fallback.textContent = '';
     container.appendChild(fallback);
-    if (onDone) onDone();
+    typewriter(fallback,
+      "Hm. That was supposed to be visual. benolivas@gmail.com if you want to see it properly.",
+      () => { if (onDone) onDone(); }
+    );
   };
   // Timeout fallback
   setTimeout(() => {
@@ -1195,16 +1212,23 @@ function renderInlineToggle(type, targetBody, onDone) {
   toggle.appendChild(label);
   wrap.appendChild(toggle);
 
+  let interactionFired = false;
   toggle.addEventListener('click', () => {
     const nowDark = !document.body.classList.contains('dark');
     setDark(nowDark);
     toggle.setAttribute('aria-checked', String(nowDark));
     label.textContent = nowDark ? 'dark' : 'light';
+    // Fire onDone only once — on first interaction
+    if (!interactionFired) {
+      interactionFired = true;
+      setTimeout(() => { if (onDone) onDone(); }, 300);
+    }
   });
 
   container.appendChild(wrap);
   scrollBottom();
-  setTimeout(() => { if (onDone) onDone(); }, 400);
+  // NOTE: onDone intentionally NOT called on a timer here.
+  // It waits for user to actually click the toggle.
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
@@ -1222,8 +1246,15 @@ function renderMemebotImage(memeId, targetBody, onDone) {
     // Wait for user to actually see the image before continuing
     setTimeout(() => { if (onDone) onDone(); }, 900);
   };
-  // If image fails to load or is cached, still continue
-  img.onerror = () => { if (onDone) onDone(); };
+  // MemeBot image broken — greentext fallback
+  img.onerror = () => {
+    const mbFallback = appendLabelOnly('memebot', 'MEMEBOT');
+    renderGreentext([
+      ">tried to post image",
+      ">it broke",
+      ">this is fine"
+    ], mbFallback, onDone);
+  };
   const container = targetBody || chatWindow;
   container.appendChild(img);
   scrollBottom();
