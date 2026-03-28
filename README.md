@@ -1,151 +1,125 @@
-# benolivas.com — BEN OS v2.2
+# benolivas.com — BEN OS v2.4
 
 ## The short version
 
-**To change what BEN OS says:** open a file in `data/`, edit the text, save, refresh the browser.
+**To change what BEN OS says:** edit `SCRIPT.md`, share with Claude, Claude converts to `chat.js`.
 
-**To push changes to GitHub:** three commands in the terminal (see bottom of this file).
+**To push changes to GitHub:**
+```
+git add -A
+git commit -m "describe what changed"
+git push
+```
 
-**Never need to touch:** `chat.js`, `style.css`, `index.html` — unless something structural is changing.
+**Never touch directly:** `chat.js`, `style.css`, `index.html` — unless Claude is making a structural change.
 
 ---
 
-## The files and what they do
+## File structure
 
 ```
 benolivas.com/
 │
-├── index.html        ← the page itself. Don't touch unless changing layout.
-├── style.css         ← colors, fonts, spacing. Don't touch unless changing visuals.
-├── chat.js           ← the engine. Don't touch unless adding a new feature type.
+├── index.html          ← page layout and static UI copy (title, nav, placeholder text)
+├── style.css           ← all visual styling — colors, fonts, spacing, animations
+├── chat.js             ← the engine — script data + all rendering logic
 │
-├── data/             ← EDIT THESE. This is where the script lives.
-│   ├── intents.json      ← every response BEN OS gives to user input
-│   ├── facts.json        ← the Surprise Me rotating facts + MemeBot reactions
-│   ├── vignettes.json    ← MemeBot scripted moments (triggered by specific phrases)
-│   ├── memes.json        ← meme image library (filenames, alt text, when to use)
-│   └── portfolio.json    ← work catalog (not fully wired yet)
+├── SCRIPT.md           ← EDIT THIS — human-readable script. Share with Claude to convert.
+│
+├── versions/           ← read-only script archives. One snapshot per milestone.
+│   └── SCRIPT.YY.MM.DD.HHMM.md
+│
+├── data/               ← legacy folder, currently unused.
 │
 └── assets/
-    ├── logo/             ← BenOlivasLogo3.png goes here
-    ├── memes/            ← meme image files go here
-    ├── memebot/          ← MemeBot character face crops (future)
-    └── portfolio/        ← portfolio images (future)
+    ├── logo/           ← BenOlivasLogo3.png
+    ├── memes/          ← meme image files (webp, gif, jpg, jpeg)
+    ├── portfolio/      ← portfolio images (⚠️ migrating from old site)
+    └── generated/      ← prerendered assets for magic tricks (⚠️ not yet created)
 ```
 
 ---
 
 ## How to edit the script
 
-### Changing what BEN OS says to a specific question
+1. Open `SCRIPT.md`
+2. Make edits — add intents, change copy, add chips, etc.
+3. Archive: copy `SCRIPT.md` to `versions/SCRIPT.YY.MM.DD.HHMM.md`
+4. Share updated `SCRIPT.md` with Claude
+5. Claude converts and delivers updated `chat.js`
+6. Replace `chat.js`, test locally, push
 
-Open `data/intents.json`. Find the entry by its `_note` or `id`. Change the text in `"beats"`.
+See `SCRIPT.md → HOW TO READ THIS` for full format reference.
 
-Example — changing the greeting:
-```json
-{
-  "id": "greeting",
-  "_note": "Fires when someone just says hi",
-  "patterns": ["hi", "hello", "hey"],
-  "beats": [
-    { "text": "Hey. What do you need?", "pause": 0 }
-  ]
-}
-```
-Change `"Hey. What do you need?"` to whatever you want. Save. Refresh browser.
+---
 
-### Adding a pause between sentences
+## UI copy (static text in index.html)
 
-Each beat is one typed message. Add another beat object with a `pause` value (milliseconds).
-`pause: 600` = 0.6 second gap. `pause: 0` = no gap (always use 0 on the last beat).
+| Element | Current value |
+|---|---|
+| Page title | "Ben Olivas" |
+| Input placeholder | "Ask me something." |
+| Header tagline | "Creative Producer · Graphic Designer · Los Angeles" |
+| Watermark | "BEN OS V2.2" |
+| Nav link 1 | "Portfolio PDF ↗" → benolivas.com/portfolio |
+| Nav link 2 | "Contact" → triggers popup |
+| Contact popup | benolivas@gmail.com, LinkedIn ↗, Behance ↗ |
 
-```json
-"beats": [
-  { "text": "First sentence.", "pause": 700 },
-  { "text": "Second sentence.", "pause": 500 },
-  { "text": "Final question?", "pause": 0 }
-]
-```
+---
 
-### Adding a new response branch
+## Working memory (localStorage)
 
-Add a new object to the `"intents"` array in `intents.json`:
+Persists indefinitely until user clears browser data. Key: `bo_visit`.
 
-```json
-{
-  "id": "something_unique",
-  "_note": "What this is for — your own reference, not shown to users",
-  "patterns": ["phrase that triggers it", "another way they might say it"],
-  "beats": [
-    { "text": "BEN OS response here.", "pause": 0 }
-  ]
-}
-```
-
-### Adding follow-up buttons after a response
-
-Add a `"chips"` field:
-```json
-"chips": ["Button one", "Button two", "Button three"]
-```
-
-### Changing a Surprise Me fact
-
-Open `data/facts.json`. Each fact has:
-- `"text"` — what BEN OS starts saying (gets cut off by MemeBot mid-sentence)
-- `"memebot_meme"` — image MemeBot posts (must match an id in memes.json)
-- `"memebot_greentext"` — if MemeBot posts text lines instead of an image
-- `"benos_reaction"` — BEN OS one-liner after MemeBot
-- `"memebot_greentext_2"` — MemeBot's second beat after BEN OS reacts
-- `"chips"` — buttons shown at the end
-
-### Adding a new meme
-
-1. Drop the image into `assets/memes/`
-2. Add an entry to `data/memes.json` in the `"finished"` array:
-```json
-{
-  "id": "your-meme-name",
-  "file": "assets/memes/your-meme-name.jpg",
-  "alt": "describe what's in the image",
-  "format": "image",
-  "notes": "when to use this"
-}
-```
-3. Reference it in `facts.json` or `vignettes.json` by its id.
+| Key | What it stores |
+|---|---|
+| `count` | Visit count |
+| `first` | First visit timestamp |
+| `last` | Last visit timestamp |
+| `topics` | Array of topics from `*Topic saved:*` annotations |
+| `dark` | Dark mode preference |
+| `name` | User's name if shared |
 
 ---
 
 ## Previewing locally
 
-Direct double-click on `index.html` will not load JSON files — browser security blocks it.
-
-**One-time setup:**
-1. Open VSCode
-2. Extensions panel (square icon, left sidebar) → search **Live Server** → Install (by Ritwick Dey)
-
-**Every session:**
-- Right-click `index.html` in the Explorer panel → **Open with Live Server**
-- Browser opens at `http://127.0.0.1:5500` and everything works
+Right-click `index.html` in VSCode → **Open with Live Server**
+(requires Live Server extension by Ritwick Dey)
 
 ---
 
-## Pushing changes to GitHub
+## Git workflow
 
-Open terminal in VSCode (Ctrl + backtick) → select Command Prompt → run:
-
-```
+```bash
+git pull                          # always pull before starting on a new device
 git add -A
-git commit -m "describe what you changed"
+git commit -m "describe change"
 git push
+
+# if pull fails with diverged branches:
+git config pull.rebase false
+git pull
 ```
+
+One active device at a time. Never edit on two machines simultaneously.
 
 ---
 
-## Quick verification commands
+## Known gaps
 
-```
-ls assets/memes/
-git status
-git diff --name-only
-```
+See `SCRIPT.md → KNOWN GAPS / TODO` for full list. Top priorities:
+
+- `assets/portfolio/` — migrate from old benolivas.com before it goes down
+- `assets/generated/` — create folder + prerendered gifs for magic tricks
+- `assets/memes/open-sesame.gif` — not yet sourced
+- Animation pass — easing, scroll lock during typing, smoother text arrival
+- Lightbox — gallery/slideshow, project copy, video embed
+
+## Planned / on backburner
+
+- Visual GUI script editor (nested node structure)
+- Jazz admat / Blue Note poster generator
+- Unmatched input logging (post-launch)
+- Project pages / case studies
+- `## GOTCHAS` script section

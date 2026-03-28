@@ -723,6 +723,20 @@ body.dark .toggle-thumb {
 
 .inline-toggle-wrap:hover .toggle-label { opacity: 1; }
 
+
+/* ── GENERATION TIME LABEL ───────────────────────────── */
+/* Appears below generated content — "generated in x.xx seconds" */
+.gen-time-label {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadein 0.4s ease 0.3s forwards;
+}
+
 /* ── ANIMATIONS ──────────────────────────────────── */
 @keyframes fadein {
   from { opacity:0; transform:translateY(3px); }

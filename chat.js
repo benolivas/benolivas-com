@@ -56,7 +56,7 @@ function returnGreeting(mem) {
 
 /* ── INTRO BEATS ─────────────────────────────────── */
 const FIRST_INTRO = [
-  { text: 'BEN OS — online.', pause: 700 },
+  { text: 'BEN OS — online.', pause: 700, type: 'newline' },
   { text: "You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant. The distinction matters less than you'd think.", pause: 1200, type: 'newline' },
   { text: 'How may I help you?', pause: 0 }
 ];
@@ -1126,7 +1126,16 @@ function renderBeats(beats, who, onComplete) {
 
     if (beat.text && beat.text.startsWith('[TOGGLE:')) {
       const type = beat.text.replace('[TOGGLE:', '').replace(']', '').trim();
-      renderInlineToggle(type, currentBody, after);
+      // Toggle gets its own fresh body element for clean blur-fade-in
+      const toggleBody = appendLabelOnly(role, '');
+      // Remove the who label for the toggle row — it's unlabeled
+      const toggleRow = toggleBody.closest('.msg-row');
+      if (toggleRow) {
+        const whoEl = toggleRow.querySelector('.msg-who');
+        if (whoEl) whoEl.textContent = '';
+      }
+      currentBody = toggleBody;
+      renderInlineToggle(type, toggleBody, after);
       return;
     }
 
@@ -1195,8 +1204,15 @@ function renderInlineGif(path, targetBody, onDone) {
 /* ── INLINE TOGGLE — renders a clickable dark mode switch ── */
 function renderInlineToggle(type, targetBody, onDone) {
   const container = targetBody || chatWindow;
+  const startTime = Date.now(); // track for "generated in x.xx seconds" label
+
   const wrap = document.createElement('div');
   wrap.className = 'inline-toggle-wrap';
+
+  // Spacer row above toggle for breathing room
+  const spacer = document.createElement('div');
+  spacer.style.height = '16px';
+  container.appendChild(spacer);
 
   const toggle = document.createElement('button');
   toggle.className = 'inline-toggle';
@@ -1218,23 +1234,34 @@ function renderInlineToggle(type, targetBody, onDone) {
   toggle.appendChild(label);
   wrap.appendChild(toggle);
 
+  // "Generated in x.xx seconds" label — appears below toggle
+  const genLabel = document.createElement('div');
+  genLabel.className = 'gen-time-label';
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+  genLabel.textContent = `generated in ${elapsed}s`;
+  wrap.appendChild(genLabel);
+
+  container.appendChild(wrap);
+
+  // Spacer row below toggle
+  const spacerBottom = document.createElement('div');
+  spacerBottom.style.height = '12px';
+  container.appendChild(spacerBottom);
+
+  scrollBottom();
+
   let interactionFired = false;
   toggle.addEventListener('click', () => {
     const nowDark = !document.body.classList.contains('dark');
     setDark(nowDark);
     toggle.setAttribute('aria-checked', String(nowDark));
     label.textContent = nowDark ? 'dark' : 'light';
-    // Fire onDone only once — on first interaction
     if (!interactionFired) {
       interactionFired = true;
       setTimeout(() => { if (onDone) onDone(); }, 300);
     }
   });
-
-  container.appendChild(wrap);
-  scrollBottom();
-  // NOTE: onDone intentionally NOT called on a timer here.
-  // It waits for user to actually click the toggle.
+  // NOTE: onDone waits for actual user click — not a timer.
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
@@ -1394,6 +1421,14 @@ function dismissAllChips() {
 
 function renderChips(chips) {
   if (!chips?.length) return;
+  // Guard against double-render — if identical chips already exist, skip
+  const existing = chatWindow.querySelectorAll('.chips');
+  const lastExisting = existing[existing.length - 1];
+  if (lastExisting) {
+    const existingLabels = [...lastExisting.querySelectorAll('.chip')].map(b => b.textContent).join(',');
+    const newLabels = chips.map(c => typeof c === 'string' ? c : c.label).join(',');
+    if (existingLabels === newLabels) return;
+  }
   const wrap = document.createElement('div'); wrap.className = 'chips';
   chips.forEach(chip => {
     // chip can be a string (old format, goes through matcher)
@@ -1686,6 +1721,7 @@ async function sendMessage(text) {
   userInput.value = '';
   autoResize();
   if (doorsBuilt) dismissDoors();
+  dismissAllChips(); // dismiss any active chips when user types freely
   clearTimeout(introTimer);
 
   appendMsg('user', input, 'You', { isAction: input.startsWith('*') && input.endsWith('*') });
