@@ -240,7 +240,7 @@ Auto-fire when something fails. Not triggered by user input.
 |---|---|---|
 | Input placeholder | "Ask me something." | index.html — `placeholder` attribute on textarea |
 | Header tagline | "Creative Producer · Graphic Designer · Los Angeles" | index.html — `.header-sub` div |
-| Watermark | "BEN OS V2.2" | index.html — `#watermark` div |
+| Watermark | "BEN OS v2.4" | index.html — `#watermark` div — **update this whenever version bumps** |
 | Nav link 1 | "PORTFOLIO PDF ↗" | index.html — header nav |
 | Nav link 2 | "CONTACT" | index.html — header nav, triggers contact popup |
 | Contact popup — email | "benolivas@gmail.com" | index.html — contact popup |

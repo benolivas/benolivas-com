@@ -1204,15 +1204,15 @@ function renderInlineGif(path, targetBody, onDone) {
 /* ── INLINE TOGGLE — renders a clickable dark mode switch ── */
 function renderInlineToggle(type, targetBody, onDone) {
   const container = targetBody || chatWindow;
-  const startTime = Date.now(); // track for "generated in x.xx seconds" label
+  const startTime = Date.now(); // starts when toggle is first rendered
 
   const wrap = document.createElement('div');
   wrap.className = 'inline-toggle-wrap';
 
-  // Spacer row above toggle for breathing room
-  const spacer = document.createElement('div');
-  spacer.style.height = '16px';
-  container.appendChild(spacer);
+  // Spacer above toggle
+  const spacerTop = document.createElement('div');
+  spacerTop.style.height = '20px';
+  container.appendChild(spacerTop);
 
   const toggle = document.createElement('button');
   toggle.className = 'inline-toggle';
@@ -1226,42 +1226,51 @@ function renderInlineToggle(type, targetBody, onDone) {
   thumb.className = 'toggle-thumb';
   track.appendChild(thumb);
 
-  const label = document.createElement('span');
-  label.className = 'toggle-label';
-  label.textContent = isDark ? 'dark' : 'light';
+  const toggleLabel = document.createElement('span');
+  toggleLabel.className = 'toggle-label';
+  toggleLabel.textContent = isDark ? 'dark' : 'light';
 
   toggle.appendChild(track);
-  toggle.appendChild(label);
+  toggle.appendChild(toggleLabel);
   wrap.appendChild(toggle);
-
-  // "Generated in x.xx seconds" label — appears below toggle
-  const genLabel = document.createElement('div');
-  genLabel.className = 'gen-time-label';
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-  genLabel.textContent = `generated in ${elapsed}s`;
-  wrap.appendChild(genLabel);
-
   container.appendChild(wrap);
 
-  // Spacer row below toggle
+  // Spacer between toggle and gen-time label
+  const spacerMid = document.createElement('div');
+  spacerMid.style.height = '10px';
+  container.appendChild(spacerMid);
+
+  // "generated in x.xxs" — shown below toggle, separate element
+  const genLabel = document.createElement('div');
+  genLabel.className = 'gen-time-label';
+  genLabel.textContent = 'generated in 0.00s'; // placeholder, updated on click
+  container.appendChild(genLabel);
+
+  // Spacer below gen label
   const spacerBottom = document.createElement('div');
-  spacerBottom.style.height = '12px';
+  spacerBottom.style.height = '16px';
   container.appendChild(spacerBottom);
 
   scrollBottom();
 
+  // chatbar stays locked (isWaiting=true) until user clicks toggle
   let interactionFired = false;
   toggle.addEventListener('click', () => {
     const nowDark = !document.body.classList.contains('dark');
     setDark(nowDark);
     toggle.setAttribute('aria-checked', String(nowDark));
-    label.textContent = nowDark ? 'dark' : 'light';
+    toggleLabel.textContent = nowDark ? 'dark' : 'light';
+
+    // Update gen time on first click — shows actual time since render
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+    genLabel.textContent = `generated in ${elapsed}s`;
+
     if (!interactionFired) {
       interactionFired = true;
       setTimeout(() => { if (onDone) onDone(); }, 300);
     }
   });
-  // NOTE: onDone waits for actual user click — not a timer.
+  // NOTE: onDone fires on click, not on timer. chatbar blocked until then.
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
