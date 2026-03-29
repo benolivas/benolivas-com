@@ -774,29 +774,205 @@ function playExactTrigger(trigger, typingBody) {
 }
 
 /* ── MEDIA CATALOG ───────────────────────────────── */
-/* src: thumbnail shown in grid
-   fullSrc: image shown in lightbox (use same as src if no hi-res version)
-   label: title shown in lightbox
-   caseStudyUrl: optional — shows "View case study ↗" link in lightbox. null = no link. */
+/* GRID ITEM TYPES:
+   type: 'lightbox'   → clicking opens fullscreen lightbox (single image + case study link)
+   type: 'subgrid'    → clicking opens a sub-grid of child items (category or client view)
+   type: 'youtube'    → clicking opens YouTube link (video items)
+
+   PATH CONVENTION:
+   assets/portfolio/graphic-design/[project]/thumb.gif   ← confirmed local asset
+   assets/portfolio/video/[category]/[project]/thumb.jpg ← confirmed local asset
+   ⚠️ = placeholder path — file not yet created
+
+   GRID MODES (future):
+   mode: 'custom'   → shows exactly what's listed, in order (current behavior)
+   mode: 'pool'     → randomly pick N from defined list, no session repeats
+   mode: 'category' → randomly pick N from entire category folder
+*/
+
 const MEDIA = {
-  posters: [
-    { src: 'https://benolivas.com/images/Thumbnails/onibabaSM.png',    fullSrc: 'https://benolivas.com/images/GraphicDesign/OnibabaPoster.png',  label: 'Onibaba',           caseStudyUrl: null },
-    { src: 'https://benolivas.com/images/Thumbnails/swissstyleSM.png', fullSrc: 'https://benolivas.com/images/GraphicDesign/SwissStylePoster.png', label: 'Swiss Design',      caseStudyUrl: null },
-    { src: 'https://benolivas.com/images/Thumbnails/voltaireSM.png',   fullSrc: 'https://benolivas.com/images/GraphicDesign/VoltairePoster.jpg',   label: 'Voltaire',          caseStudyUrl: null }
-  ],
-  video: [
-    { src: 'https://benolivas.com/images/Thumbnails/jump20SM.png',     fullSrc: 'https://benolivas.com/images/Thumbnails/jump20SM.png',            label: 'JUMP 20',           caseStudyUrl: 'https://www.youtube.com/watch?v=lxT9cGUEeZA' },
-    { src: 'https://benolivas.com/images/Thumbnails/crystal.png',      fullSrc: 'https://benolivas.com/images/Thumbnails/crystal.png',             label: 'Asana',             caseStudyUrl: 'https://www.youtube.com/watch?v=8bh_nmZqUu0' },
-    { src: 'https://benolivas.com/images/Thumbnails/stayoverSM.png',   fullSrc: 'https://benolivas.com/images/Thumbnails/stayoverSM.png',          label: 'NoMBe',             caseStudyUrl: 'https://www.youtube.com/watch?v=n60cpM8_G-I' }
-  ],
+
+  // ── DESIGN GRID — "Show me something." ──────────────
+  // 6 items curated, 3 cols desktop / 2 cols mobile
+  // Items with type:'subgrid' will open a child grid on click (not yet built — falls back to lightbox)
   design: [
-    { src: 'https://benolivas.com/images/CaseStudies/afterhours.gif',  fullSrc: 'https://benolivas.com/images/CaseStudies/afterhours.gif',         label: 'After Hours',       caseStudyUrl: null },
-    { src: 'https://benolivas.com/images/CaseStudies/misfortunes.gif', fullSrc: 'https://benolivas.com/images/CaseStudies/misfortunes.gif',        label: 'Misfortune Cookies', caseStudyUrl: 'https://misfortunes.net' },
-    { src: 'https://benolivas.com/images/CaseStudies/chess.gif',       fullSrc: 'https://benolivas.com/images/CaseStudies/chess.gif',              label: 'Man Ray Chess',     caseStudyUrl: null },
-    { src: 'https://benolivas.com/images/Thumbnails/onibabaSM.png',    fullSrc: 'https://benolivas.com/images/GraphicDesign/OnibabaPoster.png',    label: 'Onibaba',           caseStudyUrl: null },
-    { src: 'https://benolivas.com/images/Thumbnails/swissstyleSM.png', fullSrc: 'https://benolivas.com/images/GraphicDesign/SwissStylePoster.png', label: 'Swiss Design',      caseStudyUrl: null },
-    { src: 'https://benolivas.com/images/Thumbnails/voltaireSM.png',   fullSrc: 'https://benolivas.com/images/GraphicDesign/VoltairePoster.jpg',   label: 'Voltaire',          caseStudyUrl: null }
+    {
+      src:          'assets/portfolio/graphic-design/after-hours/thumb.gif',
+      fullSrc:      'assets/portfolio/graphic-design/after-hours/thumb.gif',
+      label:        'After Hours',
+      type:         'lightbox',
+      caseStudyUrl: null
+      // ✓ asset confirmed local
+    },
+    {
+      src:          'assets/portfolio/graphic-design/misfortune-cookies/thumb.gif',
+      fullSrc:      'assets/portfolio/graphic-design/misfortune-cookies/thumb.gif',
+      label:        'Misfortune Cookies',
+      type:         'lightbox',
+      caseStudyUrl: 'https://misfortunes.net'
+      // ✓ asset confirmed local
+    },
+    {
+      src:          'assets/portfolio/graphic-design/man-ray-chess/thumb.gif',
+      fullSrc:      'assets/portfolio/graphic-design/man-ray-chess/thumb.gif',
+      label:        'Man Ray Chess',
+      type:         'lightbox',
+      caseStudyUrl: null
+      // ✓ asset confirmed local
+    },
+    {
+      src:          'assets/portfolio/graphic-design/aerovironment/thumb.gif',
+      fullSrc:      'assets/portfolio/graphic-design/aerovironment/thumb.gif',
+      label:        'AeroVironment',
+      type:         'subgrid',
+      subgrid:      'aerovironment-design',
+      caseStudyUrl: null
+      // ✓ asset confirmed local
+    },
+    {
+      src:          'assets/portfolio/graphic-design/posters/thumb.gif',
+      fullSrc:      'assets/portfolio/graphic-design/posters/thumb.gif',
+      label:        'Posters',
+      type:         'subgrid',
+      subgrid:      'posters',
+      caseStudyUrl: null
+      // ⚠️ placeholder needed — representative poster thumb
+    },
+    {
+      src:          'assets/portfolio/graphic-design/blue-note/thumb.jpg',
+      fullSrc:      'assets/portfolio/graphic-design/blue-note/thumb.jpg',
+      label:        'Blue Note LA',
+      type:         'lightbox',
+      caseStudyUrl: null
+      // ⚠️ placeholder needed — no Blue Note work added yet
+    }
+  ],
+
+  // ── VIDEO GRID — "Show me video." ───────────────────
+  // Category-level items — each opens a sub-grid of projects within that category
+  video: [
+    {
+      src:          'assets/portfolio/video/commercials/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/commercials/thumb.jpg',
+      label:        'Commercials',
+      type:         'subgrid',
+      subgrid:      'commercials',
+      caseStudyUrl: null
+      // ⚠️ placeholder needed — representative commercials thumb
+    },
+    {
+      src:          'assets/portfolio/video/music-videos/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/music-videos/thumb.jpg',
+      label:        'Music Videos',
+      type:         'subgrid',
+      subgrid:      'music-videos',
+      caseStudyUrl: null
+      // ⚠️ placeholder needed — representative music video thumb
+    },
+    {
+      src:          'assets/portfolio/video/aerovironment/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/aerovironment/thumb.jpg',
+      label:        'AeroVironment',
+      type:         'subgrid',
+      subgrid:      'aerovironment-video',
+      caseStudyUrl: null
+      // ⚠️ placeholder needed — global AeroVironment video thumb
+    }
+  ],
+
+  // ── POSTERS SUB-GRID — opens from design grid "Posters" ──
+  posters: [
+    {
+      src:          'assets/portfolio/graphic-design/posters/full/onibaba-thumb.jpg',
+      fullSrc:      'assets/portfolio/graphic-design/posters/full/onibaba.jpg',
+      label:        'Onibaba',
+      type:         'lightbox',
+      caseStudyUrl: null
+      // ⚠️ migrate from: benolivas.com/images/GraphicDesign/OnibabaPoster.png
+    },
+    {
+      src:          'assets/portfolio/graphic-design/posters/full/swiss-design-thumb.jpg',
+      fullSrc:      'assets/portfolio/graphic-design/posters/full/swiss-design.jpg',
+      label:        'Swiss Design',
+      type:         'lightbox',
+      caseStudyUrl: null
+      // ⚠️ migrate from: benolivas.com/images/GraphicDesign/SwissStylePoster.png
+    },
+    {
+      src:          'assets/portfolio/graphic-design/posters/full/voltaire-thumb.jpg',
+      fullSrc:      'assets/portfolio/graphic-design/posters/full/voltaire.jpg',
+      label:        'Voltaire',
+      type:         'lightbox',
+      caseStudyUrl: null
+      // ⚠️ migrate from: benolivas.com/images/GraphicDesign/VoltairePoster.jpg
+    }
+  ],
+
+  // ── COMMERCIALS SUB-GRID ─────────────────────────────
+  'commercials': [
+    {
+      src:          'assets/portfolio/video/commercials/asana/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/commercials/asana/thumb.jpg',
+      label:        'Asana',
+      type:         'youtube',
+      caseStudyUrl: 'https://www.youtube.com/watch?v=8bh_nmZqUu0'
+      // ⚠️ migrate from: benolivas.com/images/Thumbnails/crystal.png
+    },
+    {
+      src:          'assets/portfolio/video/commercials/camp-mobile/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/commercials/camp-mobile/thumb.jpg',
+      label:        'Camp Mobile',
+      type:         'youtube',
+      caseStudyUrl: null
+      // ⚠️ thumb needed, YouTube URL needed
+    },
+    {
+      src:          'assets/portfolio/video/commercials/american-cancer-society/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/commercials/american-cancer-society/thumb.jpg',
+      label:        'American Cancer Society',
+      type:         'youtube',
+      caseStudyUrl: null
+      // ⚠️ thumb needed, YouTube URL needed
+    },
+    {
+      src:          'assets/portfolio/video/commercials/target/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/commercials/target/thumb.jpg',
+      label:        'Target',
+      type:         'youtube',
+      caseStudyUrl: null
+      // ⚠️ thumb needed, YouTube URL needed
+    }
+  ],
+
+  // ── MUSIC VIDEOS SUB-GRID ────────────────────────────
+  'music-videos': [
+    {
+      src:          'assets/portfolio/video/music-videos/nombe-summers-gone/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/music-videos/nombe-summers-gone/thumb.jpg',
+      label:        "NoMBe — Summer's Gone",
+      type:         'youtube',
+      caseStudyUrl: 'https://www.youtube.com/watch?v=n60cpM8_G-I'
+      // ⚠️ migrate from: benolivas.com/images/Thumbnails/stayoverSM.png
+    }
+  ],
+
+  // ── AEROVIRONMENT VIDEO SUB-GRID ─────────────────────
+  'aerovironment-video': [
+    {
+      src:          'assets/portfolio/video/aerovironment/jump-20/thumb.jpg',
+      fullSrc:      'assets/portfolio/video/aerovironment/jump-20/thumb.jpg',
+      label:        'JUMP 20',
+      type:         'youtube',
+      caseStudyUrl: 'https://www.youtube.com/watch?v=lxT9cGUEeZA'
+      // ⚠️ migrate from: benolivas.com/images/Thumbnails/jump20SM.png
+    }
+  ],
+
+  // ── AEROVIRONMENT DESIGN SUB-GRID ────────────────────
+  'aerovironment-design': [
+    // ⚠️ individual AeroVironment design projects go here when ready
   ]
+
 };
 
 /* ════════════════════════════════════════════════════
