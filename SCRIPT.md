@@ -1,5 +1,5 @@
 # BEN OS — Script
-**Version: 2.5**
+**Version: 2.6**
 **Date: 2026-03-28**
 **Status: Active — edit this file, share with Claude, Claude converts to chat.js**
 
@@ -15,6 +15,7 @@
 | 2.3 | 2026-03-25 | Merged session edits, improved HOW TO READ THIS, version control added |
 | 2.4 | 2026-03-28 | Intro beat spacing fix, chips dismiss on free type, toggle spacing + gen time label, placeholder text updated, memory system documented |
 | 2.5 | 2026-03-28 | MEDIA catalog updated to new folder structure, subgrid types, asset migration status, TRACKER.md added |
+| 2.6 | 2026-03-2x | Huge overhaul, flow adjustments. Removed flow-killing paths, major pruning. Grid updates, button updates. |
 
 **Archived versions:** `versions/` folder contains read-only snapshots.
 **Git history:** Every push to GitHub is a recoverable snapshot of all files.
@@ -1170,6 +1171,6 @@ TRIGGERS: bye, goodbye, see ya, later, peace, gotta go, ttyl, cya
 
 ---
 
-*End of script v2.3*
-*Next version: 2.4*
+*End of script v2.6*
+*Next version: 2.7*
 *Archive this file to versions/SCRIPT.26.03.25.HHMM.md before major edits*
