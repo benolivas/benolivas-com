@@ -290,8 +290,8 @@ let _uid=0;const uid=p=>p+'_'+(++_uid).toString(36);
 function mkBeat(type='text',text='',speaker='BEN OS',media=null,pause=0,display='default'){return{id:uid('bt'),speaker,type,text,pause,display,isPool:false,poolMode:'random',variants:[],media:media||defMedia(type)};}
 function defMedia(t){if(t==='grid')return{collection:'design',picks:[]};if(t==='image')return{src:'',memeId:''};if(t==='video')return{url:'',label:'',thumb:''};if(t==='component')return{kind:'dark_mode'};if(t==='pdf')return{src:'',label:'',description:''};return null;}
 function mkPool(vs=[],mode='random',speaker='BEN OS',pause=0,display='default'){return{id:uid('bt'),speaker,type:'pool',text:'',pause,display,isPool:true,poolMode:mode,variants:vs.map(v=>({id:uid('v'),text:v,weight:1,beats:[],buttons:[]})),media:null};}
-function mkBtn(label='',visible=true){return{id:uid('b'),label,visible,btnType:'normal',priority:false,wireTarget:null,child:null,triggers:[],scopedState:''};}
-function mkCatchall(priority=false){return{id:uid('b'),label:'[catch-all]',visible:false,btnType:'catchall',priority,wireTarget:null,child:null,triggers:[],scopedState:''};}
+function mkBtn(label='',visible=true){return{id:uid('b'),label,visible,btnType:'normal',priority:false,wireTarget:null,child:null,triggers:[],scopedState:'',matchPriority:'global'};}
+function mkCatchall(priority=false){return{id:uid('b'),label:'[catch-all]',visible:false,btnType:'catchall',priority,wireTarget:null,child:null,triggers:[],scopedState:'',matchPriority:'catchall'};}
 function mkResp(rid='',beats=[],buttons=[]){return{rid,beats,buttons};}
 
 function assignRids(branch){
@@ -299,6 +299,8 @@ function assignRids(branch){
     const used={};
     resp.buttons.forEach(btn=>{
       if(!btn.child)return;
+      // Inline child — mark as nested priority
+      btn.matchPriority='nested';
       const words=btn.label.toLowerCase().replace(/[^a-z0-9 ]/g,'').split(/\s+/).filter(Boolean);
       let slug='';const sibs=resp.buttons.filter(b=>b.id!==btn.id&&b.child);
       for(let i=0;i<words.length;i++){slug+=words[i];const ss=sibs.map(s=>{const sw=s.label.toLowerCase().replace(/[^a-z0-9 ]/g,'').split(/\s+/).filter(Boolean);let sl='';for(let j=0;j<=i&&j<sw.length;j++)sl+=sw[j];return sl;});if(!ss.includes(slug))break;}
@@ -367,14 +369,14 @@ function buildDefault(){
   const all=[intro,greeting,who,sw,surprise,bye];
   all.forEach(b=>{if(b.root&&b.id!=='intro')assignRids(b);});
   // Wire intro door buttons to their branches
-  intro.root.buttons[0].wireTarget=sw.root.rid;       // Show me something → show_work
-  intro.root.buttons[1].wireTarget=who.root.rid;      // Who is Ben → who_is_ben
+  intro.root.buttons[0].wireTarget=sw.root.rid;intro.root.buttons[0].matchPriority='wire';       // Show me something → show_work
+  intro.root.buttons[1].wireTarget=who.root.rid;intro.root.buttons[1].matchPriority='wire';      // Who is Ben → who_is_ben
   // Predict my future and Surprise me have no branch yet — leave unwired
-  intro.root.buttons[3].wireTarget=surprise.root.rid; // Surprise me → surprise
-  greeting.root.buttons[0].wireTarget=sw.root.rid;
-  greeting.root.buttons[1].wireTarget=who.root.rid;
-  greeting.root.buttons[2].wireTarget=surprise.root.rid;
-  who.root.buttons[0].wireTarget=sw.root.rid;
+  intro.root.buttons[3].wireTarget=surprise.root.rid;intro.root.buttons[3].matchPriority='wire'; // Surprise me → surprise
+  greeting.root.buttons[0].wireTarget=sw.root.rid;greeting.root.buttons[0].matchPriority='wire';
+  greeting.root.buttons[1].wireTarget=who.root.rid;greeting.root.buttons[1].matchPriority='wire';
+  greeting.root.buttons[2].wireTarget=surprise.root.rid;greeting.root.buttons[2].matchPriority='wire';
+  who.root.buttons[0].wireTarget=sw.root.rid;who.root.buttons[0].matchPriority='wire';
   return all;
 }
 
@@ -382,7 +384,15 @@ let BRANCHES=[];
 function migrateBranch(b){
   // Fill in fields added after initial saves
   b.state=b.state||'';b.topic=b.topic||'';b.special=b.special||'none';b.exactMatch=b.exactMatch||'';b.isGlobalFallback=b.isGlobalFallback||false;b.chatbar=b.chatbar||{placeholder:'',disabled:false};
-  if(b.root)walkBtns(b.root,btn=>{btn.scopedState=btn.scopedState||'';btn.triggers=btn.triggers||[];});
+  if(b.root)walkBtns(b.root,btn=>{btn.scopedState=btn.scopedState||'';btn.triggers=btn.triggers||[];
+    // Backfill matchPriority based on existing structure
+    if(!btn.matchPriority){
+      if(btn.btnType==='catchall')btn.matchPriority='catchall';
+      else if(btn.wireTarget)btn.matchPriority='wire';
+      else if(btn.child)btn.matchPriority='nested';
+      else btn.matchPriority='global';
+    }
+  });
   if(b.root)walkResps(b.root,resp=>{resp.beats&&resp.beats.forEach(beat=>{beat.pause=beat.pause||0;beat.display=beat.display||'default';beat.speaker=beat.speaker||'BEN OS';if(beat.variants)beat.variants.forEach(v=>{v.beats=v.beats||[];v.buttons=(v.buttons||[]).map(b=>({id:b.id||uid('vb'),label:b.label||'',visible:true,btnType:'normal',priority:false,wireTarget:b.wireTarget||null,child:null,triggers:[],scopedState:''}));});});});
   return b;
 }
@@ -562,7 +572,7 @@ function drawWires(){
 }
 
 function startWire(btn){let srcRid=null;for(const b of BRANCHES){if(!b.root)continue;const walk=r=>{if(r.buttons.some(x=>x.id===btn.id)){srcRid=r.rid;return;}r.buttons.forEach(x=>{if(x.child)walk(x.child);});};walk(b.root);if(srcRid)break;}wiring={btnId:btn.id,srcRid};VP.classList.add('wiring');document.getElementById('wire-hint').classList.add('show');}
-function finishWire(rid){if(!wiring)return;for(const b of BRANCHES){const bt=findBtn(b,wiring.btnId);if(bt){if(bt.child&&!confirm('Button "'+bt.label+'" has an inline response. Wire takes priority at runtime. Wire anyway?')){cancelWire();return;}bt.wireTarget=rid;markDirty();break;}}cancelWire();renderAll();toast('Wired → '+rid);}
+function finishWire(rid){if(!wiring)return;for(const b of BRANCHES){const bt=findBtn(b,wiring.btnId);if(bt){if(bt.child&&!confirm('Button "'+bt.label+'" has an inline response. Wire takes priority at runtime. Wire anyway?')){cancelWire();return;}bt.wireTarget=rid;bt.matchPriority='wire';markDirty();break;}}cancelWire();renderAll();toast('Wired → '+rid);}
 function cancelWire(){wiring=null;VP.classList.remove('wiring');document.getElementById('wire-hint').classList.remove('show');DRAFTPATH.setAttribute('d','');}
 function updateDraft(){if(!wiring)return;const outEl=document.getElementById('outd-'+wiring.btnId);if(!outEl){cancelWire();return;}const oc=domCenter(outEl);const x1=oc.x,y1=oc.y,x2=mouseVP.x,y2=mouseVP.y;const cx=(x1+x2)/2;DRAFTPATH.setAttribute('d',`M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`);}
 
@@ -741,7 +751,7 @@ function buildBtnDP(body,branch,btn){
     };
     chdr.appendChild(clbl);chdr.appendChild(crem);cs.appendChild(chdr);body.appendChild(cs);
     buildRespDP(body,branch,btn.child);
-  }else{const s2=document.createElement('div');s2.className='dp-sec';const addC=document.createElement('button');addC.className='dp-add';addC.textContent='+ Add inline response';addC.onclick=()=>{if(btn.wireTarget&&!confirm('This button wires to "'+btn.wireTarget+'". Wire takes priority at runtime — adding an inline response creates ambiguity. Add anyway?'))return;btn.child=mkResp('',[mkBeat('text','Response here.')],[]);assignRids(branch);expanded.add(btn.id);markDirty();renderAll();buildDP();};s2.appendChild(addC);body.appendChild(s2);}
+  }else{const s2=document.createElement('div');s2.className='dp-sec';const addC=document.createElement('button');addC.className='dp-add';addC.textContent='+ Add inline response';addC.onclick=()=>{if(btn.wireTarget&&!confirm('This button wires to "'+btn.wireTarget+'". Wire takes priority at runtime — adding an inline response creates ambiguity. Add anyway?'))return;btn.child=mkResp('',[mkBeat('text','Response here.')],[]);btn.matchPriority='nested';assignRids(branch);expanded.add(btn.id);markDirty();renderAll();buildDP();};s2.appendChild(addC);body.appendChild(s2);}
 }
 
 function buildRespDP(body,branch,resp){
@@ -964,7 +974,15 @@ function loadJson(evt){
 }
 
 function exportMd(){
-  const lines=['# BEN OS — Flow Export v7','# '+new Date().toLocaleString(),'','# PRIORITY: wire → nested inline → invisible (scoped/global) → catch-all',''];
+  const lines=['# BEN OS — Flow Export v7','# '+new Date().toLocaleString(),'',
+    '# MATCH PRIORITY (for chat.js generation):',
+    '# 1. WIRE      — button.wireTarget set; routes directly to that resp/branch. Score: 300.',
+    '# 2. NESTED    — button.child inline response; triggers scoped to parent branch. Score: 200.',
+    '# 3. INVISIBLE — scoped invisible button (scopedState set). Score: 130+.',
+    '# 4. GLOBAL    — branch-level triggers, compete globally. Score: 60–100.',
+    '# 5. CATCHALL  — fires only if nothing scores above threshold.',
+    '# Buttons annotated below with [WIRE], [NESTED], [GLOBAL], [CATCHALL] accordingly.',
+    ''];
   BRANCHES.forEach(b=>{
     lines.push('=== BRANCH: '+b.id+' ['+(b.type==='fallback'?'GLOBAL FALLBACK':b.type)+'] ===');
     if(b.triggers&&b.triggers.length)lines.push('TRIGGERS: '+b.triggers.join(', '));
@@ -979,7 +997,7 @@ function exportMd(){
       (b.introPool.firstVisit||[]).forEach(beat=>fmtBeat(beat,'').forEach(l=>lines.push(l)));
       lines.push('');lines.push('// RETURN VARIANTS:');
       (b.introPool.returnVisits||[]).forEach(rv=>{lines.push('  ['+rv.condition+']');rv.beats.forEach(beat=>fmtBeat(beat,'  ').forEach(l=>lines.push(l)));});
-      if(b.introPool&&b.introPool.chatbarDefault)lines.push('CHATBAR_DEFAULT: '+b.introPool.chatbarDefault);if(b.root&&b.root.buttons.length){lines.push('');lines.push('// DOORS:');b.root.buttons.forEach(btn=>{const wire=btn.wireTarget?' → WIRE:'+btn.wireTarget:'';const conflict=(btn.wireTarget&&btn.child)?' [⚠ CONFLICT]':'';lines.push('  "'+btn.label+'"'+wire+conflict);});}
+      if(b.introPool&&b.introPool.chatbarDefault)lines.push('CHATBAR_DEFAULT: '+b.introPool.chatbarDefault);if(b.root&&b.root.buttons.length){lines.push('');lines.push('// DOORS:');b.root.buttons.forEach(btn=>{const wire=btn.wireTarget?' → WIRE:'+btn.wireTarget:'';const conflict=(btn.wireTarget&&btn.child)?' [⚠ CONFLICT]':'';const pri=btn.matchPriority?'['+btn.matchPriority.toUpperCase()+'] ':'';lines.push('  '+pri+'"'+btn.label+'"'+wire+conflict);});}
     }else if(b.root){
       lines.push('');
       function wr(resp,depth){
@@ -988,6 +1006,7 @@ function exportMd(){
         if(resp.beats.length)lines.push('');
         resp.buttons.forEach(btn=>{
           let tag='';
+          const pri='['+((btn.matchPriority||'global').toUpperCase())+']';
           if(btn.btnType==='catchall')tag=' [CATCHALL'+(btn.priority?' priority':'')+']';
           else if(!btn.visible){
             tag=' [INVISIBLE]';
@@ -997,7 +1016,7 @@ function exportMd(){
             tag=' [also: '+btn.triggers.join(',')+']';
           }
           const wire=btn.wireTarget?' → WIRE:'+btn.wireTarget:'';
-          lines.push(pad+'"'+btn.label+'"'+tag+wire);
+          lines.push(pad+pri+' "'+btn.label+'"'+tag+wire);
           if(btn.child&&!btn.wireTarget)wr(btn.child,depth+1);
         });
       }

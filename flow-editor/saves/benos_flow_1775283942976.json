@@ -1,0 +1,910 @@
+{
+  "version": "7",
+  "saved": "2026-04-04T06:25:42.975Z",
+  "branches": [
+    {
+      "id": "intro",
+      "type": "intro",
+      "x": -260,
+      "y": -240,
+      "triggers": [],
+      "root": {
+        "rid": "",
+        "beats": [],
+        "buttons": [
+          {
+            "id": "b_1",
+            "label": "Show me something.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "show_work",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_2",
+            "label": "Who is Ben?",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "who_is_ben",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_3",
+            "label": "Predict my future.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "misfortunes",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_4",
+            "label": "Surprise me.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "surprise",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          }
+        ]
+      },
+      "introPool": {
+        "firstVisit": [
+          {
+            "id": "bt_5",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "BEN OS — online.",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          },
+          {
+            "id": "bt_6",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant.",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          },
+          {
+            "id": "bt_7",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "What do you need?",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          }
+        ],
+        "returnVisits": [
+          {
+            "condition": "2nd_visit",
+            "beats": [
+              {
+                "id": "bt_8",
+                "speaker": "BEN OS",
+                "type": "text",
+                "text": "You came back.",
+                "pause": 0,
+                "display": "default",
+                "isPool": false,
+                "poolMode": "random",
+                "variants": [],
+                "media": null
+              }
+            ]
+          },
+          {
+            "condition": "same_hour",
+            "beats": [
+              {
+                "id": "bt_9",
+                "speaker": "BEN OS",
+                "type": "text",
+                "text": "You were just here. Either you found something useful or you didn't. Which was it?",
+                "pause": 0,
+                "display": "default",
+                "isPool": false,
+                "poolMode": "random",
+                "variants": [],
+                "media": null
+              }
+            ]
+          },
+          {
+            "condition": "same_day",
+            "beats": [
+              {
+                "id": "bt_a",
+                "speaker": "BEN OS",
+                "type": "text",
+                "text": "Back again. What do you need?",
+                "pause": 0,
+                "display": "default",
+                "isPool": false,
+                "poolMode": "random",
+                "variants": [],
+                "media": null
+              }
+            ]
+          },
+          {
+            "condition": "within_week",
+            "beats": [
+              {
+                "id": "bt_b",
+                "speaker": "BEN OS",
+                "type": "text",
+                "text": "You're back. Last time you asked about [TOPIC]. Did anything come of it?",
+                "pause": 0,
+                "display": "default",
+                "isPool": false,
+                "poolMode": "random",
+                "variants": [],
+                "media": null
+              }
+            ]
+          },
+          {
+            "condition": "within_month",
+            "beats": [
+              {
+                "id": "bt_c",
+                "speaker": "BEN OS",
+                "type": "text",
+                "text": "You've been here before. Things may or may not have changed. What do you need?",
+                "pause": 0,
+                "display": "default",
+                "isPool": false,
+                "poolMode": "random",
+                "variants": [],
+                "media": null
+              }
+            ]
+          },
+          {
+            "condition": "longer",
+            "beats": [
+              {
+                "id": "bt_d",
+                "speaker": "BEN OS",
+                "type": "text",
+                "text": "It's been a while. What are you working on now?",
+                "pause": 0,
+                "display": "default",
+                "isPool": false,
+                "poolMode": "random",
+                "variants": [],
+                "media": null
+              }
+            ]
+          }
+        ]
+      },
+      "state": "",
+      "topic": "",
+      "special": "none",
+      "exactMatch": "",
+      "isGlobalFallback": false,
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      }
+    },
+    {
+      "id": "greeting",
+      "type": "branch",
+      "x": -170,
+      "y": 470,
+      "triggers": [
+        "hi",
+        "hello",
+        "hey",
+        "yo"
+      ],
+      "state": "",
+      "topic": "",
+      "special": "none",
+      "exactMatch": "",
+      "root": {
+        "rid": "greeting",
+        "beats": [
+          {
+            "id": "bt_e",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "Hey. What do you need?",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          }
+        ],
+        "buttons": [
+          {
+            "id": "b_f",
+            "label": "Show me something.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "show_work",
+            "child": {
+              "rid": "greeting.show",
+              "beats": [],
+              "buttons": []
+            },
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_g",
+            "label": "Who is Ben?",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "who_is_ben",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_h",
+            "label": "Surprise me.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "surprise",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_i",
+            "label": "what do you do",
+            "visible": false,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [
+              "what do you do",
+              "what kind of work",
+              "services"
+            ],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_j",
+            "label": "[catch-all]",
+            "visible": false,
+            "btnType": "catchall",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "catchall"
+          }
+        ]
+      },
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "isGlobalFallback": false
+    },
+    {
+      "id": "who_is_ben",
+      "type": "branch",
+      "x": 800,
+      "y": 600,
+      "triggers": [
+        "who is ben",
+        "tell me about ben"
+      ],
+      "state": "who_is_ben",
+      "topic": "",
+      "special": "none",
+      "exactMatch": "",
+      "root": {
+        "rid": "who_is_ben",
+        "beats": [
+          {
+            "id": "bt_k",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "Graphic designer and creative producer. Los Angeles.",
+            "pause": 500,
+            "display": "newline",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          },
+          {
+            "id": "bt_l",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "10 years across video, motion, brand. Blue Note currently.",
+            "pause": 600,
+            "display": "newline",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          },
+          {
+            "id": "bt_m",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "What do you need?",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          }
+        ],
+        "buttons": [
+          {
+            "id": "b_n",
+            "label": "Show me the work.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "show_work",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          },
+          {
+            "id": "b_o",
+            "label": "What's Blue Note?",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": {
+              "rid": "who_is_ben.whats",
+              "beats": [
+                {
+                  "id": "bt_q",
+                  "speaker": "BEN OS",
+                  "type": "text",
+                  "text": "Blue Note LA. Ben is in-house designer on the marketing team.",
+                  "pause": 0,
+                  "display": "default",
+                  "isPool": false,
+                  "poolMode": "random",
+                  "variants": [],
+                  "media": null
+                },
+                {
+                  "id": "bt_r",
+                  "speaker": "BEN OS",
+                  "type": "text",
+                  "text": "It is, in fact, a good sentence to have in a bio.",
+                  "pause": 0,
+                  "display": "default",
+                  "isPool": false,
+                  "poolMode": "random",
+                  "variants": [],
+                  "media": null
+                }
+              ],
+              "buttons": [
+                {
+                  "id": "b_s",
+                  "label": "What does he do there?",
+                  "visible": true,
+                  "btnType": "normal",
+                  "priority": false,
+                  "wireTarget": null,
+                  "child": null,
+                  "triggers": [],
+                  "scopedState": "",
+                  "matchPriority": "global"
+                },
+                {
+                  "id": "b_t",
+                  "label": "What do you actually do?",
+                  "visible": true,
+                  "btnType": "normal",
+                  "priority": false,
+                  "wireTarget": null,
+                  "child": null,
+                  "triggers": [],
+                  "scopedState": "",
+                  "matchPriority": "global"
+                }
+              ]
+            },
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "nested"
+          },
+          {
+            "id": "b_p",
+            "label": "Are you available?",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": {
+              "rid": "who_is_ben.are",
+              "beats": [
+                {
+                  "id": "bt_u",
+                  "speaker": "BEN OS",
+                  "type": "text",
+                  "text": "Full-time at Blue Note right now. That will change.",
+                  "pause": 0,
+                  "display": "default",
+                  "isPool": false,
+                  "poolMode": "random",
+                  "variants": [],
+                  "media": null
+                },
+                {
+                  "id": "bt_v",
+                  "speaker": "BEN OS",
+                  "type": "text",
+                  "text": "The right project still gets a yes. What's yours?",
+                  "pause": 0,
+                  "display": "default",
+                  "isPool": false,
+                  "poolMode": "random",
+                  "variants": [],
+                  "media": null
+                }
+              ],
+              "buttons": []
+            },
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "nested"
+          }
+        ]
+      },
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "isGlobalFallback": false
+    },
+    {
+      "id": "show_work",
+      "type": "branch",
+      "x": 1310,
+      "y": -10,
+      "triggers": [
+        "show me something",
+        "portfolio",
+        "examples"
+      ],
+      "state": "",
+      "topic": "portfolio",
+      "special": "none",
+      "exactMatch": "",
+      "root": {
+        "rid": "show_work",
+        "beats": [
+          {
+            "id": "bt_w",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "Here's a range.",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          },
+          {
+            "id": "bt_x",
+            "speaker": "BEN OS",
+            "type": "grid",
+            "text": "",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": {
+              "collection": "design",
+              "picks": []
+            }
+          }
+        ],
+        "buttons": [
+          {
+            "id": "b_y",
+            "label": "Video work.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_z",
+            "label": "More design.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_10",
+            "label": "Tell me about a project.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          }
+        ]
+      },
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "isGlobalFallback": false
+    },
+    {
+      "id": "surprise",
+      "type": "special",
+      "x": 460,
+      "y": 740,
+      "triggers": [
+        "surprise me",
+        "random"
+      ],
+      "state": "",
+      "topic": "",
+      "special": "surprise",
+      "exactMatch": "",
+      "root": {
+        "rid": "surprise",
+        "beats": [
+          {
+            "id": "bt_11",
+            "speaker": "BEN OS",
+            "type": "pool",
+            "text": "",
+            "pause": 400,
+            "display": "default",
+            "isPool": true,
+            "poolMode": "cycle",
+            "variants": [
+              {
+                "id": "v_12",
+                "text": "Did you know that Ben once built a directional sound weapon—",
+                "weight": 1,
+                "beats": [
+                  {
+                    "id": "cb_1k",
+                    "speaker": "MEMEBOT",
+                    "type": "text",
+                    "text": "",
+                    "pause": 0,
+                    "display": "default"
+                  },
+                  {
+                    "id": "cb_1l",
+                    "speaker": "BEN OS",
+                    "type": "text",
+                    "text": "",
+                    "pause": 0,
+                    "display": "default"
+                  }
+                ],
+                "buttons": []
+              },
+              {
+                "id": "v_13",
+                "text": "Did you know that Ben's chess set is based on Man Ray's 1920 designs—",
+                "weight": 1,
+                "beats": [],
+                "buttons": []
+              },
+              {
+                "id": "v_14",
+                "text": "Did you know that Ben went from defense contractor to jazz—",
+                "weight": 1,
+                "beats": [],
+                "buttons": []
+              }
+            ],
+            "media": null
+          }
+        ],
+        "buttons": [
+          {
+            "id": "b_15",
+            "label": "Tell me about the weapon.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_16",
+            "label": "Surprise me again.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_17",
+            "label": "What do you actually do?",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          }
+        ]
+      },
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "isGlobalFallback": false
+    },
+    {
+      "id": "vignette_goodbye",
+      "type": "vignette",
+      "x": 1280,
+      "y": 670,
+      "triggers": [
+        "bye",
+        "goodbye",
+        "see ya"
+      ],
+      "state": "",
+      "topic": "",
+      "special": "none",
+      "exactMatch": "",
+      "root": {
+        "rid": "vignette_goodbye",
+        "beats": [
+          {
+            "id": "bt_18",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "Take care.",
+            "pause": 600,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          },
+          {
+            "id": "bt_19",
+            "speaker": "MEMEBOT",
+            "type": "image",
+            "text": "",
+            "pause": 900,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": {
+              "memeId": "temporary-person",
+              "src": ""
+            }
+          },
+          {
+            "id": "bt_1a",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "[BEN OS: nothing]",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          }
+        ],
+        "buttons": []
+      },
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "isGlobalFallback": false
+    },
+    {
+      "id": "fallback",
+      "type": "fallback",
+      "x": 1620,
+      "y": 240,
+      "triggers": [],
+      "state": "",
+      "topic": "",
+      "special": "none",
+      "exactMatch": "",
+      "isGlobalFallback": false,
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "root": {
+        "rid": "fallback",
+        "beats": [
+          {
+            "id": "bt_1b",
+            "speaker": "BEN OS",
+            "type": "text",
+            "text": "That didn't match anything. Here's what I can help with.",
+            "pause": 0,
+            "display": "default",
+            "isPool": false,
+            "poolMode": "random",
+            "variants": [],
+            "media": null
+          }
+        ],
+        "buttons": [
+          {
+            "id": "b_1c",
+            "label": "Show me the work.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_1d",
+            "label": "Who is Ben?",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          },
+          {
+            "id": "b_1e",
+            "label": "Start over.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": null,
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "global"
+          }
+        ]
+      }
+    },
+    {
+      "id": "misfortunes",
+      "type": "branch",
+      "x": 410,
+      "y": 450,
+      "triggers": [],
+      "state": "",
+      "topic": "",
+      "special": "none",
+      "exactMatch": "",
+      "root": {
+        "rid": "misfortunes",
+        "beats": [
+          {
+            "id": "bt_1f",
+            "speaker": "BEN OS",
+            "type": "pool",
+            "text": "Response here.",
+            "pause": 0,
+            "display": "default",
+            "isPool": true,
+            "poolMode": "cycle-session",
+            "variants": [
+              {
+                "id": "v_1j",
+                "text": "You will get what you want right after you stop wanting it.",
+                "weight": 1,
+                "beats": [],
+                "buttons": []
+              },
+              {
+                "id": "v_1b",
+                "text": "You will cite your source. They will not read it.",
+                "weight": 1,
+                "beats": [],
+                "buttons": []
+              }
+            ],
+            "media": null
+          }
+        ],
+        "buttons": [
+          {
+            "id": "b_1m",
+            "label": "Again.",
+            "visible": true,
+            "btnType": "normal",
+            "priority": false,
+            "wireTarget": "misfortunes",
+            "child": null,
+            "triggers": [],
+            "scopedState": "",
+            "matchPriority": "wire"
+          }
+        ]
+      },
+      "chatbar": {
+        "placeholder": "",
+        "disabled": false
+      },
+      "isGlobalFallback": false
+    }
+  ]
+}
