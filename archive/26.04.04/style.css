@@ -737,62 +737,6 @@ body.dark .toggle-thumb {
   animation: fadein 0.4s ease 0.3s forwards;
 }
 
-/* ── AUTOCOMPLETE DROPDOWN ───────────────────────── */
-#ac-dropdown {
-  display: none;
-  flex-direction: column;
-  background: var(--bg);
-  border: 0.5px solid var(--rule);
-  border-top: none;
-  z-index: 20;
-  overflow: hidden;
-  margin-bottom: 4px;
-}
-
-#ac-dropdown.ac-open {
-  display: flex;
-}
-
-.ac-item {
-  padding: 9px 13px;
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 300;
-  color: var(--faint);
-  cursor: pointer;
-  border-bottom: 0.5px solid var(--rule);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.1s, background 0.1s;
-  line-height: 1.4;
-}
-
-.ac-item:last-child {
-  border-bottom: none;
-}
-
-.ac-item:hover,
-.ac-item.ac-active {
-  color: var(--text);
-  background: var(--bg2);
-}
-
-.ac-typed {
-  font-weight: 500;
-  color: var(--text);
-}
-
-.ac-rest {
-  font-weight: 300;
-  color: var(--faint);
-}
-
-.ac-item:hover .ac-rest,
-.ac-item.ac-active .ac-rest {
-  color: var(--muted);
-}
-
 /* ── ANIMATIONS ──────────────────────────────────── */
 @keyframes fadein {
   from { opacity:0; transform:translateY(3px); }
