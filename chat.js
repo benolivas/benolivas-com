@@ -707,8 +707,8 @@ const INTENTS = [
     patterns: [],
     pool: [
       "One day, the sun will explode, and nothing you've ever done will matter.",
-      "The opportunity of a lifetime will arrive during a week you can't afford to be distracted."
-      /* third variant was empty in JSON — omitted */
+      "The opportunity of a lifetime will arrive during a week you can't afford to be distracted.",
+      "Your online personal data will soon be sold for $7."
     ],
     poolMode: 'cycle'
   },
@@ -823,6 +823,22 @@ const INTENTS = [
     chips: [
       { label: "Make another.",             route: "generate_image" },
       { label: "Let's make something real.", route: null }
+    ]
+  },
+
+  /* ── MUSIC ──────────────────────────────────────── */
+  {
+    id: 'favorite_musician',
+    patterns: ["who's your favorite musician","whos your favorite musician","fav musician","favorite musician","favorite artist","who does ben like","what music does ben like"],
+    topic: 'music',
+    beats: [
+      { text: "Oscar Peterson.", pause: 0, display: 'default' }
+    ],
+    video: { url: 'https://www.youtube.com/watch?v=ec-FrnaU0rs', label: 'Oscar Peterson Piano Lesson' },
+    chips: [
+      { label: "More Oscar.",             route: null },
+      { label: "Something contemporary?", route: null },
+      { label: "Oh, so you like jazz.",   route: "blue_note" }
     ]
   },
 
@@ -1427,6 +1443,29 @@ function renderImageGrid(key, onDone) {
   setTimeout(() => { if (onDone) onDone(); }, animDuration);
 }
 
+/* ── YOUTUBE EMBED ───────────────────────────────── */
+function renderYouTubeEmbed(url, label, onDone) {
+  const videoId = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
+  if (!videoId) { if (onDone) onDone(); return; }
+
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-embed-wrap';
+
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${videoId}`;
+  iframe.title = label || 'Video';
+  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  iframe.allowFullscreen = true;
+  iframe.className = 'yt-embed';
+
+  wrap.appendChild(iframe);
+  chatWindow.appendChild(wrap);
+  scrollBottom();
+
+  /* Give iframe a moment to render before continuing */
+  setTimeout(() => { if (onDone) onDone(); }, 800);
+}
+
 /* ── LIGHTBOX ────────────────────────────────────── */
 function openLightbox(item) {
   const existing = document.getElementById('lightbox');
@@ -1549,6 +1588,10 @@ function playIntent(intent, existingBody) {
         if (afterBeats.length) renderBeats(afterBeats, 'BEN OS', finish);
         else finish();
       });
+    });
+  } else if (intent.video) {
+    renderBeats(beats, 'BEN OS', () => {
+      renderYouTubeEmbed(intent.video.url, intent.video.label, finish);
     });
   } else {
     renderBeats(beats, 'BEN OS', finish);
