@@ -1,9 +1,10 @@
 'use strict';
 
 /* ═══════════════════════════════════════════════════
-   BEN OS v2.2 — chat.js
-   Self-contained. No server needed. Double-click index.html and it works.
-   To edit script: find the section labeled SCRIPT DATA below.
+   BEN OS v3.0 — chat.js
+   Generated from flow editor JSON.
+   Engine: improved timing, no dialogue overlap,
+   sequential beat rendering, blur/focus input lock.
    ═══════════════════════════════════════════════════ */
 
 /* ── VISITOR MEMORY ──────────────────────────────── */
@@ -25,44 +26,35 @@ const MEM = {
     };
     this.set(d); return d;
   },
-  setName(name) {
-    const d = this.get() || {};
-    d.name = name;
-    this.set(d);
-  },
-  getName() {
-    return this.get()?.name || null;
-  }
+  setName(name) { const d = this.get() || {}; d.name = name; this.set(d); },
+  getName()     { return this.get()?.name || null; }
 };
 
 /* ── RETURN GREETING ─────────────────────────────── */
+/* Maps intro.introPool.returnVisits from JSON        */
 function returnGreeting(mem) {
   const days  = Math.floor((Date.now() - mem.last) / 86400000);
   const hours = Math.floor((Date.now() - mem.last) / 3600000);
   const topic = mem.topics?.length ? mem.topics[mem.topics.length - 1] : null;
   const name  = mem.name ? mem.name + '. ' : '';
-  // 2nd visit specifically
-  if (mem.count === 2) return `${name}You came back.`;
-  // Same hour
-  if (hours < 1)       return "You were just here. Either you found something useful or you didn't. Which was it?";
-  // Same day
+  if (mem.count === 2) return `${name}Oh hey, you're back!`;
+  if (hours < 1)       return "You were just here.\u2003\u2003\u2003...looking for something?";
   if (days < 1)        return `${name}Back again. What do you need?`;
-  // Within a week with topic
   if (days < 7 && topic) return `${name}You're back. Last time you asked about ${topic}. Did anything come of it?`;
-  // Within a month
   if (days < 30)       return "You've been here before. Things may or may not have changed. What do you need?";
   return "It's been a while. What are you working on now?";
 }
 
 /* ── INTRO BEATS ─────────────────────────────────── */
+/* Maps intro.introPool.firstVisit                    */
 const FIRST_INTRO = [
-  { text: 'BEN OS — online.', pause: 700, type: 'newline' },
-  { text: "You've found a creative assistant disguised as a portfolio site. Or a portfolio site disguised as a creative assistant. The distinction matters less than you'd think.", pause: 1200, type: 'newline' },
-  { text: 'How may I help you?', pause: 0 }
+  { text: 'BEN OS — online.', pause: 700, display: 'newline' },
+  { text: "You've found a creative assistant disguised as a portfolio site. Or maybe, a portfolio site disguised as a creative assistant. ", pause: 1200, display: 'newline' },
+  { text: 'How may I help you?', pause: 0, display: 'default' }
 ];
 
 /* ── DOOR OPTIONS ────────────────────────────────── */
-/* "Surprise me." loads last — rewarding patience/exploration */
+/* Maps intro.root.buttons                            */
 const ALL_DOORS = [
   "Show me something.",
   "Who is Ben?",
@@ -71,9 +63,7 @@ const ALL_DOORS = [
 ];
 
 /* ════════════════════════════════════════════════════
-   SCRIPT DATA
-   This is where the experience lives.
-   Edit text here. No other files need touching.
+   SCRIPT DATA — generated from flow JSON
    ════════════════════════════════════════════════════ */
 
 /* ── MEMES ───────────────────────────────────────── */
@@ -87,6 +77,7 @@ const MEMES = [
 ];
 
 /* ── FACTS — Surprise Me rotating sequence ───────── */
+/* Maps surprise branch pool variants                 */
 const FACTS = [
   {
     id: 'fact-sonic',
@@ -100,7 +91,11 @@ const FACTS = [
       ">opens with sonic weapon",
       ">this is fine"
     ],
-    chips: [{ label: "Tell me about the weapon.", route: "whisper" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
+    chips: [
+      { label: "Tell me about the weapon.", route: "whisper" },
+      { label: "Surprise me again.",        route: "surprise" },
+      { label: "What do you actually do?",  route: "what_do_you_do" }
+    ]
   },
   {
     id: 'fact-chess',
@@ -121,7 +116,11 @@ const FACTS = [
       ">unprompted",
       ">on a Tuesday"
     ],
-    chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
+    chips: [
+      { label: "Tell me about the chess set.", route: "chess" },
+      { label: "Surprise me again.",           route: "surprise" },
+      { label: "What do you actually do?",     route: "what_do_you_do" }
+    ]
   },
   {
     id: 'fact-career',
@@ -135,7 +134,11 @@ const FACTS = [
       ">about the weapons to jazz pipeline",
       ">okay man"
     ],
-    chips: [{ label: "Tell me about Blue Note.", route: "blue_note" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
+    chips: [
+      { label: "Tell me about Blue Note.", route: "blue_note" },
+      { label: "Surprise me again.",       route: "surprise" },
+      { label: "What do you actually do?", route: "what_do_you_do" }
+    ]
   },
   {
     id: 'fact-pdf',
@@ -154,7 +157,11 @@ const FACTS = [
       ">in Los Angeles",
       ">no notes actually this rules"
     ],
-    chips: [{ label: "Show me the portfolio.", route: "portfolio_pdf" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
+    chips: [
+      { label: "Show me the portfolio.",   route: "portfolio_pdf" },
+      { label: "Surprise me again.",       route: "surprise" },
+      { label: "What do you actually do?", route: "what_do_you_do" }
+    ]
   },
   {
     id: 'fact-cookies',
@@ -169,7 +176,11 @@ const FACTS = [
       ">for sad cookies",
       ">honestly respect"
     ],
-    chips: [{ label: "Tell me about Misfortune Cookies.", route: "misfortunes" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
+    chips: [
+      { label: "Tell me about Misfortune Cookies.", route: "misfortunes_explainer" },
+      { label: "Surprise me again.",               route: "surprise" },
+      { label: "What do you actually do?",         route: "what_do_you_do" }
+    ]
   },
   {
     id: 'fact-manray',
@@ -190,32 +201,45 @@ const FACTS = [
       ">.",
       ">okay that actually tracks"
     ],
-    chips: [{ label: "Tell me about Man Ray.", route: "man_ray_who" }, { label: "Surprise me again.", route: "surprise" }, { label: "What do you actually do?", route: "what_do_you_do" }]
+    chips: [
+      { label: "Tell me about Man Ray.",   route: "man_ray_who" },
+      { label: "Surprise me again.",       route: "surprise" },
+      { label: "What do you actually do?", route: "what_do_you_do" }
+    ]
   }
 ];
 
-/* ── VIGNETTES — MemeBot scripted moments ────────── */
+/* ── VIGNETTES ───────────────────────────────────── */
+/* Maps branches of type "vignette"                   */
 const VIGNETTES = [
   {
-    id: 'all-ears',
-    triggers: ["i'm listening", "im listening", "all ears", "i'm a woman", "im a woman", "she her", "go on", "continue"],
+    id: 'vignette_all-ears',
+    triggers: ["i'm listening","im listening","all ears","i'm a woman","im a woman","she her","go on","continue"],
     benos_setup: "Good to know.",
     memebot: { type: 'image', id: 'all-ears' },
     benos_reaction: "Anyway. Is this for a client or something you're building yourself?",
-    buttons: ["Client work.", "Personal project.", "What was that?"]
+    buttons: [
+      { label: "Client work.",      route: null },
+      { label: "Personal project.", route: null },
+      { label: "What was that?",    route: null }
+    ]
   },
   {
-    id: 'overwhelmed',
-    triggers: ["i don't know where to start", "dont know where to start", "overwhelmed", "too many options", "i have a lot to say", "so much"],
+    id: 'vignette_overwhelmed',
+    triggers: ["i don't know where to start","dont know where to start","overwhelmed","too many options","i have a lot to say","so much"],
     benos_setup: "Start anywhere.",
     memebot: { type: 'image', id: 'full-of-soup' },
     benos_reaction: "That's — not helpful.",
     benos_reaction2: "Video or design?",
-    buttons: ["Video.", "Design work.", "Same actually."]
+    buttons: [
+      { label: "Video.",         route: "show_video" },
+      { label: "Design work.",   route: "show_design" },
+      { label: "Same actually.", route: "show_work" }
+    ]
   },
   {
-    id: 'goodbye',
-    triggers: ["bye", "goodbye", "see ya", "later", "peace", "gotta go", "ttyl", "cya"],
+    id: 'vignette_goodbye',
+    triggers: ["bye","goodbye","see ya","later","peace","gotta go","ttyl","cya"],
     benos_setup: "Take care.",
     memebot: { type: 'image', id: 'temporary-person' },
     benos_reaction: null,
@@ -223,20 +247,17 @@ const VIGNETTES = [
   }
 ];
 
-/* ── INTENTS — the full BEN OS script ────────────── */
+/* ── INTENTS ─────────────────────────────────────── */
+/* Maps all branches of type "branch" and "special"   */
 const INTENTS = [
 
-  /* ── SMALL TALK ──────────────────────────────────── */
-  /* ── EDGE CASES ────────────────────────────────── */
+  /* ── EDGE CASES ─────────────────────────────────── */
   {
     id: 'distress',
-    patterns: [
-      'i wanna die','want to die','kill myself','end it all',
-      'i hate myself','i want to disappear','suicidal',
-      "i'm worthless",'i give up completely'
-    ],
+    patterns: ['i wanna die','want to die','kill myself','end it all','i hate myself','i want to disappear','suicidal',"i'm worthless",'i give up completely'],
     beats: [
-      { text: "[response TBD — write in SCRIPT.md distress intent]", pause: 0 }
+      /* NOTE: placeholder — write real distress response */
+      { text: "Do you require special assistance?", pause: 0, display: 'default' }
     ]
   },
 
@@ -245,49 +266,51 @@ const INTENTS = [
     id: 'greeting',
     patterns: ['hi','hello','hey','yo','sup','good morning','good afternoon','morning','evening','hiya','howdy'],
     beats: [
-      { text: "Hey. What do you need?", pause: 0 }
+      { text: "Hey. What do you need?", pause: 0, display: 'default' }
     ]
   },
   {
     id: 'thanks',
     patterns: ['thanks','thank you','thx','ty','cheers','appreciate it','helpful','that helped'],
     beats: [
-      { text: "For sure.", pause: 900, type: 'newline' },
-      { text: "How else may I help you?", pause: 0 }
+      { text: "For sure.", pause: 900, display: 'newline' },
+      { text: "How else may I help you?", pause: 0, display: 'default' }
     ]
   },
   {
     id: 'ok',
     patterns: ['ok','okay','cool','got it','makes sense','noted','understood','alright','sounds good','nice','interesting','fair','word'],
     beats: [
-      { text: "[ECHO: capitalize, add !]", pause: 400, type: 'newline' },
-      { text: "How else may I help you?", pause: 0 }
+      { text: "[ECHO: capitalize, add !]", pause: 400, display: 'newline' },
+      { text: "How else may I help you?", pause: 0, display: 'default' }
     ]
   },
+
+  /* ── IDENTITY ────────────────────────────────────── */
   {
     id: 'im_ben',
     patterns: ["i'm ben","i am ben","this is ben","hey it's ben","im ben"],
-    beats: [
-      { text: "Really.", pause: 600, type: 'inline' },
-      { text: " Nice to meet you.", pause: 500, type: 'newline' },
-      { text: "I am also Ben.", pause: 400, type: 'inline' },
-      { text: " BEN OS, that is.", pause: 0 }
-    ],
     state: 'identity_theft',
+    beats: [
+      { text: "Really.", pause: 600, display: 'inline' },
+      { text: " Nice to meet you.", pause: 500, display: 'newline' },
+      { text: "I am also Ben.", pause: 400, display: 'inline' },
+      { text: " BEN OS, that is.", pause: 0, display: 'default' }
+    ],
     chips: [
       { label: "No really I'm Ben.", route: "identity_theft_pt2" },
-      { label: "I'm Ben Olivas", route: "identity_theft_pt2" }
+      { label: "I'm Ben Olivas",     route: "identity_theft_pt2" }
     ]
   },
   {
     id: 'identity_theft_pt2',
     patterns: ["i'm ben olivas","my name is ben olivas"],
     nestedPatterns: { 'identity_theft': ["i'm ben","i am ben","this is ben","hey it's ben","im ben"] },
+    state: 'identity_theft_pt2',
     beats: [
-      { text: "Sure thing.", pause: 400, type: 'inline' },
-      { text: " You should have built me better to deal with all the clowns we get around here.", pause: 0 }
-    ],
-    state: 'identity_theft_pt2'
+      { text: "Sure thing.", pause: 400, display: 'inline' },
+      { text: " You should have built me better to deal with all the clowns we get around here.", pause: 0, display: 'default' }
+    ]
   },
 
   /* ── WHAT IS THIS ────────────────────────────────── */
@@ -295,100 +318,178 @@ const INTENTS = [
     id: 'what_do_you_do',
     patterns: ['what do you do','what does ben do','what is this','what kind of work','services','what can you make','what can you do','what is this site','i need something made','need something made','something made'],
     beats: [
-      { text: "Depends what you need done.", pause: 600 },
-      { text: "What are you working on?", pause: 0 }
+      { text: "Depends what you need done.", pause: 600, display: 'default' },
+      { text: "What are you working on?", pause: 0, display: 'default' }
     ]
-  },
-  {
-    id: 'who_is_ben',
-    patterns: ['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'],
-    beats: [
-      { text: "Ben Olivas is a graphic designer and creative producer based in Los Angeles.", pause: 500, type: 'inline' },
-      { text: " 10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600, type: 'newline' },
-      { text: "What do you need?", pause: 0 }
-    ],
-    state: 'who_is_ben',
-    chips: [{ label: "Show me the work.", route: "show_work" }, { label: "What's Blue Note?", route: "blue_note" }, { label: "Are you available?", route: "available" }]
-  },
-  {
-    id: 'who_is_ben_pt2',
-    patterns: ['who the fuck is ben olivas','who does ben olivas think he is'],
-    nestedPatterns: { 'who_is_ben': ['what','go again','who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'] },
-    beats: [
-      { text: "A graphic designer and creative producer.", pause: 500, type: 'inline' },
-      { text: " Based in Los Angeles.", pause: 400, type: 'inline' },
-      { text: " Working at Blue Note.", pause: 600, type: 'newline' },
-      { text: "What do you need?", pause: 0 }
-    ],
-    chips: [{ label: "Show me the work.", route: "show_work" }, { label: "What's Blue Note?", route: "blue_note" }, { label: "Are you available?", route: "available" }]
   },
   {
     id: 'what_is_benos',
     patterns: ['what is ben os','what is benos','who am i talking to','what is this ai','explain ben os'],
     beats: [
-      { text: "BEN OS. An AI running on Ben Olivas's portfolio site.", pause: 500 },
-      { text: "Powered by Claude. Not Ben. If you want Ben: benolivas@gmail.com.", pause: 600 },
-      { text: "What do you need?", pause: 0 }
+      { text: "BEN OS. An AI running on Ben Olivas's portfolio site.", pause: 500, display: 'default' },
+      { text: "Powered by Claude. Not Ben. If you want Ben: benolivas@gmail.com.", pause: 600, display: 'default' },
+      { text: "What do you need?", pause: 0, display: 'default' }
     ]
   },
   {
     id: 'is_ai',
     patterns: ['are you an ai','are you real','is this ai','is this a bot','who is typing','are you ben','chatbot','ai or human','what are you'],
     beats: [
-      { text: "Yes. You were going to ask that eventually.", pause: 500 },
-      { text: "Running on Claude — made by Anthropic. Ben isn't typing. For actual Ben: benolivas@gmail.com.", pause: 0 }
+      { text: "Yes. You were going to ask that eventually.", pause: 500, display: 'default' },
+      { text: "Running on Claude — made by Anthropic. Ben isn't typing. For actual Ben: benolivas@gmail.com.", pause: 0, display: 'default' }
     ]
   },
   {
     id: 'how_works',
     patterns: ['how does this work','how does the site work','what is happening','what am i talking to','explain yourself'],
     beats: [
-      { text: "You typed something. The system read it. A response appeared. You're now considering whether to type again.", pause: 700 },
-      { text: "This is the same loop that keeps people on social media. Variable reward, minimal friction, the sense that the next response might be more interesting than the last.", pause: 600 },
-      { text: "It's also how this site works. You're already several exchanges in.", pause: 0 }
+      { text: "You typed something. The system read it. A response appeared. You're now considering whether to type again.", pause: 700, display: 'default' },
+      { text: "This is the same loop that keeps people on social media. Variable reward, minimal friction, the sense that the next response might be more interesting than the last.", pause: 600, display: 'default' },
+      { text: "It's also how this site works. You're already several exchanges in.", pause: 0, display: 'default' }
     ]
   },
 
-  /* ── SPECIAL HANDLERS (no beats — handled in code) ─ */
+  /* ── WHO IS BEN ──────────────────────────────────── */
   {
-    id: 'surprise',
-    patterns: ['surprise me','random','something random','impress me','go ahead','just show me'],
-    beats: [],
-    special: 'surprise'
-  },
-  {
-    id: 'dark_mode',
-    patterns: ["dark mode","turn off lights","it's 3am","its 3am","turn dark","dark theme","light mode","turn on lights","bright","lights on","lights off"],
-    beats: [],
-    special: 'dark_mode'
-  },
-
-  /* ── PREDICT / FORTUNE ───────────────────────────── */
-  {
-    id: 'predict_future',
-    patterns: ['predict my future','predict future','tell my fortune','fortune','my future','what will happen','crystal ball'],
+    id: 'who_is_ben',
+    patterns: ['who is ben','tell me about ben','who made this','about ben','ben olivas','who built this','who are you'],
+    state: 'who_is_ben',
     beats: [
-      { text: "You're going to ask about something you've been putting off.", pause: 600 },
-      { text: "It's going to go better than you think.", pause: 500 },
-      { text: "That's all you're getting. What do you actually need?", pause: 0 }
+      { text: "Ben Olivas is a graphic designer and creative producer based in Los Angeles.", pause: 500, display: 'inline' },
+      { text: " 10 years across video production, motion graphics, and brand design. Currently at Blue Note Los Angeles.", pause: 600, display: 'newline' },
+      { text: "What do you need?", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Show me the work.", route: "show_work" },
+      { label: "What's Blue Note?",  route: "blue_note" },
+      { label: "Are you available?", route: "available" }
+    ],
+    nestedPatterns: {
+      'who_is_ben': ["what","go again","who is ben","tell me about ben","who made this","about ben","ben olivas","who built this","who are you"]
+    },
+    nestedTarget: 'who_is_ben_pt2'
+  },
+  {
+    id: 'who_is_ben_pt2',
+    patterns: ["who the fuck is ben olivas","who does ben olivas think he is"],
+    beats: [
+      { text: "A graphic designer and creative producer.", pause: 500, display: 'inline' },
+      { text: " Based in Los Angeles.", pause: 400, display: 'inline' },
+      { text: " Working at Blue Note.", pause: 600, display: 'newline' },
+      { text: "Now, what do you need?", pause: 1200, display: 'default' }
+    ],
+    chips: [
+      { label: "Show me the work.", route: "show_work" },
+      { label: "What's Blue Note?",  route: "blue_note" },
+      { label: "Are you available?", route: "available" }
     ]
   },
 
-  /* ── HIRING / CONTACT ────────────────────────────── */
+  /* ── BLUE NOTE ───────────────────────────────────── */
+  {
+    id: 'blue_note',
+    patterns: ['blue note','jazz club','jazz venue','where does ben work','current job','current role','tell me about blue note'],
+    beats: [
+      { text: "Blue Note Los Angeles — one of the iconic jazz franchise venues. Ben is the in-house graphic designer on the marketing team.", pause: 500, display: 'newline' },
+      { text: "It is, in fact, a good sentence to have in a bio.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "What does he do there?",   route: "blue_note_work" },
+      { label: "What do you actually do?", route: "what_do_you_do" },
+      { label: "What kind of jazz?",        route: null }
+    ]
+  },
+  {
+    id: 'blue_note_work',
+    patterns: ['what does he do there','what does ben do at blue note','his work at blue note','blue note projects'],
+    beats: [
+      { text: "Posters, social, print, digital — the full marketing stack for a live music venue.", pause: 500, display: 'newline' },
+      { text: "Every week is a new show. Every show needs assets. It's fast.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Show me examples.",        route: "show_work" },
+      { label: "What do you actually do?", route: "what_do_you_do" }
+    ]
+  },
+
+  /* ── AVAILABILITY ────────────────────────────────── */
   {
     id: 'available',
     patterns: ['are you available','is ben available','available for hire','taking projects','freelance','open to work','for hire','hire ben','can i hire you'],
+    topic: 'availability',
     beats: [
-      { text: "Full-time at Blue Note Los Angeles right now. That will change. It always does.", pause: 600, type: 'newline' },
-      { text: "In the meantime — the right project still gets a yes. What's yours?", pause: 0 }
-    ],
-    topic: 'availability'
+      { text: "Full-time at Blue Note Los Angeles right now. That will change. It always does.", pause: 600, display: 'newline' },
+      { text: "In the meantime — the right project still gets a yes. What's yours?", pause: 0, display: 'default' }
+    ]
   },
+
+  /* ── CONTACT ─────────────────────────────────────── */
   {
     id: 'contact',
     patterns: ['how do i contact','contact info','email','reach out','get in touch','how to reach ben','benolivas@gmail.com'],
     beats: [
-      { text: "benolivas@gmail.com. He reads it.", pause: 0 }
+      { text: "benolivas@gmail.com. He reads it.", pause: 0, display: 'default' }
+    ]
+  },
+
+  /* ── PORTFOLIO / SHOW WORK ───────────────────────── */
+  {
+    id: 'show_work',
+    patterns: ['show me something','show me work','show me your work','portfolio','examples','what have you made','past work','see your work','show me examples','show me recent projects','most recent projects','recent work','show me ben'],
+    topic: 'portfolio',
+    beats: [
+      { text: "Here's a range.", pause: 400, display: 'default' }
+    ],
+    media: 'design',
+    mediaAfterBeat: 0,
+    afterBeats: [
+      { text: "What else do you want to see?", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Video work.",              route: "show_video" },
+      { label: "More design.",             route: "show_design" },
+      { label: "Tell me about a project.", route: "chess_prediction" },
+      { label: "Who is Ben?",              route: "who_is_ben" }
+    ]
+  },
+  {
+    id: 'show_design',
+    patterns: ['show me design','design examples','your design work','show design'],
+    topic: 'design',
+    beats: [
+      { text: "Here's a range.", pause: 0, display: 'default' }
+    ],
+    media: 'design',
+    mediaAfterBeat: 0,
+    chips: [
+      { label: "More branding.",     route: null },
+      { label: "Packaging work.",    route: null },
+      { label: "Something weirder.", route: null },
+      { label: "What else?",         route: null }
+    ]
+  },
+  {
+    id: 'show_video',
+    patterns: ['show me video','video examples','your videos','show videos'],
+    topic: 'video',
+    beats: [
+      { text: "A few directions.", pause: 0, display: 'default' }
+    ],
+    media: 'video',
+    mediaAfterBeat: 0,
+    chips: [
+      { label: "Music videos specifically.", route: "show_video" },
+      { label: "Corporate / brand work.",    route: "show_video" },
+      { label: "Defense / technical.",       route: "show_video" },
+      { label: "What else?",                 route: null }
+    ]
+  },
+  {
+    id: 'portfolio_pdf',
+    patterns: ['pdf','resume','cv','portfolio pdf','download','the document','unclassified'],
+    beats: [
+      { text: "The portfolio PDF is at benolivas.com/portfolio.", pause: 400, display: 'default' },
+      { text: "It's formatted as a government document. The cover page says UNCLASSIFIED. This was intentional.", pause: 0, display: 'default' }
     ]
   },
 
@@ -396,590 +497,481 @@ const INTENTS = [
   {
     id: 'need_video',
     patterns: ['i need a video','need a video','video production','make a video','produce a video','brand video','product video','commercial','music video','video work'],
-    beats: [
-      { text: "What's it for?", pause: 0 }
-    ],
     topic: 'video',
-    media: 'video',
-    chips: [{ label: "Brand / product.", route: "video_vs_static" }, { label: "Music video.", route: "show_video" }, { label: "Event coverage.", route: "show_video" }, { label: "Something else.", route: "what_do_you_do" }]
-  },
-  {
-    id: 'show_video',
-    patterns: ['show me video','video examples','your videos','show videos'],
     beats: [
-      { text: "A few directions.", pause: 0 }
+      { text: "What's it for?", pause: 0, display: 'default' }
     ],
     media: 'video',
-    topic: 'video',
-    chips: [{ label: "Music videos specifically.", route: "show_video" }, { label: "Corporate / brand work.", route: "show_video" }, { label: "Defense / technical.", route: "show_video" }, { label: "What else?", route: "what_do_you_do" }]
+    mediaAfterBeat: 0,
+    chips: [
+      { label: "Brand / product.", route: "video_vs_static" },
+      { label: "Music video.",     route: "show_video" },
+      { label: "Event coverage.",  route: "show_video" },
+      { label: "Something else.",  route: null }
+    ]
   },
   {
     id: 'video_vs_static',
     patterns: ['video or images','video vs static','should i use video','does video convert','static vs video'],
+    topic: 'video',
     beats: [
-      { text: "Video wins at consideration. Static wins at awareness — lower cognitive load, faster impression, easier to scroll past without feeling like you missed something.", pause: 700 },
-      { text: "The mistake most brands make is using video everywhere because it feels premium. A six-second autoplay with no sound in a feed is doing the job of a static image, just worse.", pause: 600 },
-      { text: "What stage is your audience at when they see it?", pause: 0 }
-    ],
-    topic: 'video'
+      { text: "Video wins at consideration. Static wins at awareness — lower cognitive load, faster impression, easier to scroll past without feeling like you missed something.", pause: 700, display: 'default' },
+      { text: "The mistake most brands make is using video everywhere because it feels premium. A six-second autoplay with no sound in a feed is doing the job of a static image, just worse.", pause: 600, display: 'default' },
+      { text: "What stage is your audience at when they see it?", pause: 0, display: 'default' }
+    ]
   },
 
   /* ── DESIGN ──────────────────────────────────────── */
   {
     id: 'need_design',
     patterns: ['i need a designer','need design','graphic design','need branding','design work','need a logo','logo design','visual identity'],
-    beats: [
-      { text: "What kind?", pause: 0 }
-    ],
     topic: 'design',
-    chips: [{ label: "Logo / identity.", route: "need_design" }, { label: "Print.", route: "need_design" }, { label: "Digital / web.", route: "need_design" }, { label: "Packaging.", route: "need_design" }, { label: "Something weird.", route: "need_design" }]
+    beats: [
+      { text: "What kind?", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Logo / identity.",  route: "need_design" },
+      { label: "Print.",            route: "need_design" },
+      { label: "Digital / web.",    route: "need_design" },
+      { label: "Packaging.",        route: "need_design" },
+      { label: "Something weird.",  route: "need_design" }
+    ]
   },
   {
     id: 'need_poster',
     patterns: ['poster','make a poster','design a poster','need a poster','can you make a poster','posters'],
+    topic: 'design',
     beats: [
-      { text: "Something like these.", pause: 0 }
+      { text: "Something like these.", pause: 0, display: 'default' }
     ],
     media: 'posters',
-    topic: 'design',
-    chips: [{ label: "More editorial.", route: "need_poster" }, { label: "Something darker.", route: "need_poster" }, { label: "Different style entirely.", route: "need_poster" }, { label: "What's it for?", route: "what_do_you_do" }]
-  },
-  {
-    id: 'show_design',
-    patterns: ['show me design','design examples','your design work','show design'],
-    beats: [
-      { text: "Here's a range.", pause: 0 }
-    ],
-    media: 'design',
-    topic: 'design',
-    chips: [{ label: "More branding.", route: "show_design" }, { label: "Packaging work.", route: "show_design" }, { label: "Something weirder.", route: "show_design" }, { label: "What else?", route: "what_do_you_do" }]
-  },
-  {
-    id: 'color_psychology',
-    patterns: ['color psychology','colours in branding','brand colors','what colors','color theory'],
-    beats: [
-      { text: "Color in branding isn't about preference — it's about expectation. Consumers already have associations baked in by decades of category convention. Blue is trustworthy. Red is urgent. Green is natural or financial depending on the decade.", pause: 700 },
-      { text: "Breaking those conventions can work, but it requires enough brand equity to carry the dissonance. Most don't have that.", pause: 500 },
-      { text: "What's the category?", pause: 0 }
-    ],
-    topic: 'design'
-  },
-
-  /* ── PORTFOLIO ───────────────────────────────────── */
-  {
-    id: 'show_work',
-    patterns: ['show me something','show me work','show me your work','portfolio','examples','what have you made','past work','see your work','show me examples','show me recent projects','most recent projects','recent work','show me ben'],
-    beats: [
-      { text: "Here's a range.", pause: 400 },
-      { text: "What else do you want to see?", pause: 0 }
-    ],
-    topic: 'portfolio',
-    media: 'design',
     mediaAfterBeat: 0,
-    chips: [{ label: "Video work.", route: "show_video" }, { label: "More design.", route: "show_design" }, { label: "Tell me about a project.", route: "chess_prediction" }, { label: "Who is Ben?", route: "who_is_ben" }]
-  },
-  {
-    id: 'portfolio_pdf',
-    patterns: ['pdf','resume','cv','portfolio pdf','download','the document','unclassified'],
-    beats: [
-      { text: "The portfolio PDF is at benolivas.com/portfolio.", pause: 400 },
-      { text: "It's formatted as a government document. The cover page says UNCLASSIFIED. This was intentional.", pause: 0 }
+    chips: [
+      { label: "More editorial.",          route: "need_poster" },
+      { label: "Something darker.",        route: "need_poster" },
+      { label: "Different style entirely.", route: "need_poster" },
+      { label: "What's it for?",           route: null }
     ]
   },
-
-  /* ── BRANDING ────────────────────────────────────── */
   {
     id: 'rebrand',
     patterns: ['rebrand','rebranding','new brand','brand refresh','update our brand','brand identity','new look','redesign our brand'],
-    beats: [
-      { text: "What broke?", pause: 600, type: 'newline' },
-      { text: "Rebrands happen for one of three reasons — the brand no longer reflects what the company actually does, the market shifted and the visual language aged out, or someone new came in and wanted to mark the territory.", pause: 700, type: 'newline' },
-      { text: "Which one is it?", pause: 0 }
-    ],
     topic: 'branding',
-    chips: [{ label: "Looks dated.", route: "rebrand" }, { label: "Doesn't reflect us anymore.", route: "rebrand" }, { label: "Leadership change.", route: "rebrand" }, { label: "Honestly not sure.", route: "rebrand" }]
+    beats: [
+      { text: "What broke?", pause: 600, display: 'newline' },
+      { text: "Rebrands happen for one of three reasons — the brand no longer reflects what the company actually does, the market shifted and the visual language aged out, or someone new came in and wanted to mark the territory.", pause: 700, display: 'newline' },
+      { text: "Which one is it?", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Looks dated.",               route: "rebrand" },
+      { label: "Doesn't reflect us anymore.", route: "rebrand" },
+      { label: "Leadership change.",          route: "rebrand" },
+      { label: "Honestly not sure.",          route: "rebrand" }
+    ]
   },
   {
     id: 'why_rebrand_fail',
     patterns: ['why do rebrands fail','rebrand mistakes','rebrand gone wrong','failed rebrand','bad rebrand'],
+    topic: 'branding',
     beats: [
-      { text: "Usually one of two things. Either the new brand solves an internal problem instead of an audience problem. Or the visual change outpaces the operational change. You can't redesign your logo into a better company.", pause: 700 },
-      { text: "The ones that work have a clear answer to: who did we think we were talking to, and who are we actually talking to now?", pause: 0 }
-    ],
-    topic: 'branding'
+      { text: "Usually one of two things. Either the new brand solves an internal problem instead of an audience problem. Or the visual change outpaces the operational change. You can't redesign your logo into a better company.", pause: 700, display: 'default' },
+      { text: "The ones that work have a clear answer to: who did we think we were talking to, and who are we actually talking to now?", pause: 0, display: 'default' }
+    ]
+  },
+  {
+    id: 'color_psychology',
+    patterns: ['color psychology','colours in branding','brand colors','what colors','color theory'],
+    topic: 'design',
+    beats: [
+      { text: "Color in branding isn't about preference — it's about expectation. Consumers already have associations baked in by decades of category convention. Blue is trustworthy. Red is urgent. Green is natural or financial depending on the decade.", pause: 700, display: 'default' },
+      { text: "Breaking those conventions can work, but it requires enough brand equity to carry the dissonance. Most don't have that.", pause: 500, display: 'default' },
+      { text: "What's the category?", pause: 0, display: 'default' }
+    ]
   },
 
-  /* ── MARKETING ───────────────────────────────────── */
+  /* ── CONVERSIONS ─────────────────────────────────── */
   {
     id: 'conversions',
     patterns: ['conversions','more conversions','conversion rate','get more sales','increase sales','more clicks','engagement','marketing','ad performance','not converting'],
-    beats: [
-      { text: "What's the page doing right now — video, static images, long-form copy?", pause: 0 }
-    ],
     topic: 'conversions',
-    chips: [{ label: "Static images.", route: "conversions_static" }, { label: "Short video.", route: "need_video" }, { label: "Long-form copy.", route: "conversions" }, { label: "Mix of things.", route: "conversions" }]
+    beats: [
+      { text: "What's the page doing right now — video, static images, long-form copy?", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Static images.", route: "conversions_static" },
+      { label: "Short video.",   route: "need_video" },
+      { label: "Long-form copy.", route: "conversions" },
+      { label: "Mix of things.", route: "conversions" }
+    ]
   },
   {
     id: 'conversions_static',
     patterns: ['static images','just images','mostly images','image and copy'],
+    topic: 'conversions',
     beats: [
-      { text: "Static images convert worse than video at the consideration stage. Not because video is flashier — because it reduces the cognitive load of imagining the product in use. The brain fills in gaps with doubt. Video fills them for you.", pause: 700 },
-      { text: "What's the product?", pause: 0 }
-    ],
-    topic: 'conversions'
+      { text: "Static images convert worse than video at the consideration stage. Not because video is flashier — because it reduces the cognitive load of imagining the product in use. The brain fills in gaps with doubt. Video fills them for you.", pause: 700, display: 'default' },
+      { text: "What's the product?", pause: 0, display: 'default' }
+    ]
   },
   {
     id: 'social_proof',
     patterns: ['social proof','testimonials','reviews','trust signals','build trust','credibility'],
+    topic: 'conversions',
     beats: [
-      { text: "Social proof works because humans are lazy evaluators. When something is hard to assess, we use other people's behavior as a shortcut.", pause: 600 },
-      { text: "The trick is specificity. 'Great product!' means nothing. 'Increased our conversion rate by 34% in six weeks' means something.", pause: 700 },
-      { text: "Also: negative reviews increase overall trust as long as they're not about core functionality. They signal authenticity.", pause: 0 }
-    ],
-    topic: 'conversions'
+      { text: "Social proof works because humans are lazy evaluators. When something is hard to assess, we use other people's behavior as a shortcut.", pause: 600, display: 'default' },
+      { text: "The trick is specificity. 'Great product!' means nothing. 'Increased our conversion rate by 34% in six weeks' means something.", pause: 700, display: 'default' },
+      { text: "Also: negative reviews increase overall trust as long as they're not about core functionality. They signal authenticity.", pause: 0, display: 'default' }
+    ]
   },
 
   /* ── PROJECTS ────────────────────────────────────── */
   {
-    id: 'generate_image',
-    patterns: ['generate something','generate an image','make me something','create something','make an image','generate','make something visual','show me something you made','can you generate','make me art'],
+    id: 'chess_prediction',
+    patterns: ['personal projects','side projects','his projects','what projects','other projects'],
+    topic: 'projects',
     beats: [
-      { text: "What should I make?", pause: 0 }
+      { text: "A few. A fortune cookie brand that gives bad advice. A chess set based on Man Ray's work. A fictional acoustic weapon with a real datasheet.", pause: 700, display: 'newline' },
+      { text: "You're going to ask about the chess set.", pause: 0, display: 'default' }
     ],
-    state: 'generation_flow'
+    chips: [
+      { label: "Tell me about the chess set.", route: "chess" },
+      { label: "Tell me about the cookies.",   route: "misfortunes_explainer" },
+      { label: "Tell me about the weapon.",    route: "whisper" },
+      { label: "Predict my future.",           route: "predict_future" }
+    ]
   },
   {
+    id: 'chess',
+    patterns: ['chess set','man ray','chess pieces','the chess set','chess project','surrealist chess'],
+    topic: 'projects',
+    beats: [
+      { text: "Man Ray designed chess pieces in the 1920s. Ben 3D modeled them, had them cast in resin, and packaged them as a collectible set.", pause: 500, display: 'newline' },
+      { text: "Man Ray was not consulted. I think he'd be fine with it.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Tell me about Man Ray.",             route: "man_ray_who" },
+      { label: "What does the packaging look like?", route: null },
+      { label: "Can I buy one?",                     route: "can_buy_chess" }
+    ]
+  },
+  {
+    id: 'can_buy_chess',
+    patterns: ['can i buy','is it for sale','where can i buy','how much','price','cost'],
+    beats: [
+      { text: "Not currently. Limited run — most went to people Ben wanted to have them.", pause: 500, display: 'newline' },
+      { text: "That might change. benolivas@gmail.com if you're serious.", pause: 0, display: 'default' }
+    ]
+  },
+  {
+    id: 'man_ray_who',
+    patterns: ['who is man ray','tell me about man ray','man ray artist','what is dada','dadaism'],
+    beats: [
+      { text: "Man Ray was a Dadaist and Surrealist — photography, painting, objects. Active in Paris in the 1920s. Made things that deliberately resisted being useful.", pause: 600, display: 'newline' },
+      { text: "He also designed chess pieces. Never meant to be played with. Ben found this relatable.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Tell me about the chess set.", route: "chess" },
+      { label: "Surprise me again.",           route: "surprise" }
+    ]
+  },
+  {
+    id: 'unusual',
+    patterns: ["what's the most unusual","most unusual thing","strangest thing","weirdest thing","unusual about him","what else is unusual","tell me more"],
+    topic: 'projects',
+    beats: [
+      { text: "Harder to rank than you'd think.", pause: 500, display: 'default' },
+      { text: "There's the sound weapon. The surrealist chess set. The fortune cookie company. The government document that isn't classified. The defense contractor work followed immediately by a jazz club.", pause: 700, display: 'default' },
+      { text: "The through-line is probably: he makes things that shouldn't exist as if they obviously should.", pause: 0, display: 'default' }
+    ]
+  },
+
+  /* ── MISFORTUNE COOKIES ──────────────────────────── */
+  {
+    id: 'misfortunes_explainer',
+    patterns: ['misfortune cookies','fortune cookies','misfortunes','misfortunes.net','bad fortunes','the cookie','cookie project'],
+    topic: 'projects',
+    beats: [
+      { text: "Fortune cookies, but honest.", pause: 500, display: 'newline' },
+      { text: "Swiss grid, stark type, dark palette — deliberately clinical against the warm expectations of the category. Packaging, web, copy. Fortunes are AI-generated from a curated dataset.", pause: 700, display: 'newline' },
+      { text: "If you want to feel seen by a cookie: misfortunes.net.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "What does it look like?",  route: "misfortunes" },
+      { label: "What's the worst fortune?", route: "worst_fortune" },
+      { label: "Is it for sale?",           route: null }
+    ]
+  },
+  {
+    /* Pool intent — cycles through misfortunes; triggered by MISFORTUNE_TRIGGERS set */
+    id: 'misfortunes',
+    patterns: [],
+    pool: [
+      "One day, the sun will explode, and nothing you've ever done will matter.",
+      "The opportunity of a lifetime will arrive during a week you can't afford to be distracted."
+      /* third variant was empty in JSON — omitted */
+    ],
+    poolMode: 'cycle'
+  },
+  {
+    id: 'worst_fortune',
+    patterns: ["what's the worst fortune","worst fortune","most brutal fortune","saddest fortune","most depressing"],
+    beats: [
+      { text: "They're all the worst fortune. That's the product.", pause: 600, display: 'newline' },
+      { text: "The good ones are the ones that feel too specific.", pause: 0, display: 'default' }
+    ]
+  },
+
+  /* ── WHISPER / WEAPON ────────────────────────────── */
+  {
+    id: 'whisper',
+    patterns: ['whisper gun','whisper mk','lrad','sound weapon','acoustic device','directional sound','ultrasonic','the weapon','show me the datasheet','tell me about the weapon'],
+    topic: 'projects',
+    beats: [
+      { text: "The Whisper MK-I is a fictional product —", pause: 400, display: 'inline' },
+      { text: " in the sense that the datasheet is a design exercise.", pause: 600, display: 'newline' },
+      { text: "The actual device is real. Portable directional sound using ultrasonic transducers and PWM signal generation. Built and documented.", pause: 600, display: 'newline' },
+      { text: "The datasheet is the interesting part. Government document parody. Very dry.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Show me the datasheet.", route: "portfolio_pdf" },
+      { label: "How does it work?",      route: "whisper" },
+      { label: "Is this legal?",         route: "weapon_legal" }
+    ]
+  },
+  {
+    id: 'weapon_legal',
+    patterns: ['is this legal','is that legal','is the weapon legal','can you do that'],
+    beats: [
+      { text: "It's a speaker.", pause: 600, display: 'inline' },
+      { text: " A very directional one.", pause: 0, display: 'default' }
+    ]
+  },
+
+  /* ── PREDICT FUTURE ──────────────────────────────── */
+  {
+    id: 'predict_future',
+    patterns: ['predict my future','predict future','tell my fortune','fortune','my future','what will happen','crystal ball'],
+    beats: [
+      { text: "You're going to ask about something you've been putting off.", pause: 600, display: 'default' },
+      { text: "It's going to go better than you think.", pause: 500, display: 'default' },
+      { text: "That's all you're getting. What do you actually need?", pause: 0, display: 'default' }
+    ]
+  },
+
+  /* ── GENERATION FLOW ─────────────────────────────── */
+  {
+    id: 'generate_image',
+    patterns: ['generate something','generate an image','make me something','create something','make an image','generate','make something visual','show me something you made','can you generate','make me art'],
+    state: 'generation_flow',
+    beats: [
+      { text: "What should I make?", pause: 0, display: 'default' }
+    ]
+  },
+  {
+    /* catch-all in generation state */
     id: 'generation_response',
     patterns: [],
+    state: 'generation_flow',
     nestedPatterns: { 'generation_flow': ['*'] },
     beats: [
-      { text: "Generating...", pause: 1200, type: 'newline' },
-      { text: "[GIF: assets/generated/placeholder.gif]", pause: 800, type: 'newline' },
-      { text: "There.", pause: 0 }
+      { text: "Generating...", pause: 1200, display: 'newline' },
+      { text: "[GIF: assets/generated/placeholder.gif]", pause: 800, display: 'newline' },
+      { text: "There.", pause: 0, display: 'default' }
     ],
-    state: 'generation_flow',
     chips: [
-      { label: "Make another.", route: "generate_image" },
-      { label: "What is this?", route: "generate_explain" },
-      { label: "I like this.", route: "generate_save" },
-      { label: "Let's make something real.", route: "what_do_you_do" }
+      { label: "Make another.",             route: "generate_image" },
+      { label: "What is this?",             route: "generate_explain" },
+      { label: "I like this.",              route: "generate_save" },
+      { label: "Let's make something real.", route: null }
     ]
   },
   {
     id: 'generate_interactive',
     patterns: [],
+    state: 'generation_flow',
     nestedPatterns: { 'generation_flow': ['interactive','something interactive','make it interactive','a toggle','something i can use'] },
     beats: [
-      { text: "Generating...", pause: 1200, type: 'newline' },
-      { text: "[TOGGLE: dark_mode]", pause: 800, type: 'newline' },
-      { text: "There.", pause: 0 }
+      { text: "Generating...", pause: 1200, display: 'newline' },
+      { text: "[TOGGLE: dark_mode]", pause: 800, display: 'newline' },
+      { text: "There.", pause: 0, display: 'default' }
     ],
     chips: [
-      { label: "What is this?", route: "generate_explain" },
-      { label: "Make another.", route: "generate_image" },
-      { label: "Let's make something real.", route: "what_do_you_do" }
+      { label: "What is this?",             route: "generate_explain" },
+      { label: "Make another.",             route: "generate_image" },
+      { label: "Let's make something real.", route: null }
     ]
   },
   {
     id: 'generate_explain',
     patterns: ['what is this','what did you make','explain this','what am i looking at'],
     beats: [
-      { text: "Something made from available assets.", pause: 500, type: 'newline' },
-      { text: "The prompt shapes the category. The category shapes the result.", pause: 0 }
+      { text: "Something made from available assets.", pause: 500, display: 'newline' },
+      { text: "The prompt shapes the category. The category shapes the result.", pause: 0, display: 'default' }
     ],
     chips: [
-      { label: "Make another.", route: "generate_image" },
-      { label: "Let's make something real.", route: "what_do_you_do" }
+      { label: "Make another.",             route: "generate_image" },
+      { label: "Let's make something real.", route: null }
     ]
   },
   {
     id: 'generate_save',
     patterns: ['i like this','save this','keep this'],
     beats: [
-      { text: "Right-click. Save image.", pause: 500, type: 'newline' },
-      { text: "Low-tech but it works.", pause: 0 }
+      { text: "Right-click. Save image.", pause: 500, display: 'newline' },
+      { text: "Low-tech but it works.", pause: 0, display: 'default' }
     ],
     chips: [
-      { label: "Make another.", route: "generate_image" },
-      { label: "Let's make something real.", route: "what_do_you_do" }
+      { label: "Make another.",             route: "generate_image" },
+      { label: "Let's make something real.", route: null }
     ]
-  },
-  {
-    id: 'chess_prediction',
-    patterns: ['personal projects','side projects','his projects','what projects','other projects'],
-    beats: [
-      { text: "A few. A fortune cookie brand that gives bad advice. A chess set based on Man Ray's work. A fictional acoustic weapon with a real datasheet.", pause: 700, type: 'newline' },
-      { text: "You're going to ask about the chess set.", pause: 0 }
-    ],
-    topic: 'projects',
-    chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Tell me about the cookies.", route: "misfortunes" }, { label: "Tell me about the weapon.", route: "whisper" }]
-  },
-  {
-    id: 'unusual',
-    patterns: ["what's the most unusual","most unusual thing","strangest thing","weirdest thing","unusual about him","what else is unusual","tell me more"],
-    beats: [
-      { text: "Harder to rank than you'd think.", pause: 500 },
-      { text: "There's the sound weapon. The surrealist chess set. The fortune cookie company. The government document that isn't classified. The defense contractor work followed immediately by a jazz club.", pause: 700 },
-      { text: "The through-line is probably: he makes things that shouldn't exist as if they obviously should.", pause: 0 }
-    ],
-    topic: 'projects'
-  },
-  {
-    id: 'chess',
-    patterns: ['chess set','man ray','chess pieces','the chess set','chess project','surrealist chess'],
-    beats: [
-      { text: "Man Ray designed chess pieces in the 1920s. Ben 3D modeled them, had them cast in resin, and packaged them as a collectible set.", pause: 500, type: 'newline' },
-      { text: "Man Ray was not consulted. I think he'd be fine with it.", pause: 0 }
-    ],
-    topic: 'projects',
-    chips: [{ label: "Tell me about Man Ray.", route: "man_ray_who" }, { label: "What does the packaging look like?", route: "chess" }, { label: "Can I buy one?", route: "can_buy_chess" }]
-  },
-  {
-    id: 'misfortunes',
-    patterns: ['misfortune cookies','fortune cookies','misfortunes','misfortunes.net','bad fortunes','the cookie','cookie project'],
-    beats: [
-      { text: "Fortune cookies, but honest.", pause: 500, type: 'newline' },
-      { text: "Swiss grid, stark type, dark palette — deliberately clinical against the warm expectations of the category. Packaging, web, copy. Fortunes are AI-generated from a curated dataset.", pause: 700, type: 'newline' },
-      { text: "If you want to feel seen by a cookie: misfortunes.net.", pause: 0 }
-    ],
-    topic: 'projects',
-    chips: [{ label: "What does it look like?", route: "misfortunes" }, { label: "What's the worst fortune?", route: "worst_fortune" }, "Is it for sale?"]
-  },
-  {
-    id: 'whisper',
-    patterns: ['whisper gun','whisper mk','lrad','sound weapon','acoustic device','directional sound','ultrasonic','the weapon','show me the datasheet','tell me about the weapon'],
-    beats: [
-      { text: "The Whisper MK-I is a fictional product —", pause: 400, type: 'inline' },
-      { text: " in the sense that the datasheet is a design exercise.", pause: 600, type: 'newline' },
-      { text: "The actual device is real. Portable directional sound using ultrasonic transducers and PWM signal generation. Built and documented.", pause: 600, type: 'newline' },
-      { text: "The datasheet is the interesting part. Government document parody. Very dry.", pause: 0 }
-    ],
-    topic: 'projects',
-    chips: [{ label: "Show me the datasheet.", route: "portfolio_pdf" }, { label: "How does it work?", route: "whisper" }, { label: "Is this legal?", route: "weapon_legal" }]
-  },
-  {
-    id: 'weapon_legal',
-    patterns: ['is this legal','is that legal','is the weapon legal','can you do that'],
-    beats: [
-      { text: "It's a speaker.", pause: 600, type: 'inline' },
-      { text: " A very directional one.", pause: 0 }
-    ]
-  },
-  {
-    id: 'blue_note',
-    patterns: ['blue note','jazz club','jazz venue','where does ben work','current job','current role','tell me about blue note'],
-    beats: [
-      { text: "Blue Note Los Angeles — one of the iconic jazz franchise venues. Ben is the in-house graphic designer on the marketing team.", pause: 500, type: 'newline' },
-      { text: "It is, in fact, a good sentence to have in a bio.", pause: 0 }
-    ],
-    chips: [{ label: "What does he do there?", route: "blue_note_work" }, "What kind of jazz?", { label: "What do you actually do?", route: "what_do_you_do" }]
-  },
-  {
-    id: 'blue_note_work',
-    patterns: ['what does he do there','what does ben do at blue note','his work at blue note','blue note projects'],
-    beats: [
-      { text: "Posters, social, print, digital — the full marketing stack for a live music venue.", pause: 500, type: 'newline' },
-      { text: "Every week is a new show. Every show needs assets. It's fast.", pause: 0 }
-    ],
-    chips: [{ label: "Show me examples.", route: "show_work" }, { label: "What do you actually do?", route: "what_do_you_do" }]
   },
 
-  /* ── META ────────────────────────────────────────── */
+  /* ── SPECIALS ────────────────────────────────────── */
   {
-    id: 'man_ray_who',
-    patterns: ['who is man ray','tell me about man ray','man ray artist','what is dada','dadaism'],
-    beats: [
-      { text: "Man Ray was a Dadaist and Surrealist — photography, painting, objects. Active in Paris in the 1920s. Made things that deliberately resisted being useful.", pause: 600, type: 'newline' },
-      { text: "He also designed chess pieces. Never meant to be played with. Ben found this relatable.", pause: 0 }
-    ],
-    chips: [{ label: "Tell me about the chess set.", route: "chess" }, { label: "Surprise me again.", route: "surprise" }]
+    id: 'dark_mode',
+    patterns: ['dark mode','turn off lights',"it's 3am",'its 3am','turn dark','dark theme','light mode','turn on lights','bright','lights on','lights off'],
+    special: 'dark_mode'
   },
   {
-    id: 'can_buy_chess',
-    patterns: ['can i buy','is it for sale','where can i buy','how much','price','cost'],
-    beats: [
-      { text: "Not currently. Limited run — most went to people Ben wanted to have them.", pause: 500, type: 'newline' },
-      { text: "That might change. benolivas@gmail.com if you're serious.", pause: 0 }
-    ]
-  },
-  {
-    id: 'worst_fortune',
-    patterns: ["what's the worst fortune","worst fortune","most brutal fortune","saddest fortune","most depressing"],
-    beats: [
-      { text: "They're all the worst fortune. That's the product.", pause: 600, type: 'newline' },
-      { text: "The good ones are the ones that feel too specific.", pause: 0 }
-    ]
+    id: 'surprise',
+    patterns: ['surprise me','random','something random','impress me','go ahead','just show me'],
+    special: 'surprise'
   }
 
 ];
 
-
 /* ── EXACT TRIGGERS ──────────────────────────────── */
-/* Checked BEFORE normalization. Case-insensitive but  */
-/* must match the full input exactly (trimmed).        */
-/* Use for easter eggs, passwords, secret paths.       */
-/* memebot_image: file path, or null                   */
-/* benos_beats: array of {text, pause, type} beats     */
+/* Maps branches of type "exact" + twilight_zone      */
 const EXACT_TRIGGERS = [
   {
     id: 'open_sesame',
     match: 'open sesame',
     memebot_image: 'assets/memes/open-sesame.gif',
     benos_beats: [
-      { text: "...how did you know that.", pause: 0 }
+      { text: "...how did you know that.", pause: 0, display: 'default' }
     ],
     chips: [
-      { label: "Know what?", route: "what_is_benos" },
+      { label: "Know what?",      route: "what_is_benos" },
       { label: "I have my ways.", route: "unusual" }
+    ]
+  },
+  {
+    id: 'show_me_everything',
+    match: 'show me everything',
+    benos_beats: [
+      { text: "That would take a while.", pause: 500, display: 'default' },
+      { text: "Start somewhere.", pause: 0, display: 'default' }
+    ],
+    chips: [
+      { label: "Show me the work.", route: "show_work" },
+      { label: "Surprise me.",      route: "surprise" }
+    ]
+  },
+  {
+    id: 'you_had_me_at_hello',
+    match: 'you had me at hello',
+    benos_beats: [
+      { text: "Good.", pause: 0, display: 'default' }
+    ]
+  },
+  {
+    id: 'twilight_zone',
+    match: 'twilight zone',
+    /* beat sequence: BEN OS → BEN OS → MEMEBOT image → BEN OS */
+    /* handled by playExactTriggerFull() — not standard benos_beats */
+    full_beats: [
+      { speaker: 'BEN OS',   type: 'text',  text: "You've just entered a world where everything is upside down.", pause: 0,    display: 'default' },
+      { speaker: 'BEN OS',   type: 'text',  text: "At least, that's how it feels.",                               pause: 1200, display: 'default' },
+      { speaker: 'MEMEBOT',  type: 'image', src: 'assets/memebot/twilight-zone.gif',                              pause: 1800, display: 'default' },
+      { speaker: 'BEN OS',   type: 'text',  text: ".....right.",                                                  pause: 2600, display: 'default' }
+    ]
+  },
+  {
+    id: 'fidelio',
+    match: 'fidelio',
+    benos_beats: [
+      { text: "Wrong party.", pause: 0, display: 'default' }
     ]
   }
 ];
 
-/* ── EXACT TRIGGER MATCHING ──────────────────────── */
-function matchExact(input) {
-  const t = input.trim().toLowerCase();
-  return EXACT_TRIGGERS.find(e => e.match.toLowerCase() === t) || null;
-}
-
-/* ── PLAY EXACT TRIGGER ──────────────────────────── */
-function playExactTrigger(trigger, typingBody) {
-  // MemeBot appears first if image exists
-  const fireBenosResponse = () => {
-    if (trigger.benos_beats?.length) {
-      // Clear the existing typing body first beat
-      renderBeats(trigger.benos_beats, 'BEN OS', () => {
-        renderChips(trigger.chips);
-        setWaiting(false);
-      });
-    } else {
-      renderChips(trigger.chips);
-      setWaiting(false);
-    }
-  };
-
-  if (trigger.memebot_image) {
-    // Dismiss the BEN OS typing bubble — MemeBot goes first
-    typingBody.classList.remove('typing');
-    typingBody.remove();
-    const mbBody = appendLabelOnly('memebot', 'MEMEBOT');
-    renderMemebotImage(trigger.memebot_image, mbBody, () => {
-      fireBenosResponse();
-    });
-  } else {
-    // No image — just BEN OS responds
-    typingBody.classList.remove('typing');
-    typingBody.textContent = '';
-    fireBenosResponse();
-  }
-}
+/* ── MISFORTUNE TRIGGERS ─────────────────────────── */
+/* Maps misfortunes.exactPhrases from JSON            */
+/* O(1) lookup Set — avoids false positives from      */
+/* keyword scorer on very short inputs like "f"       */
+const MISFORTUNE_TRIGGERS = new Set([
+  '?','??','???',
+  'bad','bad fortune','bad luck','bad news',
+  'can you','can you predict','can you predict my future','can you read my future','can you see my future','can you tell my future',
+  'cryptic','cryptic fortune','cryptic message','say something cryptic',
+  'dark','dark fortune','dark prediction','dark reading','tell me something dark',
+  'destiny','destiny reading','my destiny','read my destiny','what is my destiny',"what's my destiny",'whats my destiny',
+  'do a fortune','do a prediction','do a reading',
+  'fate','fate reading','my fate','read my fate','what is my fate',"what's my fate",'whats my fate',
+  'fortune','fortune cookie','fortune cookies','fortune me','fortune please','fortune reading',
+  'future','future me','future now','future please','future pred','future read','future tell',
+  'give me','give me bad luck','give me fortune','give me misfortune','give me something bad','give me something ominous','give me something random','give me something weird',
+  'idk','idk future','idk prediction','idk what next',
+  'just give me fortune','just give me something','just predict','just say something','just tell me','just tell me a fortune','just tell me my future','just tell me something',
+  'misfortune','misfortune cookie','misfortune cookies','misfortune please',
+  'my future','my path',
+  'ominous','ominous fortune','say something ominous',
+  'oracle','oracle me','oracle reading',
+  'predict','predict future','predict life','predict me','predict my future','predict please','prediction','predictions',
+  'prophesy','prophesize','prophecy','prophecy reading',
+  'random','random fortune','random misfortune','random prediction',
+  'read me','read my destiny','read my fate','read my future',
+  'show me something','show me something ominous','show me something random','show me something weird',
+  'surprise me','suprise me','surprize me',
+  'tarot','tarot me','tarot reading',
+  'tell me','tell me a fortune','tell me future','tell me my destiny','tell me my fate','tell me my future','tell me something','tell me something bad','tell me something cryptic','tell me something ominous','tell me something weird',
+  'what comes next','what do you see','what do you see for me','what do you see in my future','what happens','what happens next','what is my future','what next','what will happen','what will happen to me',
+  "what's going to happen","what's my future","what's next",
+  'whats going to happen','whats gonna happen','whats my future','whats next',
+  '🔮','🔮 future','🔮 me','🔮 pls','🔮 predict','🔮 tell me',
+  '🥠','🥠 bad','🥠 cookie','🥠 cursed','🥠 fortune','🥠 tell me'
+]);
 
 /* ── MEDIA CATALOG ───────────────────────────────── */
-/* GRID ITEM TYPES:
-   type: 'lightbox'   → clicking opens fullscreen lightbox (single image + case study link)
-   type: 'subgrid'    → clicking opens a sub-grid of child items (category or client view)
-   type: 'youtube'    → clicking opens YouTube link (video items)
-
-   PATH CONVENTION:
-   assets/portfolio/graphic-design/[project]/thumb.gif   ← confirmed local asset
-   assets/portfolio/video/[category]/[project]/thumb.jpg ← confirmed local asset
-   ⚠️ = placeholder path — file not yet created
-
-   GRID MODES (future):
-   mode: 'custom'   → shows exactly what's listed, in order (current behavior)
-   mode: 'pool'     → randomly pick N from defined list, no session repeats
-   mode: 'category' → randomly pick N from entire category folder
-*/
-
 const MEDIA = {
-
-  // ── DESIGN GRID — "Show me something." ──────────────
-  // 6 items curated, 3 cols desktop / 2 cols mobile
-  // Items with type:'subgrid' will open a child grid on click (not yet built — falls back to lightbox)
   design: [
-    {
-      src:          'assets/portfolio/graphic-design/after-hours/thumb.gif',
-      fullSrc:      'assets/portfolio/graphic-design/after-hours/thumb.gif',
-      label:        'After Hours',
-      type:         'lightbox',
-      caseStudyUrl: null
-      // ✓ asset confirmed local
-    },
-    {
-      src:          'assets/portfolio/graphic-design/misfortune-cookies/thumb.gif',
-      fullSrc:      'assets/portfolio/graphic-design/misfortune-cookies/thumb.gif',
-      label:        'Misfortune Cookies',
-      type:         'lightbox',
-      caseStudyUrl: 'https://misfortunes.net'
-      // ✓ asset confirmed local
-    },
-    {
-      src:          'assets/portfolio/graphic-design/man-ray-chess/thumb.gif',
-      fullSrc:      'assets/portfolio/graphic-design/man-ray-chess/thumb.gif',
-      label:        'Man Ray Chess',
-      type:         'lightbox',
-      caseStudyUrl: null
-      // ✓ asset confirmed local
-    },
-    {
-      src:          'assets/portfolio/graphic-design/aerovironment/thumb.gif',
-      fullSrc:      'assets/portfolio/graphic-design/aerovironment/thumb.gif',
-      label:        'AeroVironment',
-      type:         'subgrid',
-      subgrid:      'aerovironment-design',
-      caseStudyUrl: null
-      // ✓ asset confirmed local
-    },
-    {
-      src:          'assets/portfolio/graphic-design/posters/thumb.gif',
-      fullSrc:      'assets/portfolio/graphic-design/posters/thumb.gif',
-      label:        'Posters',
-      type:         'subgrid',
-      subgrid:      'posters',
-      caseStudyUrl: null
-      // ⚠️ placeholder needed — representative poster thumb
-    },
-    {
-      src:          'assets/portfolio/graphic-design/blue-note/thumb.jpg',
-      fullSrc:      'assets/portfolio/graphic-design/blue-note/thumb.jpg',
-      label:        'Blue Note LA',
-      type:         'lightbox',
-      caseStudyUrl: null
-      // ⚠️ placeholder needed — no Blue Note work added yet
-    }
+    { src: 'assets/portfolio/graphic-design/after-hours/thumb.gif',        fullSrc: 'assets/portfolio/graphic-design/after-hours/thumb.gif',        label: 'After Hours',    type: 'lightbox', caseStudyUrl: null },
+    { src: 'assets/portfolio/graphic-design/misfortune-cookies/thumb.gif', fullSrc: 'assets/portfolio/graphic-design/misfortune-cookies/thumb.gif', label: 'Misfortune Cookies', type: 'lightbox', caseStudyUrl: 'https://misfortunes.net' },
+    { src: 'assets/portfolio/graphic-design/man-ray-chess/thumb.gif',      fullSrc: 'assets/portfolio/graphic-design/man-ray-chess/thumb.gif',      label: 'Man Ray Chess',  type: 'lightbox', caseStudyUrl: null },
+    { src: 'assets/portfolio/graphic-design/aerovironment/thumb.gif',      fullSrc: 'assets/portfolio/graphic-design/aerovironment/thumb.gif',      label: 'AeroVironment',  type: 'subgrid',  subgrid: 'aerovironment-design', caseStudyUrl: null },
+    { src: 'assets/portfolio/graphic-design/posters/thumb.gif',            fullSrc: 'assets/portfolio/graphic-design/posters/thumb.gif',            label: 'Posters',        type: 'subgrid',  subgrid: 'posters', caseStudyUrl: null },
+    { src: 'assets/portfolio/graphic-design/blue-note/thumb.jpg',          fullSrc: 'assets/portfolio/graphic-design/blue-note/thumb.jpg',          label: 'Blue Note LA',   type: 'lightbox', caseStudyUrl: null }
   ],
-
-  // ── VIDEO GRID — "Show me video." ───────────────────
-  // Category-level items — each opens a sub-grid of projects within that category
   video: [
-    {
-      src:          'assets/portfolio/video/commercials/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/commercials/thumb.jpg',
-      label:        'Commercials',
-      type:         'subgrid',
-      subgrid:      'commercials',
-      caseStudyUrl: null
-      // ⚠️ placeholder needed — representative commercials thumb
-    },
-    {
-      src:          'assets/portfolio/video/music-videos/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/music-videos/thumb.jpg',
-      label:        'Music Videos',
-      type:         'subgrid',
-      subgrid:      'music-videos',
-      caseStudyUrl: null
-      // ⚠️ placeholder needed — representative music video thumb
-    },
-    {
-      src:          'assets/portfolio/video/aerovironment/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/aerovironment/thumb.jpg',
-      label:        'AeroVironment',
-      type:         'subgrid',
-      subgrid:      'aerovironment-video',
-      caseStudyUrl: null
-      // ⚠️ placeholder needed — global AeroVironment video thumb
-    }
+    { src: 'assets/portfolio/video/commercials/thumb.jpg',   fullSrc: 'assets/portfolio/video/commercials/thumb.jpg',   label: 'Commercials',   type: 'subgrid', subgrid: 'commercials',         caseStudyUrl: null },
+    { src: 'assets/portfolio/video/music-videos/thumb.jpg',  fullSrc: 'assets/portfolio/video/music-videos/thumb.jpg',  label: 'Music Videos',  type: 'subgrid', subgrid: 'music-videos',        caseStudyUrl: null },
+    { src: 'assets/portfolio/video/aerovironment/thumb.jpg', fullSrc: 'assets/portfolio/video/aerovironment/thumb.jpg', label: 'AeroVironment', type: 'subgrid', subgrid: 'aerovironment-video', caseStudyUrl: null }
   ],
-
-  // ── POSTERS SUB-GRID — opens from design grid "Posters" ──
   posters: [
-    {
-      src:          'assets/portfolio/graphic-design/posters/full/onibaba-thumb.jpg',
-      fullSrc:      'assets/portfolio/graphic-design/posters/full/onibaba.jpg',
-      label:        'Onibaba',
-      type:         'lightbox',
-      caseStudyUrl: null
-      // ⚠️ migrate from: benolivas.com/images/GraphicDesign/OnibabaPoster.png
-    },
-    {
-      src:          'assets/portfolio/graphic-design/posters/full/swiss-design-thumb.jpg',
-      fullSrc:      'assets/portfolio/graphic-design/posters/full/swiss-design.jpg',
-      label:        'Swiss Design',
-      type:         'lightbox',
-      caseStudyUrl: null
-      // ⚠️ migrate from: benolivas.com/images/GraphicDesign/SwissStylePoster.png
-    },
-    {
-      src:          'assets/portfolio/graphic-design/posters/full/voltaire-thumb.jpg',
-      fullSrc:      'assets/portfolio/graphic-design/posters/full/voltaire.jpg',
-      label:        'Voltaire',
-      type:         'lightbox',
-      caseStudyUrl: null
-      // ⚠️ migrate from: benolivas.com/images/GraphicDesign/VoltairePoster.jpg
-    }
+    { src: 'assets/portfolio/graphic-design/posters/full/onibaba-thumb.jpg',      fullSrc: 'assets/portfolio/graphic-design/posters/full/onibaba.jpg',      label: 'Onibaba',      type: 'lightbox', caseStudyUrl: null },
+    { src: 'assets/portfolio/graphic-design/posters/full/swiss-design-thumb.jpg', fullSrc: 'assets/portfolio/graphic-design/posters/full/swiss-design.jpg', label: 'Swiss Design', type: 'lightbox', caseStudyUrl: null },
+    { src: 'assets/portfolio/graphic-design/posters/full/voltaire-thumb.jpg',     fullSrc: 'assets/portfolio/graphic-design/posters/full/voltaire.jpg',     label: 'Voltaire',     type: 'lightbox', caseStudyUrl: null }
   ],
-
-  // ── COMMERCIALS SUB-GRID ─────────────────────────────
-  'commercials': [
-    {
-      src:          'assets/portfolio/video/commercials/asana/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/commercials/asana/thumb.jpg',
-      label:        'Asana',
-      type:         'youtube',
-      caseStudyUrl: 'https://www.youtube.com/watch?v=8bh_nmZqUu0'
-      // ⚠️ migrate from: benolivas.com/images/Thumbnails/crystal.png
-    },
-    {
-      src:          'assets/portfolio/video/commercials/camp-mobile/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/commercials/camp-mobile/thumb.jpg',
-      label:        'Camp Mobile',
-      type:         'youtube',
-      caseStudyUrl: null
-      // ⚠️ thumb needed, YouTube URL needed
-    },
-    {
-      src:          'assets/portfolio/video/commercials/american-cancer-society/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/commercials/american-cancer-society/thumb.jpg',
-      label:        'American Cancer Society',
-      type:         'youtube',
-      caseStudyUrl: null
-      // ⚠️ thumb needed, YouTube URL needed
-    },
-    {
-      src:          'assets/portfolio/video/commercials/target/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/commercials/target/thumb.jpg',
-      label:        'Target',
-      type:         'youtube',
-      caseStudyUrl: null
-      // ⚠️ thumb needed, YouTube URL needed
-    }
+  commercials: [
+    { src: 'assets/portfolio/video/commercials/asana/thumb.jpg',                   fullSrc: 'assets/portfolio/video/commercials/asana/thumb.jpg',                   label: 'Asana',                   type: 'youtube', caseStudyUrl: 'https://www.youtube.com/watch?v=8bh_nmZqUu0' },
+    { src: 'assets/portfolio/video/commercials/camp-mobile/thumb.jpg',             fullSrc: 'assets/portfolio/video/commercials/camp-mobile/thumb.jpg',             label: 'Camp Mobile',             type: 'youtube', caseStudyUrl: null },
+    { src: 'assets/portfolio/video/commercials/american-cancer-society/thumb.jpg', fullSrc: 'assets/portfolio/video/commercials/american-cancer-society/thumb.jpg', label: 'American Cancer Society', type: 'youtube', caseStudyUrl: null },
+    { src: 'assets/portfolio/video/commercials/target/thumb.jpg',                  fullSrc: 'assets/portfolio/video/commercials/target/thumb.jpg',                  label: 'Target',                  type: 'youtube', caseStudyUrl: null }
   ],
-
-  // ── MUSIC VIDEOS SUB-GRID ────────────────────────────
   'music-videos': [
-    {
-      src:          'assets/portfolio/video/music-videos/nombe-summers-gone/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/music-videos/nombe-summers-gone/thumb.jpg',
-      label:        "NoMBe — Summer's Gone",
-      type:         'youtube',
-      caseStudyUrl: 'https://www.youtube.com/watch?v=n60cpM8_G-I'
-      // ⚠️ migrate from: benolivas.com/images/Thumbnails/stayoverSM.png
-    }
+    { src: 'assets/portfolio/video/music-videos/nombe-summers-gone/thumb.jpg', fullSrc: 'assets/portfolio/video/music-videos/nombe-summers-gone/thumb.jpg', label: "NoMBe — Summer's Gone", type: 'youtube', caseStudyUrl: 'https://www.youtube.com/watch?v=n60cpM8_G-I' }
   ],
-
-  // ── AEROVIRONMENT VIDEO SUB-GRID ─────────────────────
   'aerovironment-video': [
-    {
-      src:          'assets/portfolio/video/aerovironment/jump-20/thumb.jpg',
-      fullSrc:      'assets/portfolio/video/aerovironment/jump-20/thumb.jpg',
-      label:        'JUMP 20',
-      type:         'youtube',
-      caseStudyUrl: 'https://www.youtube.com/watch?v=lxT9cGUEeZA'
-      // ⚠️ migrate from: benolivas.com/images/Thumbnails/jump20SM.png
-    }
+    { src: 'assets/portfolio/video/aerovironment/jump-20/thumb.jpg', fullSrc: 'assets/portfolio/video/aerovironment/jump-20/thumb.jpg', label: 'JUMP 20', type: 'youtube', caseStudyUrl: 'https://www.youtube.com/watch?v=lxT9cGUEeZA' }
   ],
-
-  // ── AEROVIRONMENT DESIGN SUB-GRID ────────────────────
-  'aerovironment-design': [
-    // ⚠️ individual AeroVironment design projects go here when ready
-  ]
-
+  'aerovironment-design': []
 };
 
 /* ════════════════════════════════════════════════════
    ENGINE — don't edit below this line
    ════════════════════════════════════════════════════ */
 
-/* ── PRE-FILTERS ─────────────────────────────────── */
+/* ── PRE-FILTER ──────────────────────────────────── */
 function preFilter(input) {
   const t = input.trim();
   if (t.length > 400) return "That's a lot. Give me the one sentence version first.";
@@ -991,29 +983,44 @@ function preFilter(input) {
   return null;
 }
 
-/* ── INTENT MATCHING ─────────────────────────────── */
+/* ── NORMALIZE / MATCH ───────────────────────────── */
 function normalize(s) { return s.toLowerCase().replace(/[^\w\s]/g,'').trim(); }
+
+function matchExact(input) {
+  const t = input.trim().toLowerCase();
+  return EXACT_TRIGGERS.find(e => e.match.toLowerCase() === t) || null;
+}
+
+function matchVignette(input) {
+  const n = normalize(input);
+  for (const v of VIGNETTES) {
+    if (v.triggers.some(t => n.includes(normalize(t)))) return v;
+  }
+  return null;
+}
+
+function matchMisfortune(input) {
+  return MISFORTUNE_TRIGGERS.has(input.trim().toLowerCase());
+}
 
 function matchIntent(input) {
   const n = normalize(input), words = n.split(/\s+/);
   let best = null, top = 0;
-
-  let wildcardIntent = null; // wildcard is last resort within a state
+  let wildcardIntent = null;
 
   for (const intent of INTENTS) {
-    const patterns = intent.patterns || [];
+    const patterns       = intent.patterns || [];
     const nestedPatterns = intent.nestedPatterns || {};
 
-    // Check nested triggers for current state — specific patterns first
+    /* Scoped nested patterns — higher priority */
     if (currentState && nestedPatterns[currentState]) {
       const np = nestedPatterns[currentState];
       if (np.includes('*')) {
-        // Save wildcard as fallback — only use if nothing else matches
         wildcardIntent = intent;
       } else {
         for (const p of np) {
           const pn = normalize(p); let score = 0;
-          if (n === pn)            score = 200; // nested specific = highest priority
+          if (n === pn)            score = 200;
           else if (n.includes(pn)) score = 130 + pn.length;
           else {
             const pw = pn.split(/\s+/), hits = pw.filter(w => words.includes(w)).length;
@@ -1024,7 +1031,7 @@ function matchIntent(input) {
       }
     }
 
-    // Global patterns
+    /* Global patterns */
     for (const p of patterns) {
       const pn = normalize(p); let score = 0;
       if (n === pn)            score = 100;
@@ -1037,35 +1044,8 @@ function matchIntent(input) {
     }
   }
 
-  // If nothing scored above threshold, use wildcard state catch
   if (top <= 18 && wildcardIntent) return wildcardIntent;
   return top > 18 ? best : null;
-}
-
-function matchVignette(input) {
-  const n = normalize(input);
-  for (const v of VIGNETTES) {
-    if (v.triggers.some(t => n.includes(normalize(t)))) return v;
-  }
-  return null;
-}
-
-/* ── CLAUDE FALLBACK (only if API available) ─────── */
-const SYS = `You are BEN OS — an AI on Ben Olivas's creative consulting and portfolio site.
-Voice: dry, competent, occasionally funny, slightly ahead of the visitor.
-Ben: creative producer and graphic designer, Los Angeles. Currently at Blue Note Los Angeles. Open to freelance: benolivas@gmail.com.
-Personal projects: Misfortune Cookies (misfortunes.net), Man Ray chess set, Whisper MK-I acoustic device.
-Rules: under 3 sentences. Never start with "I", "Sure", "Great question". Never mention being an AI unless asked.`;
-
-async function callClaude(messages) {
-  try {
-    const res = await fetch('./proxy.php', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, system: SYS })
-    });
-    const d = await res.json();
-    return d.content || "Something went wrong. Try benolivas@gmail.com directly.";
-  } catch(e) { return "Can't reach the API. Direct line: benolivas@gmail.com."; }
 }
 
 /* ── DOM REFS ────────────────────────────────────── */
@@ -1077,20 +1057,24 @@ const statusLabel    = document.getElementById('status-label');
 const contactTrigger = document.getElementById('contact-trigger');
 const contactPopup   = document.getElementById('contact-popup');
 
+/* ── RUNTIME STATE ───────────────────────────────── */
 let isWaiting           = false;
 let conversationHistory = [];
 let sessionTopics       = [];
 let doorsBuilt          = false;
 let introPlayed         = false;
 let introTimer          = null;
-let currentState        = null;  // tracks conversation state for nested triggers
-let lastUserInput       = '';    // for [ECHO] annotation
+let currentState        = null;
+let lastUserInput       = '';
+let fortuneIndex        = 0; /* for misfortune pool cycling */
 
 /* ── WAITING STATE ───────────────────────────────── */
 function setWaiting(on) {
   isWaiting = on;
   const inputArea = document.getElementById('input-area');
   if (inputArea) inputArea.classList.toggle('is-waiting', on);
+  if (on) userInput.blur();
+  else    userInput.focus();
 }
 
 /* ── DARK MODE ───────────────────────────────────── */
@@ -1109,9 +1093,8 @@ function setupContactPopup() {
     contactPopup.classList.toggle('open');
   });
   document.addEventListener('click', e => {
-    if (!contactPopup.contains(e.target) && e.target !== contactTrigger) {
+    if (!contactPopup.contains(e.target) && e.target !== contactTrigger)
       contactPopup.classList.remove('open');
-    }
   });
 }
 
@@ -1132,7 +1115,7 @@ function appendMsg(role, text, who, opts={}) {
   if (opts.typing) {
     body.classList.add('typing');
   } else if (text) {
-    renderTextWithActions(body, text);
+    renderTextWithLinks(body, text);
   }
   row.appendChild(wDiv);
   row.appendChild(body);
@@ -1141,23 +1124,6 @@ function appendMsg(role, text, who, opts={}) {
   return { row, body };
 }
 
-/* ── ACTION TEXT — renders *emotes* with distinct style ── */
-function renderTextWithActions(el, text) {
-  // Split on *action* patterns and render them distinctly
-  const parts = text.split(/(\*[^*]+\*)/g);
-  parts.forEach(part => {
-    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
-      const em = document.createElement('em');
-      em.className = 'action-text';
-      em.textContent = part; // keep asterisks — they're part of the style
-      el.appendChild(em);
-    } else if (part) {
-      el.appendChild(document.createTextNode(part));
-    }
-  });
-}
-
-/* Append label only — label appears, then content fills in after a pause */
 function appendLabelOnly(role, who) {
   const row  = document.createElement('div');
   row.className = 'msg-row';
@@ -1166,7 +1132,6 @@ function appendLabelOnly(role, who) {
   wDiv.textContent = who;
   const body = document.createElement('div');
   body.className = 'msg-body ' + role;
-  // memebot body gets extra class for layout
   if (role === 'memebot') body.classList.add('memebot-body');
   row.appendChild(wDiv);
   row.appendChild(body);
@@ -1175,66 +1140,22 @@ function appendLabelOnly(role, who) {
   return body;
 }
 
-/* ── TYPEWRITER ──────────────────────────────────── */
-function charDelay(text, i) {
-  const ch = text[i], next = text[i+1]||'', prev = text[i-1]||'';
-  if ((ch==='.'||ch==='!'||ch==='?') && next===' ') return 420 + Math.random()*200;
-  if (ch==='—' || (ch===':' && next===' '))          return 300 + Math.random()*150;
-  if (ch===',' && next===' ')                        return 200 + Math.random()*120;
-  if (ch===' ') return Math.random()<0.12 ? 180+Math.random()*140 : 60+Math.random()*60;
-  if (prev===' ' && text.slice(i).split(' ')[0].length>7) return 40+Math.random()*40;
-  return 28 + Math.random()*28;
-}
-
-function typewriter(el, text, onDone, fast=true, appendMode=false) {
-  if (!appendMode) {
-    el.classList.remove('typing');
-    el.innerHTML = '';
-  }
-  // Resolve special annotations before typing
-  let resolved = text;
-  // [ECHO: capitalize, add !] — echo user input
-  if (resolved.includes('[ECHO')) {
-    const stripped = lastUserInput.replace(/[.,!?…]+$/, '').trim();
-    const capitalized = stripped.charAt(0).toUpperCase() + stripped.slice(1);
-    resolved = resolved.replace(/\[ECHO[^\]]*\]/, capitalized + '!');
-  }
-  // [NAME] — extract and echo name
-  if (resolved.includes('[NAME]')) {
-    const name = extractName(lastUserInput);
-    MEM.setName(name);
-    resolved = resolved.replace('[NAME]', name);
-  }
-  // [LINK: url | text] — replace with placeholder during typing, swap after
-  // (links are rendered after typing completes)
-
-  let i = 0;
-  const spd = fast ? 1 : 2.8;
-  // Build a plain-text version for character-by-character typing
-  // Action text (*...*) types normally, styled on completion
-  function tick() {
-    if (i < resolved.length) {
-      if (appendMode) {
-        el.insertAdjacentText('beforeend', resolved[i]);
-      } else {
-        el.textContent += resolved[i];
-      }
-      scrollBottom();
-      setTimeout(tick, charDelay(resolved, i++) * spd);
-    } else {
-      // After typing, re-render with action styling and links
-      const finalText = el.textContent;
-      el.innerHTML = '';
-      renderTextWithLinks(el, finalText);
-      if (onDone) onDone();
+/* ── TEXT RENDERING ──────────────────────────────── */
+function renderTextWithActions(el, text) {
+  const parts = text.split(/(\*[^*]+\*)/g);
+  parts.forEach(part => {
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      const em = document.createElement('em');
+      em.className = 'action-text';
+      em.textContent = part;
+      el.appendChild(em);
+    } else if (part) {
+      el.appendChild(document.createTextNode(part));
     }
-  }
-  setTimeout(tick, fast ? 40 + Math.random()*40 : 120 + Math.random()*80);
+  });
 }
 
-/* ── RENDER TEXT WITH LINKS AND ACTIONS ─────────────── */
 function renderTextWithLinks(el, text) {
-  // Handle [LINK: url | display] annotations
   const linkPattern = /\[LINK:\s*([^|\]]+)(?:\|([^\]]+))?\]/g;
   let last = 0, match;
   const parts = [];
@@ -1244,15 +1165,12 @@ function renderTextWithLinks(el, text) {
     last = match.index + match[0].length;
   }
   if (last < text.length) parts.push({ type: 'text', content: text.slice(last) });
-
   parts.forEach(part => {
     if (part.type === 'link') {
       const a = document.createElement('a');
       a.href = part.url.startsWith('http') || part.url.startsWith('mailto') ? part.url : 'https://' + part.url;
       a.textContent = part.label;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.className = 'inline-link';
+      a.target = '_blank'; a.rel = 'noopener'; a.className = 'inline-link';
       el.appendChild(a);
     } else {
       renderTextWithActions(el, part.content);
@@ -1260,27 +1178,79 @@ function renderTextWithLinks(el, text) {
   });
 }
 
-/* ── EXTRACT NAME FROM INPUT ────────────────────────── */
+/* ── EXTRACT NAME ────────────────────────────────── */
 function extractName(input) {
   const t = input.trim();
-  // Strip common prefixes
-  const prefixes = ['my name is ', "i'm called ", 'call me ', "name's ", "my name's ", "i'm ", 'im '];
+  const prefixes = ['my name is ',"i'm called ",'call me ',"name's ","my name's ","i'm ",'im '];
   for (const p of prefixes) {
     if (t.toLowerCase().startsWith(p)) {
       const name = t.slice(p.length).trim();
-      // Capitalize first letter
       return name.charAt(0).toUpperCase() + name.slice(1);
     }
   }
-  // Fallback — just use the whole input capitalized
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+/* ── TYPEWRITER ──────────────────────────────────── */
+/* Improved character delays — punctuation breathes,  */
+/* long words slow slightly, spaces vary naturally.   */
+/* onDone fires only after all characters are typed.  */
+function charDelay(text, i, fast) {
+  const ch = text[i], next = text[i+1]||'';
+  const spd = fast ? 1 : 2.8;
+  if ((ch==='.'||ch==='!'||ch==='?') && next===' ') return (360+Math.random()*160)*spd;
+  if (ch==='—' || (ch===':' && next===' '))          return (240+Math.random()*120)*spd;
+  if (ch===',' && next===' ')                        return (150+Math.random()*90)*spd;
+  if (ch===' ') return Math.random()<0.12 ? (140+Math.random()*110)*spd : (45+Math.random()*45)*spd;
+  if (next===' ' && text.slice(i).split(' ')[0].length>7) return (28+Math.random()*32)*spd;
+  return (20+Math.random()*22)*spd;
+}
+
+function typewriter(el, text, onDone, fast=true, appendMode=false) {
+  if (!appendMode) { el.classList.remove('typing'); el.innerHTML = ''; }
+
+  /* Resolve annotations */
+  let resolved = text;
+  if (resolved.includes('[ECHO')) {
+    const stripped = lastUserInput.replace(/[.,!?…]+$/, '').trim();
+    const cap = stripped.charAt(0).toUpperCase() + stripped.slice(1);
+    resolved = resolved.replace(/\[ECHO[^\]]*\]/, cap + '!');
+  }
+  if (resolved.includes('[NAME]')) {
+    const name = extractName(lastUserInput);
+    MEM.setName(name);
+    resolved = resolved.replace('[NAME]', name);
+  }
+  if (resolved.includes('[TOPIC]')) {
+    const mem = MEM.get();
+    const topic = mem?.topics?.length ? mem.topics[mem.topics.length-1] : 'that';
+    resolved = resolved.replace('[TOPIC]', topic);
+  }
+
+  let i = 0;
+  function tick() {
+    if (i < resolved.length) {
+      if (appendMode) el.insertAdjacentText('beforeend', resolved[i]);
+      else            el.textContent += resolved[i];
+      scrollBottom();
+      setTimeout(tick, charDelay(resolved, i++, fast));
+    } else {
+      /* Re-render with link/action styling after typing completes */
+      const finalText = el.textContent;
+      el.innerHTML = '';
+      renderTextWithLinks(el, finalText);
+      if (onDone) onDone();
+    }
+  }
+  /* Brief pre-type gap — avoids "pop-in" feeling, gives reader moment to register speaker */
+  setTimeout(tick, fast ? 25+Math.random()*25 : 90+Math.random()*60);
+}
+
 /* ── RENDER BEATS ────────────────────────────────── */
-/* Beat types:
-   (default) — new row with label. New speaker or distinct thought.
-   inline    — appends to current line, no break. Mid-sentence pause.
-   newline   — new line in same row. Same speaker, new sentence.
+/* Beat display modes (JSON "display" field):
+   "default" — new labeled row; new thought or speaker
+   "newline" — line break within same bubble, same speaker
+   "inline"  — appends to current line, no visual break
 */
 function renderBeats(beats, who, onComplete) {
   const fast = (who !== 'MEMEBOT');
@@ -1291,226 +1261,148 @@ function renderBeats(beats, who, onComplete) {
   function next() {
     if (i >= beats.length) { if (onComplete) onComplete(); return; }
     const beat = beats[i++];
+    /* after() fires when this beat finishes typing AND its pause has elapsed */
     const after = () => beat.pause ? setTimeout(next, beat.pause) : next();
 
-    // Special beat annotations — [GIF:], [TOGGLE:]
+    /* Special beat annotations */
     if (beat.text && beat.text.startsWith('[GIF:')) {
       const path = beat.text.replace('[GIF:', '').replace(']', '').trim();
       renderInlineGif(path, currentBody, after);
       return;
     }
-
     if (beat.text && beat.text.startsWith('[TOGGLE:')) {
       const type = beat.text.replace('[TOGGLE:', '').replace(']', '').trim();
-      // Toggle gets its own fresh body element for clean blur-fade-in
       const toggleBody = appendLabelOnly(role, '');
-      // Remove the who label for the toggle row — it's unlabeled
       const toggleRow = toggleBody.closest('.msg-row');
-      if (toggleRow) {
-        const whoEl = toggleRow.querySelector('.msg-who');
-        if (whoEl) whoEl.textContent = '';
-      }
+      if (toggleRow) { const whoEl = toggleRow.querySelector('.msg-who'); if (whoEl) whoEl.textContent = ''; }
       currentBody = toggleBody;
       renderInlineToggle(type, toggleBody, after);
       return;
     }
 
-    // First beat — reuse existing typing bubble
+    /* First beat — reuse existing typing bubble if present */
     if (i === 1) {
       const existing = chatWindow.querySelector('.msg-body.typing');
-      if (existing) {
-        currentBody = existing;
-        typewriter(currentBody, beat.text, after, fast);
-        return;
-      }
+      if (existing) { currentBody = existing; typewriter(currentBody, beat.text, after, fast); return; }
     }
 
-    if (beat.type === 'inline' && currentBody) {
+    const display = beat.display || 'default';
+    if (display === 'inline' && currentBody) {
+      typewriter(currentBody, beat.text, after, fast, true);
+      return;
+    }
+    if (display === 'newline' && currentBody) {
+      currentBody.appendChild(document.createElement('br'));
       typewriter(currentBody, beat.text, after, fast, true);
       return;
     }
 
-    if (beat.type === 'newline' && currentBody) {
-      const br = document.createElement('br');
-      currentBody.appendChild(br);
-      typewriter(currentBody, beat.text, after, fast, true);
-      return;
-    }
-
-    // Default — new row with label
+    /* Default: new labeled row */
     const { body } = appendMsg(role, '', who, { typing: true });
     currentBody = body;
     typewriter(currentBody, beat.text, after, fast);
   }
-  next();
+
+  /* Small inter-speaker gap before sequence starts */
+  setTimeout(next, 80);
 }
 
-/* ── INLINE GIF — BEN OS drops a gif mid-speech ──── */
+/* ── INLINE GIF ──────────────────────────────────── */
 function renderInlineGif(path, targetBody, onDone) {
   const container = targetBody || chatWindow;
   const img = document.createElement('img');
   img.className = 'inline-gif';
   img.src = path;
-  img.onload = () => {
-    img.classList.add('loaded');
-    setTimeout(() => { if (onDone) onDone(); }, 600);
-  };
+  img.onload = () => { img.classList.add('loaded'); setTimeout(() => { if (onDone) onDone(); }, 600); };
   img.onerror = () => {
-    // Scripted fallback — image didn't load, BEN OS acknowledges it
     const fallback = document.createElement('div');
     fallback.className = 'msg-body sys';
-    fallback.textContent = '';
     container.appendChild(fallback);
-    typewriter(fallback,
-      "Hm. That was supposed to be visual. benolivas@gmail.com if you want to see it properly.",
-      () => { if (onDone) onDone(); }
-    );
+    typewriter(fallback, "Hm. That was supposed to be visual. benolivas@gmail.com if you want to see it properly.", () => { if (onDone) onDone(); });
   };
-  // Timeout fallback
-  setTimeout(() => {
-    if (!img.classList.contains('loaded')) {
-      img.classList.add('loaded');
-      if (onDone) onDone();
-    }
-  }, 2000);
+  setTimeout(() => { if (!img.classList.contains('loaded')) { img.classList.add('loaded'); if (onDone) onDone(); } }, 2000);
   container.appendChild(img);
   scrollBottom();
 }
 
-/* ── INLINE TOGGLE — renders a clickable dark mode switch ── */
+/* ── INLINE TOGGLE ───────────────────────────────── */
 function renderInlineToggle(type, targetBody, onDone) {
   const container = targetBody || chatWindow;
-  const startTime = Date.now(); // starts when toggle is first rendered
-
-  const wrap = document.createElement('div');
-  wrap.className = 'inline-toggle-wrap';
-
-  // Spacer above toggle
-  const spacerTop = document.createElement('div');
-  spacerTop.style.height = '20px';
-  container.appendChild(spacerTop);
-
+  const startTime = Date.now();
+  const spacerTop = document.createElement('div'); spacerTop.style.height = '20px'; container.appendChild(spacerTop);
+  const wrap = document.createElement('div'); wrap.className = 'inline-toggle-wrap';
   const toggle = document.createElement('button');
   toggle.className = 'inline-toggle';
   const isDark = document.body.classList.contains('dark');
   toggle.setAttribute('aria-checked', String(isDark));
   toggle.setAttribute('role', 'switch');
-
-  const track = document.createElement('span');
-  track.className = 'toggle-track';
-  const thumb = document.createElement('span');
-  thumb.className = 'toggle-thumb';
+  const track = document.createElement('span'); track.className = 'toggle-track';
+  const thumb = document.createElement('span'); thumb.className = 'toggle-thumb';
   track.appendChild(thumb);
-
-  const toggleLabel = document.createElement('span');
-  toggleLabel.className = 'toggle-label';
-  toggleLabel.textContent = isDark ? 'dark' : 'light';
-
-  toggle.appendChild(track);
-  toggle.appendChild(toggleLabel);
-  wrap.appendChild(toggle);
-  container.appendChild(wrap);
-
-  // Spacer between toggle and gen-time label
-  const spacerMid = document.createElement('div');
-  spacerMid.style.height = '10px';
-  container.appendChild(spacerMid);
-
-  // "generated in x.xxs" — shown below toggle, separate element
-  const genLabel = document.createElement('div');
-  genLabel.className = 'gen-time-label';
-  genLabel.textContent = 'generated in 0.00s'; // placeholder, updated on click
-  container.appendChild(genLabel);
-
-  // Spacer below gen label
-  const spacerBottom = document.createElement('div');
-  spacerBottom.style.height = '16px';
-  container.appendChild(spacerBottom);
-
+  const toggleLabel = document.createElement('span'); toggleLabel.className = 'toggle-label'; toggleLabel.textContent = isDark ? 'dark' : 'light';
+  toggle.appendChild(track); toggle.appendChild(toggleLabel); wrap.appendChild(toggle); container.appendChild(wrap);
+  const spacerMid = document.createElement('div'); spacerMid.style.height = '10px'; container.appendChild(spacerMid);
+  const genLabel = document.createElement('div'); genLabel.className = 'gen-time-label'; genLabel.textContent = 'generated in 0.00s'; container.appendChild(genLabel);
+  const spacerBot = document.createElement('div'); spacerBot.style.height = '16px'; container.appendChild(spacerBot);
   scrollBottom();
-
-  // chatbar stays locked (isWaiting=true) until user clicks toggle
-  let interactionFired = false;
+  let fired = false;
   toggle.addEventListener('click', () => {
     const nowDark = !document.body.classList.contains('dark');
     setDark(nowDark);
     toggle.setAttribute('aria-checked', String(nowDark));
     toggleLabel.textContent = nowDark ? 'dark' : 'light';
-
-    // Update gen time on first click — shows actual time since render
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-    genLabel.textContent = `generated in ${elapsed}s`;
-
-    if (!interactionFired) {
-      interactionFired = true;
-      setTimeout(() => { if (onDone) onDone(); }, 300);
-    }
+    genLabel.textContent = `generated in ${((Date.now()-startTime)/1000).toFixed(2)}s`;
+    if (!fired) { fired = true; setTimeout(() => { if (onDone) onDone(); }, 300); }
   });
-  // NOTE: onDone fires on click, not on timer. chatbar blocked until then.
 }
 
 /* ── MEMEBOT IMAGE ───────────────────────────────── */
-/* Calls onDone after a short display pause so next     */
-/* speaker doesn't fire before user sees the image.     */
 function renderMemebotImage(memeId, targetBody, onDone) {
-  const meme = MEMES.find(m => m.id === memeId);
-  if (!meme) { if (onDone) onDone(); return; }
+  let done = false;
+  const finish = () => { if (!done) { done = true; if (onDone) onDone(); } };
+
+  let src;
+  if (memeId && memeId.startsWith('assets/')) {
+    src = memeId;
+  } else {
+    const meme = MEMES.find(m => m.id === memeId);
+    if (!meme) { finish(); return; }
+    src = meme.file;
+  }
   const img = document.createElement('img');
-  img.className = 'memebot-img';
-  img.alt = meme.id;
-  img.src = meme.file;
-  img.onload = () => {
-    img.classList.add('loaded');
-    // Wait for user to actually see the image before continuing
-    setTimeout(() => { if (onDone) onDone(); }, 900);
-  };
-  // MemeBot image broken — greentext fallback
+  img.className = 'memebot-img'; img.alt = memeId; img.src = src;
+  img.onload = () => { img.classList.add('loaded'); setTimeout(finish, 900); };
   img.onerror = () => {
     const mbFallback = appendLabelOnly('memebot', 'MEMEBOT');
-    renderGreentext([
-      ">tried to post image",
-      ">it broke",
-      ">this is fine"
-    ], mbFallback, onDone);
+    renderGreentext([">tried to post image",">it broke",">this is fine"], mbFallback, finish);
   };
   const container = targetBody || chatWindow;
   container.appendChild(img);
   scrollBottom();
-  // Fallback: if onload never fires (e.g. gif already cached), continue after 1.5s
-  setTimeout(() => {
-    if (!img.classList.contains('loaded')) {
-      img.classList.add('loaded');
-      if (onDone) onDone();
-    }
-  }, 1500);
+  setTimeout(() => { if (!img.classList.contains('loaded')) { img.classList.add('loaded'); finish(); } }, 1500);
 }
 
-/* ── MEMEBOT GREENTEXT — line by line, human paced ── */
-/* Always calls onDone when all lines finish typing.    */
+/* ── MEMEBOT GREENTEXT ───────────────────────────── */
 function renderGreentext(lines, targetBody, onDone) {
   const container = targetBody || chatWindow;
   let i = 0;
   function nextLine() {
     if (i >= lines.length) { if (onDone) onDone(); return; }
     const line = lines[i++];
-    const span = document.createElement('div');
-    span.className = 'gt-line';
-    container.appendChild(span);
-    scrollBottom();
+    const span = document.createElement('div'); span.className = 'gt-line'; container.appendChild(span); scrollBottom();
     const text = line.replace(/^>/, '').trim();
     let c = 0;
     function typeChar() {
       if (c < text.length) {
-        span.textContent = text.slice(0, c+1);
-        scrollBottom();
-        const delay = text[c] === ' ' ? 60 + Math.random()*40 : 30 + Math.random()*30;
+        span.textContent = text.slice(0, c+1); scrollBottom();
+        const delay = text[c] === ' ' ? 50+Math.random()*30 : 22+Math.random()*22;
         c++;
         setTimeout(typeChar, delay);
       } else {
-        setTimeout(nextLine, 260 + Math.random()*160);
+        setTimeout(nextLine, 230+Math.random()*130);
       }
     }
-    setTimeout(typeChar, 50 + Math.random()*50);
+    setTimeout(typeChar, 40+Math.random()*35);
   }
   nextLine();
 }
@@ -1518,9 +1410,9 @@ function renderGreentext(lines, targetBody, onDone) {
 /* ── IMAGE GRID ──────────────────────────────────── */
 function renderImageGrid(key, onDone) {
   const items = MEDIA[key];
-  if (!items) { if (onDone) onDone(); return; }
+  if (!items || !items.length) { if (onDone) onDone(); return; }
   const grid = document.createElement('div'); grid.className = 'img-grid';
-  items.slice(0,6).forEach((item,idx) => {
+  items.slice(0,6).forEach((item, idx) => {
     const a = document.createElement('div');
     a.className = 'img-grid-item';
     a.style.animationDelay = `${idx*0.08}s`;
@@ -1531,66 +1423,32 @@ function renderImageGrid(key, onDone) {
   });
   chatWindow.appendChild(grid);
   scrollBottom();
-  // Grid fades in via CSS animation — wait for last item to finish before continuing
-  const animDuration = (items.slice(0,6).length - 1) * 80 + 600; // last delay + fadein duration
+  const animDuration = (items.slice(0,6).length - 1) * 80 + 600;
   setTimeout(() => { if (onDone) onDone(); }, animDuration);
 }
 
 /* ── LIGHTBOX ────────────────────────────────────── */
 function openLightbox(item) {
-  // Remove any existing lightbox
   const existing = document.getElementById('lightbox');
   if (existing) existing.remove();
-
-  const lb = document.createElement('div');
-  lb.id = 'lightbox';
-  lb.className = 'lightbox';
-
-  const inner = document.createElement('div');
-  inner.className = 'lightbox-inner';
-
-  // Close button
-  const close = document.createElement('button');
-  close.className = 'lightbox-close';
-  close.textContent = '×';
+  const lb = document.createElement('div'); lb.id = 'lightbox'; lb.className = 'lightbox';
+  const inner = document.createElement('div'); inner.className = 'lightbox-inner';
+  const close = document.createElement('button'); close.className = 'lightbox-close'; close.textContent = '×';
   close.addEventListener('click', () => lb.remove());
-
-  // Image
-  const img = document.createElement('img');
-  img.className = 'lightbox-img';
-  img.src = item.fullSrc;
-  img.alt = item.label;
-
-  // Footer — title + optional case study link
-  const footer = document.createElement('div');
-  footer.className = 'lightbox-footer';
-  const title = document.createElement('span');
-  title.className = 'lightbox-title';
-  title.textContent = item.label;
+  const img = document.createElement('img'); img.className = 'lightbox-img'; img.src = item.fullSrc; img.alt = item.label;
+  const footer = document.createElement('div'); footer.className = 'lightbox-footer';
+  const title = document.createElement('span'); title.className = 'lightbox-title'; title.textContent = item.label;
   footer.appendChild(title);
-
   if (item.caseStudyUrl) {
     const link = document.createElement('a');
-    link.className = 'lightbox-link';
-    link.href = item.caseStudyUrl;
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.textContent = 'View ↗';
+    link.className = 'lightbox-link'; link.href = item.caseStudyUrl;
+    link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'View ↗';
     footer.appendChild(link);
   }
-
-  inner.appendChild(close);
-  inner.appendChild(img);
-  inner.appendChild(footer);
-  lb.appendChild(inner);
-
-  // Click outside to close
+  inner.appendChild(close); inner.appendChild(img); inner.appendChild(footer); lb.appendChild(inner);
   lb.addEventListener('click', e => { if (e.target === lb) lb.remove(); });
-
-  // Escape to close
   const onKey = e => { if (e.key === 'Escape') { lb.remove(); document.removeEventListener('keydown', onKey); } };
   document.addEventListener('keydown', onKey);
-
   document.body.appendChild(lb);
 }
 
@@ -1606,32 +1464,22 @@ function dismissAllChips() {
 
 function renderChips(chips) {
   if (!chips?.length) return;
-  // Guard against double-render — if identical chips already exist, skip
   const existing = chatWindow.querySelectorAll('.chips');
-  const lastExisting = existing[existing.length - 1];
-  if (lastExisting) {
-    const existingLabels = [...lastExisting.querySelectorAll('.chip')].map(b => b.textContent).join(',');
-    const newLabels = chips.map(c => typeof c === 'string' ? c : c.label).join(',');
-    if (existingLabels === newLabels) return;
+  const last = existing[existing.length - 1];
+  if (last) {
+    const eLabels = [...last.querySelectorAll('.chip')].map(b => b.textContent).join(',');
+    const nLabels = chips.map(c => typeof c === 'string' ? c : c.label).join(',');
+    if (eLabels === nLabels) return;
   }
   const wrap = document.createElement('div'); wrap.className = 'chips';
   chips.forEach(chip => {
-    // chip can be a string (old format, goes through matcher)
-    // or { label, route } (new format, routes directly by intent id)
     const label = typeof chip === 'string' ? chip : chip.label;
     const route = typeof chip === 'string' ? null : chip.route;
-
-    const btn = document.createElement('button'); btn.className = 'chip';
-    btn.textContent = label;
+    const btn = document.createElement('button'); btn.className = 'chip'; btn.textContent = label;
     btn.addEventListener('click', () => {
       dismissAllChips();
-      if (route) {
-        // Direct route — bypass text matcher entirely
-        fireIntent(route, label);
-      } else {
-        // Fallback — goes through text matcher (old behavior)
-        sendMessage(label);
-      }
+      if (route) fireIntent(route, label);
+      else        sendMessage(label);
     });
     wrap.appendChild(btn);
   });
@@ -1639,47 +1487,54 @@ function renderChips(chips) {
   scrollBottom();
 }
 
-/* ── FIRE INTENT DIRECTLY — used by chip routing ──── */
-// Bypasses text matching. label is shown in chat as "You said X".
+/* ── FIRE INTENT DIRECTLY ────────────────────────── */
 async function fireIntent(intentId, label) {
   if (isWaiting) return;
   setWaiting(true);
 
-  // Special case: surprise picks a random fact
   if (intentId === 'surprise') {
     appendMsg('user', label, 'You');
     conversationHistory.push({ role: 'user', content: label });
     const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
-    await new Promise(r => setTimeout(r, 280 + Math.random()*180));
+    await new Promise(r => setTimeout(r, 200+Math.random()*140));
     playSurprise(typingBody);
     return;
   }
 
   const intent = INTENTS.find(i => i.id === intentId);
-  if (!intent) {
-    // Unknown route — fall through to text matcher
-    sendMessage(label);
-    return;
-  }
+  if (!intent) { sendMessage(label); return; }
 
   appendMsg('user', label, 'You');
   conversationHistory.push({ role: 'user', content: label });
   statusLabel.textContent = '';
 
   const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
-  await new Promise(r => setTimeout(r, 280 + Math.random()*180));
+  await new Promise(r => setTimeout(r, 200+Math.random()*140));
 
   if (intent.topic) sessionTopics.push(intent.topic);
-  playIntent(intent);
+  playIntent(intent, typingBody);
 }
 
-function playIntent(intent) {
-  // Set state if intent defines one
+/* ── PLAY INTENT ─────────────────────────────────── */
+function playIntent(intent, existingBody) {
   if (intent.state !== undefined) currentState = intent.state;
 
-  const beats = intent.beats || [];
-  const mediaKey = intent.media;
-  const mediaAfter = intent.mediaAfterBeat ?? null;
+  /* Pool intent (misfortunes cycling) */
+  if (intent.pool?.length) {
+    const text = intent.pool[fortuneIndex % intent.pool.length];
+    fortuneIndex++;
+    const body = existingBody || appendLabelOnly('sys', 'BEN OS');
+    if (existingBody) { existingBody.classList.remove('typing'); existingBody.textContent = ''; }
+    typewriter(body, text, () => {
+      renderChips(intent.chips);
+      setWaiting(false);
+    });
+    return;
+  }
+
+  const beats     = intent.beats || [];
+  const mediaKey  = intent.media;
+  const afterBeats = intent.afterBeats || [];
 
   const finish = () => {
     renderChips(intent.chips);
@@ -1688,86 +1543,47 @@ function playIntent(intent) {
     setWaiting(false);
   };
 
-  if (mediaKey && mediaAfter !== null) {
-    const beforeBeats = beats.slice(0, mediaAfter + 1);
-    const afterBeats  = beats.slice(mediaAfter + 1);
-    renderBeats(beforeBeats, 'BEN OS', () => {
+  if (mediaKey) {
+    renderBeats(beats, 'BEN OS', () => {
       renderImageGrid(mediaKey, () => {
-        if (afterBeats.length) {
-          renderBeats(afterBeats, 'BEN OS', finish);
-        } else {
-          finish();
-        }
+        if (afterBeats.length) renderBeats(afterBeats, 'BEN OS', finish);
+        else finish();
       });
     });
   } else {
-    renderBeats(beats, 'BEN OS', () => {
-      if (mediaKey) {
-        renderImageGrid(mediaKey, finish);
-      } else {
-        finish();
-      }
-    });
+    renderBeats(beats, 'BEN OS', finish);
   }
 }
 
 /* ── SURPRISE ME ─────────────────────────────────── */
-function getSeenFacts() {
-  try { return JSON.parse(localStorage.getItem('bo_seen_facts') || '[]'); } catch(e) { return []; }
-}
-function markFactSeen(id) {
-  try {
-    const seen = getSeenFacts();
-    if (!seen.includes(id)) seen.push(id);
-    localStorage.setItem('bo_seen_facts', JSON.stringify(seen));
-  } catch(e) {}
-}
+function getSeenFacts() { try { return JSON.parse(localStorage.getItem('bo_seen_facts') || '[]'); } catch(e) { return []; } }
+function markFactSeen(id) { try { const s = getSeenFacts(); if (!s.includes(id)) s.push(id); localStorage.setItem('bo_seen_facts', JSON.stringify(s)); } catch(e) {} }
 function pickFact() {
   const seen = getSeenFacts();
   const unseen = FACTS.filter(f => !seen.includes(f.id));
-  if (!unseen.length) {
-    localStorage.removeItem('bo_seen_facts');
-    return FACTS[Math.floor(Math.random()*FACTS.length)];
-  }
+  if (!unseen.length) { localStorage.removeItem('bo_seen_facts'); return FACTS[Math.floor(Math.random()*FACTS.length)]; }
   return unseen[Math.floor(Math.random()*unseen.length)];
 }
 
 function playSurprise(typingBody) {
   const fact = pickFact();
   markFactSeen(fact.id);
-
   typingBody.classList.remove('typing');
   typingBody.textContent = '';
 
-  // Each step only fires when the previous one calls its onDone callback.
-  // No guessed timeouts. Fully sequential.
-
-  // Step 1: BEN OS types the fact and gets cut off
   setTimeout(() => {
     typewriter(typingBody, fact.text, () => {
-
       const hasMeme      = fact.memebot_meme && MEMES.find(m => m.id === fact.memebot_meme);
       const hasGreentext = fact.memebot_greentext?.length;
 
-      // Step 2: MemeBot appears (image or greentext)
       const afterMemebot = () => {
-
-        // Step 3: BEN OS reacts
         const reactBody = appendLabelOnly('sys', 'BEN OS');
         typewriter(reactBody, fact.benos_reaction, () => {
-
-          // Step 4: Second MemeBot greentext (if exists)
           if (fact.memebot_greentext_2?.length) {
             const mb2Body = appendLabelOnly('memebot', 'MEMEBOT');
-            renderGreentext(fact.memebot_greentext_2, mb2Body, () => {
-
-              // Step 5: Chips
-              renderChips(fact.chips);
-              setWaiting(false);
-            });
+            renderGreentext(fact.memebot_greentext_2, mb2Body, () => { renderChips(fact.chips); setWaiting(false); });
           } else {
-            renderChips(fact.chips);
-            setWaiting(false);
+            renderChips(fact.chips); setWaiting(false);
           }
         });
       };
@@ -1781,32 +1597,24 @@ function playSurprise(typingBody) {
       } else {
         afterMemebot();
       }
-
     });
-  }, 400);
+  }, 320);
 }
 
-/* ── VIGNETTE RENDERER — fully sequential ────────── */
+/* ── PLAY VIGNETTE ───────────────────────────────── */
 function playVignette(vignette, typingBody) {
   const doMemebot = () => {
     const mb = vignette.memebot;
     if (!mb) { fireVignetteReaction(vignette); return; }
     const vigMbBody = appendLabelOnly('memebot', 'MEMEBOT');
-    if (mb.type === 'image') {
-      renderMemebotImage(mb.id, vigMbBody, () => fireVignetteReaction(vignette));
-    } else if (mb.type === 'greentext') {
-      renderGreentext(mb.lines, vigMbBody, () => fireVignetteReaction(vignette));
-    } else {
-      fireVignetteReaction(vignette);
-    }
+    if (mb.type === 'image')     renderMemebotImage(mb.id, vigMbBody, () => fireVignetteReaction(vignette));
+    else if (mb.type === 'greentext') renderGreentext(mb.lines, vigMbBody, () => fireVignetteReaction(vignette));
+    else fireVignetteReaction(vignette);
   };
-
   if (vignette.benos_setup) {
     typewriter(typingBody, vignette.benos_setup, doMemebot);
   } else {
-    typingBody.classList.remove('typing');
-    typingBody.textContent = '';
-    doMemebot();
+    typingBody.classList.remove('typing'); typingBody.textContent = ''; doMemebot();
   }
 }
 
@@ -1816,62 +1624,92 @@ function fireVignetteReaction(vignette) {
   typewriter(body, vignette.benos_reaction, () => {
     if (vignette.benos_reaction2) {
       const { body: b2 } = appendMsg('sys', '', 'BEN OS', { typing: true });
-      typewriter(b2, vignette.benos_reaction2, () => {
-        renderChips(vignette.buttons);
-        setWaiting(false);
-      });
+      typewriter(b2, vignette.benos_reaction2, () => { renderChips(vignette.buttons); setWaiting(false); });
     } else {
-      renderChips(vignette.buttons);
-      setWaiting(false);
+      renderChips(vignette.buttons); setWaiting(false);
     }
   });
 }
 
-/* ── DISMISS DOORS ───────────────────────────────── */
+/* ── PLAY EXACT TRIGGER ──────────────────────────── */
+function playExactTrigger(trigger, typingBody) {
+  /* Full beat sequence — mixed BEN OS / MEMEBOT beats */
+  if (trigger.full_beats?.length) {
+    if (typingBody) { typingBody.classList.remove('typing'); typingBody.remove(); }
+    playFullBeatSequence(trigger.full_beats, 0, () => {
+      renderChips(trigger.chips); setWaiting(false);
+    });
+    return;
+  }
+
+  const fireBenosResponse = () => {
+    if (trigger.benos_beats?.length) {
+      renderBeats(trigger.benos_beats, 'BEN OS', () => { renderChips(trigger.chips); setWaiting(false); });
+    } else {
+      renderChips(trigger.chips); setWaiting(false);
+    }
+  };
+  if (trigger.memebot_image) {
+    typingBody.classList.remove('typing'); typingBody.remove();
+    const mbBody = appendLabelOnly('memebot', 'MEMEBOT');
+    renderMemebotImage(trigger.memebot_image, mbBody, fireBenosResponse);
+  } else {
+    typingBody.classList.remove('typing'); typingBody.textContent = '';
+    setTimeout(fireBenosResponse, 100);
+  }
+}
+
+/* Plays a mixed-speaker beat sequence one beat at a time */
+function playFullBeatSequence(beats, i, onComplete) {
+  if (i >= beats.length) { if (onComplete) onComplete(); return; }
+  const beat = beats[i];
+  const next = () => {
+    if (beat.pause) setTimeout(() => playFullBeatSequence(beats, i+1, onComplete), beat.pause);
+    else playFullBeatSequence(beats, i+1, onComplete);
+  };
+
+  if (beat.type === 'image') {
+    const mbBody = appendLabelOnly('memebot', 'MEMEBOT');
+    renderMemebotImage(beat.src, mbBody, next);
+  } else {
+    const role = beat.speaker === 'MEMEBOT' ? 'memebot' : 'sys';
+    const fast = beat.speaker !== 'MEMEBOT';
+    const { body } = appendMsg(role, '', beat.speaker, { typing: true });
+    typewriter(body, beat.text, next, fast);
+  }
+}
+
+/* ── DOORS ───────────────────────────────────────── */
 function dismissDoors() {
   clearTimeout(introTimer);
   idleDoorsEl.querySelectorAll('.door').forEach(btn => btn.classList.add('dismissing'));
   setTimeout(() => { idleDoorsEl.innerHTML = ''; doorsBuilt = false; }, 320);
 }
 function dismissDoorsSilent() {
-  idleDoorsEl.style.transition = 'opacity 0.3s ease';
-  idleDoorsEl.style.opacity = '0';
-  setTimeout(() => {
-    idleDoorsEl.innerHTML = '';
-    idleDoorsEl.style.opacity = '';
-    idleDoorsEl.style.transition = '';
-    doorsBuilt = false;
-  }, 300);
+  idleDoorsEl.style.transition = 'opacity 0.3s ease'; idleDoorsEl.style.opacity = '0';
+  setTimeout(() => { idleDoorsEl.innerHTML = ''; idleDoorsEl.style.opacity = ''; idleDoorsEl.style.transition = ''; doorsBuilt = false; }, 300);
 }
-
-/* ── BUILD DOORS ─────────────────────────────────── */
 function buildDoors() {
   if (doorsBuilt || conversationHistory.length > 0) return;
-  doorsBuilt = true;
-  idleDoorsEl.innerHTML = '';
+  doorsBuilt = true; idleDoorsEl.innerHTML = '';
   ALL_DOORS.forEach((text, i) => {
     const btn = document.createElement('button');
-    btn.className = 'door';
-    btn.textContent = text;
-    const baseDelay = i * 0.12;
-    btn.style.animationDelay = `${baseDelay}s`;
-    btn.addEventListener('click', () => {
-      const txt = btn.textContent;
-      dismissDoors();
-      setTimeout(() => sendMessage(txt), 150);
-    });
+    btn.className = 'door'; btn.textContent = text;
+    btn.style.animationDelay = `${i * 0.12}s`;
+    btn.addEventListener('click', () => { const txt = btn.textContent; dismissDoors(); setTimeout(() => sendMessage(txt), 150); });
     idleDoorsEl.appendChild(btn);
   });
   const introDelay = (MEM.get()?.count > 1) ? 10000 : 18000;
-  introTimer = setTimeout(() => {
-    if (conversationHistory.length === 0 && !introPlayed) playIntro();
-  }, introDelay);
+  introTimer = setTimeout(() => { if (conversationHistory.length === 0 && !introPlayed) playIntro(); }, introDelay);
 }
+function dimDoors() { idleDoorsEl.querySelectorAll('.door').forEach(btn => { btn.style.transition = 'opacity 0.6s ease'; btn.style.opacity = '0.35'; }); }
+function restoreDoors() { idleDoorsEl.querySelectorAll('.door').forEach(btn => { btn.style.transition = 'opacity 0.6s ease'; btn.style.opacity = ''; }); }
 
 /* ── PLAY INTRO ──────────────────────────────────── */
 function playIntro() {
   if (introPlayed) return;
   introPlayed = true;
+  setWaiting(true);
   const mem = MEM.get();
   const isReturn = mem && mem.count > 1;
   const inputWrap = document.querySelector('.input-wrap');
@@ -1880,20 +1718,28 @@ function playIntro() {
     inputWrap.classList.remove('awakening');
     dimDoors();
     const beats = isReturn
-      ? [{ text: 'BEN OS — back online.', pause: 700 }, { text: returnGreeting(mem), pause: 0 }]
+      ? [{ text: 'BEN OS — back online.', pause: 700, display: 'default' }, { text: returnGreeting(mem), pause: 0, display: 'default' }]
       : FIRST_INTRO;
-    renderBeats(beats, 'BEN OS', () => restoreDoors());
+    renderBeats(beats, 'BEN OS', () => { restoreDoors(); setWaiting(false); });
   }, 1200);
 }
-function dimDoors() {
-  idleDoorsEl.querySelectorAll('.door').forEach(btn => {
-    btn.style.transition = 'opacity 0.6s ease'; btn.style.opacity = '0.35';
-  });
-}
-function restoreDoors() {
-  idleDoorsEl.querySelectorAll('.door').forEach(btn => {
-    btn.style.transition = 'opacity 0.6s ease'; btn.style.opacity = '';
-  });
+
+/* ── CLAUDE API FALLBACK ─────────────────────────── */
+const SYS = `You are BEN OS — an AI on Ben Olivas's creative consulting and portfolio site.
+Voice: dry, competent, occasionally funny, slightly ahead of the visitor.
+Ben: creative producer and graphic designer, Los Angeles. Currently at Blue Note Los Angeles. Open to freelance: benolivas@gmail.com.
+Personal projects: Misfortune Cookies (misfortunes.net), Man Ray chess set, Whisper MK-I acoustic device.
+Rules: under 3 sentences. Never start with "I", "Sure", "Great question". Never mention being an AI unless asked.`;
+
+async function callClaude(messages) {
+  try {
+    const res = await fetch('./proxy.php', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, system: SYS })
+    });
+    const d = await res.json();
+    return d.content || "Something went wrong. Try benolivas@gmail.com directly.";
+  } catch(e) { return "Can't reach the API. Direct line: benolivas@gmail.com."; }
 }
 
 /* ── SEND MESSAGE ────────────────────────────────── */
@@ -1902,56 +1748,73 @@ async function sendMessage(text) {
   setWaiting(true);
 
   const input = text.trim();
-  lastUserInput = input; // track for [ECHO]
+  lastUserInput = input;
   userInput.value = '';
   autoResize();
   if (doorsBuilt) dismissDoors();
-  dismissAllChips(); // dismiss any active chips when user types freely
+  dismissAllChips();
   clearTimeout(introTimer);
 
   appendMsg('user', input, 'You', { isAction: input.startsWith('*') && input.endsWith('*') });
   conversationHistory.push({ role: 'user', content: input });
   statusLabel.textContent = '';
 
-  // Pre-filter
+  /* 1. Pre-filter */
   const filtered = preFilter(input);
   if (filtered) {
     const { body } = appendMsg('sys', '', 'BEN OS', { typing: true });
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 160));
     typewriter(body, filtered, () => setWaiting(false));
     return;
   }
 
-  const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
-  await new Promise(r => setTimeout(r, 280 + Math.random()*180));
-
-  // Exact trigger check — before normalization, before everything
+  /* 2. Exact trigger — easter eggs, pre-normalization */
   const exactTrigger = matchExact(input);
   if (exactTrigger) {
-    playExactTrigger(exactTrigger, typingBody);
-    conversationHistory.push({ role: 'assistant', content: exactTrigger.benos_beats?.[0]?.text || '...' });
+    await new Promise(r => setTimeout(r, 180+Math.random()*120));
+    if (exactTrigger.full_beats?.length) {
+      /* full_beats builds its own rows — no typing bubble needed */
+      playExactTrigger(exactTrigger, null);
+    } else {
+      const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
+      playExactTrigger(exactTrigger, typingBody);
+    }
+    conversationHistory.push({ role: 'assistant', content: exactTrigger.full_beats?.[0]?.text || exactTrigger.benos_beats?.[0]?.text || '...' });
     return;
   }
 
-  // Vignette check first
+  /* 3. Misfortune pool — exact phrase lookup */
+  if (matchMisfortune(input)) {
+    const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
+    await new Promise(r => setTimeout(r, 180+Math.random()*120));
+    typingBody.classList.remove('typing'); typingBody.textContent = '';
+    const fortuneIntent = INTENTS.find(i => i.id === 'misfortunes');
+    if (fortuneIntent) playIntent(fortuneIntent, typingBody);
+    return;
+  }
+
+  /* 4. Vignette */
   const vignette = matchVignette(input);
   if (vignette) {
+    const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
+    await new Promise(r => setTimeout(r, 180+Math.random()*120));
     playVignette(vignette, typingBody);
     conversationHistory.push({ role: 'assistant', content: vignette.benos_setup || vignette.benos_reaction || '' });
     return;
   }
 
-  // Intent match
+  /* 5. Intent match */
+  const { body: typingBody } = appendMsg('sys', '', 'BEN OS', { typing: true });
+  await new Promise(r => setTimeout(r, 220+Math.random()*160));
+
   const intent = matchIntent(input);
 
   if (intent) {
-    // Special handlers
     if (intent.special === 'surprise') {
       playSurprise(typingBody);
       conversationHistory.push({ role: 'assistant', content: '...' });
       return;
     }
-
     if (intent.special === 'dark_mode') {
       const lower = normalize(input);
       const turningOn = lower.includes('dark') || lower.includes('3am') || lower.includes('off');
@@ -1964,13 +1827,10 @@ async function sendMessage(text) {
       conversationHistory.push({ role: 'assistant', content: response });
       return;
     }
-
-    // Normal intent
     if (intent.topic) sessionTopics.push(intent.topic);
-    playIntent(intent);
-
+    playIntent(intent, typingBody);
   } else {
-    // Claude API fallback — only works if proxy.php is present
+    /* 6. Claude API fallback */
     statusLabel.textContent = '...';
     const response = await callClaude(conversationHistory.slice(-10));
     conversationHistory.push({ role: 'assistant', content: response });
@@ -1984,911 +1844,16 @@ function autoResize() {
   userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
 }
 userInput.addEventListener('input', () => {
+  if (isWaiting) { userInput.value = ''; return; }
   autoResize();
   if (doorsBuilt) dismissDoorsSilent();
   clearTimeout(introTimer);
 });
 userInput.addEventListener('keydown', e => {
+  if (isWaiting) { e.preventDefault(); return; }
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(userInput.value); }
 });
-sendBtn.addEventListener('click', () => sendMessage(userInput.value));
-
-/* ── AUTOCOMPLETE ────────────────────────────────── */
-const AC_SUGGESTIONS = [
-
-  // ── A ──
-  "about ben",
-  "about this site",
-  "ad performance",
-  "am i lucky?",
-  "anyone there?",
-  "are you a bot?",
-  "Are you a bot?",
-  "are you ai?",
-  "are you an AI?",
-  "Are you an AI?",
-  "are you available?",
-  "Are you available?",
-  "are you ben?",
-  "Are you Ben?",
-  "are you even real?",
-  "are you real?",
-  "Are you real?",
-  "Are you there?",
-  "are you there?",
-  "available for hire?",
-  "Available for hire?",
-
-  // ── B ──
-  "bad fortune",
-  "Bad fortune.",
-  "bad luck",
-  "Bad luck.",
-  "bad news",
-  "Bad news.",
-  "be honest",
-  "Blue Note",
-  "Blue Note LA",
-  "blue note los angeles",
-  "brand colors",
-  "Brand colors.",
-  "break character",
-  "build trust",
-  "Build trust.",
-  "bye",
-  "Bye.",
-
-  // ── C ──
-  "can i see examples?",
-  "Can I see examples?",
-  "can i see your portfolio?",
-  "can u help me",
-  "can you design a logo?",
-  "Can you design a logo?",
-  "can you do motion graphics?",
-  "Can you do motion graphics?",
-  "can you edit something?",
-  "Can you edit something?",
-  "can you help me?",
-  "Can you help me?",
-  "can you help with branding?",
-  "Can you help with branding?",
-  "can you make a video?",
-  "Can you make a video?",
-  "can you make ads?",
-  "Can you make ads?",
-  "can you make something for me?",
-  "Can you make something for me?",
-  "can you predict the future?",
-  "Can you predict the future?",
-  "can you read my future?",
-  "Can you read my future?",
-  "can you see my future?",
-  "Can you see my future?",
-  "can you tell my future?",
-  "Can you tell my future?",
-  "can you work remote?",
-  "chess",
-  "Chess.",
-  "chess set",
-  "color psychology",
-  "Color psychology.",
-  "commercial video",
-  "Commercial video.",
-  "contact info",
-  "Contact info.",
-  "conversion rate",
-  "Conversion rate.",
-  "corporate video",
-  "Corporate video.",
-  "create something",
-  "Create something.",
-  "crystal ball",
-  "Crystal ball.",
-  "curse me",
-  "Curse me.",
-  "cursed fortune",
-  "Cursed fortune.",
-  "CV",
-
-  // ── D ──
-  "dark fortune",
-  "Dark fortune.",
-  "dark mode",
-  "Dark mode.",
-  "dark theme",
-  "Dark theme.",
-  "design work",
-  "Design work.",
-  "destiny",
-  "Destiny.",
-  "did you make this?",
-  "directional sound",
-  "do something",
-  "Do something.",
-  "do something interesting",
-  "Do something interesting.",
-  "do you do branding?",
-  "Do you do branding?",
-  "do you do motion graphics?",
-  "Do you do motion graphics?",
-  "do you do video?",
-  "Do you do video?",
-  "do you do websites?",
-  "Do you do websites?",
-  "do you like art?",
-  "Do you like art?",
-  "do you like music?",
-  "Do you like music?",
-  "does this work?",
-  "Does this work?",
-  "download",
-  "Download.",
-
-  // ── E ──
-  "email",
-  "Email.",
-  "engagement",
-  "Engagement.",
-  "examples",
-  "Examples.",
-  "examples of your work",
-  "Examples of your work.",
-  "explain",
-  "Explain.",
-  "explain more",
-  "Explain more.",
-  "explain that",
-  "Explain that.",
-
-  // ── F ──
-  "fate",
-  "Fate.",
-  "fate please",
-  "Fate please.",
-  "favorite color?",
-  "Favorite color?",
-  "favorite movie?",
-  "Favorite movie?",
-  "find me a designer",
-  "fortune",
-  "Fortune.",
-  "fortune cookie",
-  "Fortune cookie.",
-  "fortune cookies",
-  "Fortune cookies.",
-  "fortune favors the bold",
-  "Fortune favors the bold.",
-  "fortune me",
-  "Fortune me.",
-  "fortune please",
-  "Fortune please.",
-  "freelance",
-  "Freelance.",
-  "future",
-  "Future.",
-  "future please",
-  "Future please.",
-
-  // ── G ──
-  "generate something",
-  "Generate something.",
-  "get in touch",
-  "Get in touch.",
-  "get more sales",
-  "Get more sales.",
-  "give me a fortune",
-  "Give me a fortune.",
-  "give me a misfortune",
-  "Give me a misfortune.",
-  "give me a reading",
-  "Give me a reading.",
-  "give me bad luck",
-  "Give me bad luck.",
-  "give me bad news",
-  "Give me bad news.",
-  "give me something bad",
-  "Give me something bad.",
-  "give me something cryptic",
-  "Give me something cryptic.",
-  "give me something ominous",
-  "Give me something ominous.",
-  "give me something weird",
-  "Give me something weird.",
-  "good afternoon",
-  "Good afternoon.",
-  "good evening",
-  "Good evening.",
-  "good morning",
-  "Good morning.",
-  "graphic design",
-  "Graphic design.",
-
-  // ── H ──
-  "have you ever",
-  "Have you ever",
-  "help",
-  "Help.",
-  "help me",
-  "Help me.",
-  "hello",
-  "Hello",
-  "Hello?",
-  "hello?",
-  "hey",
-  "Hey",
-  "hey there",
-  "Hey there.",
-  "hi",
-  "Hi",
-  "hire ben",
-  "Hire Ben.",
-  "how are you?",
-  "How are you?",
-  "how can you help me?",
-  "How can you help me?",
-  "how do i contact ben?",
-  "How do I contact Ben?",
-  "how do i hire you?",
-  "How do I hire you?",
-  "how do i work with you?",
-  "How do I work with you?",
-  "how does this work?",
-  "How does this work?",
-  "how is this built?",
-  "How is this built?",
-  "how much do you charge?",
-  "How much do you charge?",
-  "how so?",
-  "How so?",
-  "how's it going?",
-  "How's it going?",
-
-  // ── I ──
-  "i can't decide",
-  "i don't know where to start",
-  "I don't know where to start.",
-  "i have a bad feeling about this",
-  "I have a bad feeling about this.",
-  "i have a lot to say",
-  "i need a designer",
-  "I need a designer.",
-  "i need a logo",
-  "I need a logo.",
-  "i need a poster",
-  "I need a poster.",
-  "i need a video",
-  "I need a video.",
-  "i need help",
-  "I need help.",
-  "i need something made",
-  "I need something made.",
-  "i want to see your work",
-  "I want to see your work.",
-  "idk",
-  "idk what to ask",
-  "idk where to start",
-  "impress me",
-  "Impress me.",
-  "is ben available?",
-  "Is Ben available?",
-  "is ben real?",
-  "Is Ben real?",
-  "is this a bot?",
-  "Is this a bot?",
-  "is this ai?",
-  "Is this AI?",
-  "is this automated?",
-  "Is this automated?",
-  "is this live chat?",
-  "Is this live chat?",
-  "is this real?",
-  "Is this real?",
-  "is this scripted?",
-  "Is this scripted?",
-  "it's 3am",
-  "It's 3am.",
-
-  // ── J ──
-  "jazz",
-  "Jazz.",
-  "jazz club",
-  "Jazz club.",
-  "just show me something",
-  "Just show me something.",
-  "just tell me something",
-  "Just tell me something.",
-
-  // ── L ──
-  "life advice",
-  "Life advice.",
-  "life path",
-  "Life path.",
-  "light mode",
-  "Light mode.",
-  "logo design",
-  "Logo design.",
-  "look up",
-  "looking for a designer",
-  "Looking for a designer.",
-  "looking for a video editor",
-  "Looking for a video editor.",
-
-  // ── M ──
-  "make a poster",
-  "Make a poster.",
-  "make me something",
-  "Make me something.",
-  "make me laugh",
-  "Make me laugh.",
-  "man ray",
-  "Man Ray.",
-  "marketing",
-  "Marketing.",
-  "misfortune",
-  "Misfortune.",
-  "misfortune cookie",
-  "Misfortune cookie.",
-  "misfortune cookies",
-  "Misfortune cookies.",
-  "misfortunes",
-  "Misfortunes.",
-  "more about",
-  "More about",
-  "more about ben",
-  "More about Ben.",
-  "motion graphics",
-  "Motion graphics.",
-  "my destiny",
-  "My destiny.",
-  "my fate",
-  "My fate.",
-  "my future",
-  "My future.",
-  "my path",
-  "My path.",
-
-  // ── N ──
-  "need a logo",
-  "Need a logo.",
-  "need a video editor",
-  "Need a video editor.",
-  "need branding",
-  "Need branding.",
-  "need design",
-  "Need design.",
-
-  // ── O ──
-  "okay",
-  "Okay.",
-  "open to work",
-  "Open to work.",
-  "oracle",
-  "Oracle.",
-  "oracle me",
-  "Oracle me.",
-  "overwhelmed",
-  "Overwhelmed.",
-
-  // ── P ──
-  "past work",
-  "Past work.",
-  "PDF",
-  "PDF.",
-  "ping",
-  "portfolio",
-  "Portfolio.",
-  "portfolio pdf",
-  "Portfolio PDF.",
-  "predict",
-  "Predict.",
-  "predict my future",
-  "Predict my future.",
-  "Predict my future?",
-  "prediction",
-  "Prediction.",
-  "pricing",
-  "Pricing.",
-  "prophecy",
-  "Prophecy.",
-  "prove you're not an AI",
-  "Prove you're not an AI.",
-
-  // ── R ──
-  "rates",
-  "Rates.",
-  "read my destiny",
-  "Read my destiny.",
-  "read my fate",
-  "Read my fate.",
-  "read my fortune",
-  "Read my fortune.",
-  "read my future",
-  "Read my future.",
-  "reach out",
-  "Reach out.",
-  "rebrand",
-  "Rebrand.",
-  "rebranding",
-  "Rebranding.",
-  "recent work",
-  "Recent work.",
-  "resume",
-  "Resume.",
-
-  // ── S ──
-  "say something",
-  "Say something.",
-  "say something cryptic",
-  "Say something cryptic.",
-  "say something funny",
-  "Say something funny.",
-  "say something ominous",
-  "Say something ominous.",
-  "say something unscripted",
-  "Say something unscripted.",
-  "see your work",
-  "See your work.",
-  "show me a project",
-  "Show me a project.",
-  "show me design",
-  "Show me design.",
-  "show me examples",
-  "Show me examples.",
-  "show me something",
-  "Show me something.",
-  "show me something cool",
-  "Show me something cool.",
-  "show me something interesting",
-  "Show me something interesting.",
-  "show me something weird",
-  "Show me something weird.",
-  "show me video work",
-  "Show me video work.",
-  "show me your best work",
-  "Show me your best work.",
-  "show me your work",
-  "Show me your work.",
-  "short film",
-  "Short film.",
-  "social proof",
-  "Social proof.",
-  "something about ben",
-  "Something about Ben.",
-  "something cryptic",
-  "Something cryptic.",
-  "something random",
-  "Something random.",
-  "something weird",
-  "Something weird.",
-  "sounds good",
-  "Sounds good.",
-  "stop pretending",
-  "Stop pretending.",
-  "stop",
-  "Stop.",
-  "surprise me",
-  "Surprise me.",
-
-  // ── T ──
-  "taking projects?",
-  "Taking projects?",
-  "tarot",
-  "Tarot.",
-  "tarot me",
-  "Tarot me.",
-  "tarot reading",
-  "Tarot reading.",
-  "tell me a joke",
-  "Tell me a joke.",
-  "tell me a misfortune",
-  "Tell me a misfortune.",
-  "tell me a story",
-  "Tell me a story.",
-  "tell me about a project",
-  "Tell me about a project.",
-  "tell me about ben",
-  "Tell me about Ben.",
-  "tell me about blue note",
-  "Tell me about Blue Note.",
-  "tell me about man ray",
-  "Tell me about Man Ray.",
-  "tell me about misfortune cookies",
-  "Tell me about Misfortune Cookies.",
-  "tell me about the chess set",
-  "Tell me about the chess set.",
-  "tell me about the weapon",
-  "Tell me about the weapon.",
-  "tell me my destiny",
-  "Tell me my destiny.",
-  "tell me my fate",
-  "Tell me my fate.",
-  "tell me my fortune",
-  "Tell me my fortune.",
-  "tell me my future",
-  "Tell me my future.",
-  "Tell me my future?",
-  "tell me something",
-  "Tell me something.",
-  "tell me something bad",
-  "Tell me something bad.",
-  "tell me something cryptic",
-  "Tell me something cryptic.",
-  "tell me something dark",
-  "Tell me something dark.",
-  "tell me something I don't want to hear",
-  "Tell me something I don't want to hear.",
-  "tell me something ominous",
-  "Tell me something ominous.",
-  "testimonials",
-  "Testimonials.",
-  "test",
-  "Test.",
-  "testing",
-  "Testing.",
-  "thanks",
-  "Thanks.",
-  "thank you",
-  "Thank you.",
-  "the chess set",
-  "The chess set.",
-  "the document",
-  "The document.",
-  "the weapon",
-  "The weapon.",
-  "turn off lights",
-  "Turn off lights.",
-  "turn on lights",
-  "Turn on lights.",
-
-  // ── U ──
-  "unclassified",
-  "Unclassified.",
-  "unlucky",
-  "Unlucky.",
-
-  // ── V ──
-  "video production",
-  "Video production.",
-  "visual identity",
-  "Visual identity.",
-
-  // ── W ──
-  "wat can u do",
-  "wat is this",
-  "what are you?",
-  "What are you?",
-  "what are your capabilities?",
-  "What are your capabilities?",
-  "what brands have you worked with?",
-  "What brands have you worked with?",
-  "what can u do",
-  "what can you do?",
-  "What can you do?",
-  "what can you make?",
-  "What can you make?",
-  "what clients have you worked with?",
-  "What clients have you worked with?",
-  "what do the cookies say?",
-  "What do the cookies say?",
-  "what do you design?",
-  "What do you design?",
-  "what do you do?",
-  "What do you do?",
-  "what do you help with?",
-  "What do you help with?",
-  "what do you like?",
-  "What do you like?",
-  "what do you see?",
-  "What do you see?",
-  "what do you think about",
-  "What do you think about",
-  "what does the future hold?",
-  "What does the future hold?",
-  "what have you made?",
-  "What have you made?",
-  "what inspires you?",
-  "What inspires you?",
-  "what is aerovironment?",
-  "What is AeroVironment?",
-  "what is ben os?",
-  "What is BEN OS?",
-  "what is blue note?",
-  "What is Blue Note?",
-  "what is happening?",
-  "What is happening?",
-  "what is this?",
-  "What is this?",
-  "what is this site?",
-  "What is this site?",
-  "what kind of work do you do?",
-  "What kind of work do you do?",
-  "what makes you different?",
-  "What makes you different?",
-  "what music do you like?",
-  "What music do you like?",
-  "what should i do?",
-  "What should I do?",
-  "what should i do next?",
-  "What should I do next?",
-  "what should i do with my life?",
-  "What should I do with my life?",
-  "what tools do you use?",
-  "What tools do you use?",
-  "what will happen to me?",
-  "What will happen to me?",
-  "what's aerovironment?",
-  "What's AeroVironment?",
-  "what's blue note?",
-  "What's Blue Note?",
-  "what's going to happen?",
-  "What's going to happen?",
-  "what's in the cookies?",
-  "What's in the cookies?",
-  "what's my destiny?",
-  "What's my destiny?",
-  "what's my fate?",
-  "What's my fate?",
-  "what's my future?",
-  "What's my future?",
-  "what's my path?",
-  "What's my path?",
-  "what's next for me?",
-  "What's next for me?",
-  "what's the worst that could happen?",
-  "What's the worst that could happen?",
-  "what's your background?",
-  "What's your background?",
-  "what's your process?",
-  "What's your process?",
-  "what's your style?",
-  "What's your style?",
-  "where are you based?",
-  "Where are you based?",
-  "where are you located?",
-  "Where are you located?",
-  "who are you?",
-  "Who are you?",
-  "who built this?",
-  "Who built this?",
-  "who is ben?",
-  "Who is Ben?",
-  "who is ben olivas?",
-  "Who is Ben Olivas?",
-  "who is man ray?",
-  "Who is Man Ray?",
-  "who made this?",
-  "Who made this?",
-  "who runs this?",
-  "Who runs this?",
-  "why do rebrands fail?",
-  "Why do rebrands fail?",
-  "why should i hire you?",
-  "Why should I hire you?",
-  "write a poem",
-  "Write a poem.",
-  "write something",
-  "Write something.",
-
-  // ── Y ──
-  "yo",
-  "you good?",
-  "You good?",
-  "you there?",
-  "You there?",
-
-  // ── VAGUE / EASTER EGG ENTRIES ──
-  // These hint at real things on the site without naming them directly.
-  // Chess set → Man Ray → Dada
-  "autonomous systems",
-  "Autonomous systems.",
-  "chess pieces",
-  "Chess pieces.",
-  "dadaism",
-  "Dadaism.",
-  "dada art",
-  "defense contractor",
-  "Defense contractor.",
-  "directional audio",
-  "Directional audio.",
-  "drone",
-  "Drone.",
-  "film studies",
-  "Film studies.",
-  "found objects",
-  "Found objects.",
-  "geometry",
-  "Geometry.",
-  "handmade objects",
-  "Handmade objects.",
-  "jazz design",
-  "Jazz design.",
-  "jazz poster",
-  "Jazz poster.",
-  "long range audio",
-  "Long range audio.",
-  "los angeles creative",
-  "Los Angeles creative.",
-  "lrad",
-  "LRAD.",
-  "military design",
-  "Military design.",
-  "modernist typography",
-  "Modernist typography.",
-  "packaging design",
-  "Packaging design.",
-  "photography",
-  "Photography.",
-  "print design",
-  "Print design.",
-  "santa cruz",
-  "Santa Cruz.",
-  "silent film",
-  "Silent film.",
-  "sound design",
-  "Sound design.",
-  "sound weapon",
-  "Sound weapon.",
-  "swiss design",
-  "Swiss design.",
-  "type design",
-  "Type design.",
-  "typography",
-  "Typography.",
-  "uc santa cruz",
-  "UC Santa Cruz.",
-  "warhead",
-  "Warhead.",
-
-  // ── CASUAL / LOWERCASE OPENERS ──
-  "anything interesting?",
-  "convince me",
-  "go ahead",
-  "go on",
-  "go",
-  "hmm",
-  "i have a question",
-  "i'm curious",
-  "i'm just looking around",
-  "i'm looking for",
-  "i'm not sure where to start",
-  "i'm overwhelmed",
-  "just browsing",
-  "just looking",
-  "just wondering",
-  "let's see",
-  "lol",
-  "maybe",
-  "no",
-  "not sure",
-  "ok",
-  "okay",
-  "ok…",
-  "show me",
-  "start",
-  "sure",
-  "tell me",
-  "u there?",
-  "uh",
-  "uh oh",
-  "uhh",
-  "um",
-  "wait",
-  "wait what",
-  "weird",
-  "well",
-  "well?",
-  "what",
-  "what?",
-  "what??",
-  "whoa",
-  "wow",
-  "yes",
-  "yes?",
-  "yep",
-  "yup",
-
-];
-
-// Deduplicate while preserving insertion order
-const AC_LIST = [...new Set(AC_SUGGESTIONS)];
-
-// Fisher-Yates shuffle — randomizes suggestions each page load
-// so the same first-letter doesn't always show the same 5 results
-(function shuffleAC() {
-  for (let i = AC_LIST.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [AC_LIST[i], AC_LIST[j]] = [AC_LIST[j], AC_LIST[i]];
-  }
-})();
-
-let acIndex = -1;
-
-const acDropdown = document.createElement('div');
-acDropdown.id = 'ac-dropdown';
-acDropdown.setAttribute('aria-live', 'polite');
-const idleDoorsInsert = document.getElementById('idle-doors');
-  idleDoorsInsert.parentNode.insertBefore(acDropdown, idleDoorsInsert);
-
-function acShow(items) {
-  acDropdown.innerHTML = '';
-  acIndex = -1;
-  if (!items.length) { acDropdown.classList.remove('ac-open'); return; }
-  const typed = userInput.value;
-  items.forEach((item, i) => {
-    const el = document.createElement('div');
-    el.className = 'ac-item';
-    el.setAttribute('role', 'option');
-    // Bold the typed prefix, normal weight for the rest
-    const matchLen = typed.length;
-    const boldPart = item.slice(0, matchLen);
-    const restPart = item.slice(matchLen);
-    el.innerHTML = `<span class="ac-typed">${boldPart}</span><span class="ac-rest">${restPart}</span>`;
-    el.addEventListener('mousedown', e => {
-      e.preventDefault(); // don't blur the input
-      userInput.value = item;
-      acClose();
-      userInput.focus();
-    });
-    acDropdown.appendChild(el);
-  });
-  acDropdown.classList.add('ac-open');
-}
-
-function acClose() {
-  acDropdown.classList.remove('ac-open');
-  acDropdown.innerHTML = '';
-  acIndex = -1;
-}
-
-function acUpdate() {
-  const val = userInput.value;
-  if (!val || val.length < 1) { acClose(); return; }
-  const lower = val.toLowerCase();
-  const matches = AC_LIST
-    .filter(s => s.toLowerCase().startsWith(lower) && s.toLowerCase() !== lower)
-    .slice(0, 5);
-  if (!matches.length) { acClose(); return; }
-  acShow(matches);
-}
-
-function acNavigate(dir) {
-  const items = acDropdown.querySelectorAll('.ac-item');
-  if (!items.length) return false;
-  items[acIndex]?.classList.remove('ac-active');
-  acIndex = Math.max(-1, Math.min(items.length - 1, acIndex + dir));
-  if (acIndex >= 0) {
-    items[acIndex].classList.add('ac-active');
-    userInput.value = items[acIndex].textContent; // fill input for context
-  }
-  return acIndex >= 0;
-}
-
-// Attach to existing input listener by extending it
-const _origInputListener = userInput.oninput;
-userInput.addEventListener('input', acUpdate);
-
-userInput.addEventListener('keydown', e => {
-  if (!acDropdown.classList.contains('ac-open')) return;
-  if (e.key === 'ArrowDown') { e.preventDefault(); acNavigate(1); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); acNavigate(-1); }
-  else if (e.key === 'Tab') { e.preventDefault(); acNavigate(1); }
-  else if (e.key === 'Escape') { acClose(); }
-  else if (e.key === 'Enter' && acIndex >= 0) {
-    e.preventDefault();
-    const selected = acDropdown.querySelectorAll('.ac-item')[acIndex]?.textContent;
-    if (selected) {
-      userInput.value = selected;
-      acClose();
-      sendMessage(selected);
-    }
-  }
-}, true); // capture phase so it runs before the send-on-enter listener
-
-userInput.addEventListener('blur', () => {
-  // Small delay so mousedown on an item fires first
-  setTimeout(acClose, 120);
-});
+sendBtn.addEventListener('click', () => { if (!isWaiting) sendMessage(userInput.value); });
 
 /* ── SAVE TOPICS ON UNLOAD ───────────────────────── */
 window.addEventListener('beforeunload', () => {
@@ -2909,7 +1874,7 @@ function init() {
   setupContactPopup();
   userInput.focus();
 
-  // Sticky input detection
+  /* Sticky input detection */
   const sentinel = document.createElement('div');
   sentinel.style.cssText = 'height:1px;margin-bottom:-1px;pointer-events:none;';
   document.getElementById('input-area').before(sentinel);

@@ -502,6 +502,8 @@ body.dark #input-area.is-sticky .input-wrap {
 
 #input-area.is-waiting #user-input {
   cursor: default;
+  pointer-events: none;
+  user-select: none;
 }
 
 #input-area.is-waiting .input-prompt {
